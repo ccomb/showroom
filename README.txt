@@ -1,0 +1,33 @@
+The goal is to create a management application for aws demos. The application is
+a minimalistic repoze.bfg application.
+
+
+Basic usage:
+
+- we launch the aws.demos buildout (python bootstrap.py && ./bin/buildout)
+- we can edit the config file "demos.cfg" and add or modify preconfigured demos.
+  See below to know what the options of a demo are.
+- we launch the application (bin/paster serve deploy.ini)
+- we can access a web page with the list of preconfigured demos (created
+  dynamically from the config file)
+- In the list, each demo item contains :
+    - a link to the demo
+    - a status indicator (green = online and running, red: offline or broken)
+- if we click on a demo link, we can access the demo
+
+Admin usage:
+
+- We can click on an admin link.
+- We are asked for the admin password
+- the home page now contains additional things:
+    - a "new" button to create a new demo
+    - a "clone" button to clone a preconfigured demo
+- We click on the "new" button.
+- We get a new page with a form, with the following fields
+    - demo name
+    - url of the repository
+    - others fields? (for Plone demos, we need to be able to add a list of
+      products in the instance)
+    - (the user/password of the new instance?)
+
+
