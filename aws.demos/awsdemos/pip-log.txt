@@ -1,0 +1,376 @@
+Downloading/unpacking zope
+  Getting page http://pypi.python.org/simple/zope
+  URLs to search for versions for zope:
+  * http://pypi.python.org/simple/zope/
+  Analyzing links from page http://pypi.python.org/simple/zope/
+  Could not find any downloads that satisfy the requirement zope
+No distributions at all found for zope
+Exception information:
+Traceback (most recent call last):
+  File "/home/gaby/demos_alterway/virtualenv/lib/python2.6/site-packages/pip-0.6.3-py2.6.egg/pip/basecommand.py", line 115, in main
+    self.run(options, args)
+  File "/home/gaby/demos_alterway/virtualenv/lib/python2.6/site-packages/pip-0.6.3-py2.6.egg/pip/commands/install.py", line 155, in run
+    requirement_set.install_files(finder, force_root_egg_info=self.bundle, bundle=self.bundle)
+  File "/home/gaby/demos_alterway/virtualenv/lib/python2.6/site-packages/pip-0.6.3-py2.6.egg/pip/req.py", line 823, in install_files
+    url = finder.find_requirement(req_to_install, upgrade=self.upgrade)
+  File "/home/gaby/demos_alterway/virtualenv/lib/python2.6/site-packages/pip-0.6.3-py2.6.egg/pip/index.py", line 117, in find_requirement
+    raise DistributionNotFound('No distributions at all found for %s' % req)
+DistributionNotFound: No distributions at all found for zope
+------------------------------------------------------------
+/home/gaby/demos_alterway/virtualenv/bin/pip run on Mon Feb  8 20:14:09 2010
+Downloading/unpacking zope3
+  Getting page http://pypi.python.org/simple/zope3
+  Could not fetch URL http://pypi.python.org/simple/zope3: HTTP Error 404: Not Found
+  Will skip URL http://pypi.python.org/simple/zope3 when looking for download links for zope3
+  Getting page http://pypi.python.org/simple/
+  Real name of requirement zope3 is Zope2
+  URLs to search for versions for zope3:
+  * http://pypi.python.org/simple/Zope2/
+  Getting page http://pypi.python.org/simple/Zope2/
+  Getting page http://www.zope.org
+  Analyzing links from page http://pypi.python.org/simple/Zope2/
+    Skipping link http://pypi.python.org/packages/2.6/Z/Zope2/Zope2-2.12.0b2-py2.6-win32.egg#md5=b91b60cc99288ae7ef9d5f79cd8ecab8 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/source/Z/Zope2/Zope2-2.12.0.a1.tar.gz#md5=605743c616c3f36621bc01f9f8f049be (from http://pypi.python.org/simple/Zope2/); wrong project name (not zope3)
+    Skipping link http://pypi.python.org/packages/source/Z/Zope2/Zope2-2.12.0a2.zip#md5=a30b244b87007556909c1c9d1ee81885 (from http://pypi.python.org/simple/Zope2/); wrong project name (not zope3)
+    Skipping link http://pypi.python.org/packages/source/Z/Zope2/Zope2-2.12.0c1.tar.gz#md5=3d8872dd94adcd8c7f3226d55f5a0dd4 (from http://pypi.python.org/simple/Zope2/); wrong project name (not zope3)
+    Skipping link http://pypi.python.org/packages/2.4/Z/Zope2/Zope2-2.12.0b1-py2.4-win32.egg#md5=5ffda2477370ddbdfd98c23c8946a0f0 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.4/Z/Zope2/Zope2-2.12.0a2-py2.4-win32.egg#md5=d56f2fc0f783e156926aa52edf7cb954 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.5/Z/Zope2/Zope2-2.12.0-py2.5-win32.egg#md5=4ca3c68655a37fe7c7573dd8e74f3384 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.4/Z/Zope2/Zope2-2.12.1-py2.4-win32.egg#md5=27859ca655b2f52178b392331907650f (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.5/Z/Zope2/Zope2-2.12.1-py2.5-win32.egg#md5=37a072dd1ab2fa7d345e9d542c1f6c27 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.4/Z/Zope2/Zope2-2.12.0-py2.4-win32.egg#md5=f666b4935c1c2e367d9c9a752d1631de (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.6/Z/Zope2/Zope2-2.12.0.a1-py2.6-win32.egg#md5=c965dd37a08e961b5cbbadefa9301620 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.6/Z/Zope2/Zope2-2.12.0b3-py2.6-win32.egg#md5=6c3c89b3e771b47e4c7ebaed84193e68 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.5/Z/Zope2/Zope2-2.12.0b3-py2.5-win32.egg#md5=64d0003b3997c0949170be1fcd5d3aa4 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/source/Z/Zope2/Zope2-2.12.0b3.tar.gz#md5=ffb11707b03581d54eb69b0705b834b9 (from http://pypi.python.org/simple/Zope2/); wrong project name (not zope3)
+    Skipping link http://pypi.python.org/packages/2.4/Z/Zope2/Zope2-2.12.0b3-py2.4-win32.egg#md5=8c3f38a65cc2986c7f592f5eb15ee099 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/source/Z/Zope2/Zope2-2.12.0.tar.gz#md5=f1b70591e27078ceef9211901b3871e7 (from http://pypi.python.org/simple/Zope2/); wrong project name (not zope3)
+    Skipping link http://pypi.python.org/packages/2.4/Z/Zope2/Zope2-2.12.0c1-py2.4-win32.egg#md5=9b39a23e21ace1e30a1ecf65db968ad2 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.5/Z/Zope2/Zope2-2.12.0c1-py2.5-win32.egg#md5=f527e900c1387779f40b8d0c49378c64 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.4/Z/Zope2/Zope2-2.12.0b2-py2.4-win32.egg#md5=c71a157ab60b0de0c01e6383118754b7 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.6/Z/Zope2/Zope2-2.12.0a3-py2.6-win32.egg#md5=b516f32658a48b402e0ae44f63cc2e5d (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.5/Z/Zope2/Zope2-2.12.0b1-py2.5-win32.egg#md5=d751207fcdc482c2ef68ba075b533340 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.4/Z/Zope2/Zope2-2.12.0a3-py2.4-win32.egg#md5=e7243a78acf2fd5c11cdc524454c16e1 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/source/Z/Zope2/Zope2-2.12.2.tar.gz#md5=3f029497ca579925e51457377ae10a8d (from http://pypi.python.org/simple/Zope2/); wrong project name (not zope3)
+    Skipping link http://pypi.python.org/packages/2.6/Z/Zope2/Zope2-2.12.0b1-py2.6-win32.egg#md5=4d5824b74d8f572edbc6d40114367de2 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/source/Z/Zope2/Zope2-2.12.0b1.tar.gz#md5=091746a59d161fb9551fc81d45a881c8 (from http://pypi.python.org/simple/Zope2/); wrong project name (not zope3)
+    Skipping link http://pypi.python.org/packages/2.5/Z/Zope2/Zope2-2.12.0b2-py2.5-win32.egg#md5=39449623241f00250da073d054779b20 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.6/Z/Zope2/Zope2-2.12.0-py2.6-win32.egg#md5=23bb0945e7668d0dcb5d385612930c45 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.5/Z/Zope2/Zope2-2.12.0a3-py2.5-win32.egg#md5=1b4703f50eb5cd0f63f1472744b70980 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.6/Z/Zope2/Zope2-2.12.0a2-py2.6-win32.egg#md5=570d96e292922f623c8b0ad075ec53dd (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/source/Z/Zope2/Zope2-2.12.0a3.zip#md5=36dcdb3e9dab49e2ba7715ce2523ab2e (from http://pypi.python.org/simple/Zope2/); wrong project name (not zope3)
+    Skipping link http://pypi.python.org/packages/2.4/Z/Zope2/Zope2-2.12.0.a1-py2.4-win32.egg#md5=d9589f91831e9f8a0aef40955e2ceb05 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/source/Z/Zope2/Zope2-2.12.0a2.tar.gz#md5=2301afbce4e175b7053abd3dc071dab5 (from http://pypi.python.org/simple/Zope2/); wrong project name (not zope3)
+    Skipping link http://pypi.python.org/packages/2.6/Z/Zope2/Zope2-2.12.1-py2.6-win32.egg#md5=e1ccdfb3ffc113a86d87c39c58cca707 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.6/Z/Zope2/Zope2-2.12.0c1-py2.6-win32.egg#md5=529599fec240ee2a033969f1a1046a8d (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/source/Z/Zope2/Zope2-2.12.1.tar.gz#md5=db030222f3a41f8208a29c17227b15ce (from http://pypi.python.org/simple/Zope2/); wrong project name (not zope3)
+    Skipping link http://pypi.python.org/packages/source/Z/Zope2/Zope2-2.12.0b4.tar.gz#md5=076de9d3329ddad72d559ca5a83c5463 (from http://pypi.python.org/simple/Zope2/); wrong project name (not zope3)
+    Skipping link http://pypi.python.org/packages/source/Z/Zope2/Zope2-2.12.3.tar.gz#md5=eb7610d0f66841ee3f7670871a87a55a (from http://pypi.python.org/simple/Zope2/); wrong project name (not zope3)
+    Skipping link http://pypi.python.org/packages/2.6/Z/Zope2/Zope2-2.12.3-py2.6-win-amd64.egg#md5=7cf34aaf68aa58c9c7b6f1396f1bd806 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.5/Z/Zope2/Zope2-2.12.2-py2.5-win32.egg#md5=7ba5b60b6ca67f2fac88113fa5765d3f (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.5/Z/Zope2/Zope2-2.12.3-py2.5-win32.egg#md5=5639a77af55e55abc6e478aad9218923 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.6/Z/Zope2/Zope2-2.12.3-py2.6-win32.egg#md5=611e4b48e527fdf74a4144c011c23cd9 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/source/Z/Zope2/Zope2-2.12.0a4.tar.gz#md5=ea318be582ea93c986b611199fcbf08c (from http://pypi.python.org/simple/Zope2/); wrong project name (not zope3)
+    Skipping link http://pypi.python.org/packages/2.5/Z/Zope2/Zope2-2.12.0.a1-py2.5-win32.egg#md5=0e32a0134e5b820e21923c16e0ebf9cf (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.5/Z/Zope2/Zope2-2.12.0a2-py2.5-win32.egg#md5=7a318b7037704ac2abe4d5cb7fef51ed (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.6/Z/Zope2/Zope2-2.12.2-py2.6-win32.egg#md5=70b8597a06b515b5af6b0ee643b2a025 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.4/Z/Zope2/Zope2-2.12.0b4-py2.4-win32.egg#md5=4cdccb9943c0646b2535a0a580a09900 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.5/Z/Zope2/Zope2-2.12.0b4-py2.5-win32.egg#md5=125e9bf45598b8c4cfe02de0447ebef7 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.6/Z/Zope2/Zope2-2.12.0b4-py2.6-win32.egg#md5=46f840d28fa2193b6b886b788cde6518 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/source/Z/Zope2/Zope2-2.12.0b2.tar.gz#md5=3f7699192ca22ddde6cc71fb6f5d44f8 (from http://pypi.python.org/simple/Zope2/); wrong project name (not zope3)
+    Skipping link http://www.zope.org (from http://pypi.python.org/simple/Zope2/); not a file
+    Skipping link http://codespeak.net/pipermail/z3-five/2007q2/002185.html (from http://pypi.python.org/simple/Zope2/); unknown archive format: .html
+    Skipping link http://docs.zope.org/ (from http://pypi.python.org/simple/Zope2/); not a file
+    Skipping link http://lists.w3.org/Archives/Public/w3c-dist-auth/2001JanMar/0099.html (from http://pypi.python.org/simple/Zope2/); unknown archive format: .html
+    Skipping link http://mail.zope.org/mailman/listinfo/zope (from http://pypi.python.org/simple/Zope2/); not a file
+    Skipping link https://bugs.launchpad.net/bugs/374816 (from http://pypi.python.org/simple/Zope2/); not a file
+    Skipping link https://bugs.launchpad.net/zope2 (from http://pypi.python.org/simple/Zope2/); not a file
+    Skipping link https://bugs.launchpad.net/zope2/+bug/367393 (from http://pypi.python.org/simple/Zope2/); not a file
+    Skipping link https://bugs.launchpad.net/zope2/+bug/372629 (from http://pypi.python.org/simple/Zope2/); not a file
+    Skipping link https://bugs.launchpad.net/zope2/+bug/372632 (from http://pypi.python.org/simple/Zope2/); not a file
+    Skipping link http://www.owasp.org/index.php/HTTPOnly (from http://pypi.python.org/simple/Zope2/); not a file
+    Skipping link http://www.zope.org/ (from http://pypi.python.org/simple/Zope2/); not a file
+    Skipping link http://www.zope.org/Collectors/Zope/2327 (from http://pypi.python.org/simple/Zope2/); not a file
+    Skipping link http://www.zope.org/Collectors/Zope/2333 (from http://pypi.python.org/simple/Zope2/); not a file
+    Skipping link mailto:zope-dev@zope.org (from http://pypi.python.org/simple/Zope2/); unknown archive format: .org
+    Skipping link mailto:zope-request@zope.org (from http://pypi.python.org/simple/Zope2/); unknown archive format: .org
+    Skipping link mailto:zope@zope.org (from http://pypi.python.org/simple/Zope2/); unknown archive format: .org
+  Analyzing links from page http://www.zope.org
+    Skipping link http://www.zope.org/ploneNS4.css (from http://www.zope.org); unknown archive format: .css
+    Skipping link http://www.zope.org/plonePrint.css (from http://www.zope.org); unknown archive format: .css
+    Skipping link http://www.zope.org/plonePresentation.css (from http://www.zope.org); unknown archive format: .css
+    Skipping link http://www.zope.org/favicon.ico (from http://www.zope.org); unknown archive format: .ico
+    Skipping link http://www.zope.org/search_form (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/login_form (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/portal_form/join_form (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/Products/ (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/Products/CMF/ (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/Resources/ (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/Collectors/ (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/Resources/MailingLists (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/Resources/UserGroups/ (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/Resources/License/ (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/Documentation/ (from http://www.zope.org); not a file
+    Skipping link http://wiki.zope.org/zope2/ (from http://www.zope.org); not a file
+    Skipping link http://wiki.zope.org/zope3/ (from http://www.zope.org); not a file
+    Skipping link http://docs.zope.org/zope2/zope2book/ (from http://www.zope.org); not a file
+    Skipping link http://docs.zope.org/zope2/zope2book/AppendixB.html (from http://www.zope.org); unknown archive format: .html
+    Skipping link http://docs.zope.org/zope2/zope2book/AppendixC.html (from http://www.zope.org); unknown archive format: .html
+    Skipping link http://docs.zope.org/zope2/zdgbook/ (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/Products/CMF/docs/ (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/Documentation/How-To/ (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/WhatIsZope (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/Resources/ZopePowered/ (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/About/ (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/Help/ (from http://www.zope.org); not a file
+    Skipping link http://foundation.zope.org/ (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/Resources/ZSP/ (from http://www.zope.org); not a file
+    Skipping link http://www.zope.com (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/Training/ (from http://www.zope.org); not a file
+    Skipping link http://dev.zope.org/ (from http://www.zope.org); not a file
+    Skipping link http://dev.zope.org/Projects/ (from http://www.zope.org); not a file
+    Skipping link http://dev.zope.org/Subversion/ (from http://www.zope.org); not a file
+    Skipping link http://dev.zope.org/CVS/ (from http://www.zope.org); not a file
+    Skipping link http://wiki.zope.org/zope2/Sites (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/mail_password_form (from http://www.zope.org); not a file
+    Skipping link javascript:this.print%28%29; (from http://www.zope.org); unknown archive format: .print%28%29;
+    Skipping link http://zope2.zope.org (from http://www.zope.org); not a file
+    Skipping link http://docs.zope.org (from http://www.zope.org); not a file
+    Skipping link http://docs.zope.org/developer/ (from http://www.zope.org); not a file
+    Skipping link http://docs.zope.org/developer/becoming-a-contributor.html (from http://www.zope.org); unknown archive format: .html
+    Skipping link http://docs.zope.org/zope2/releases/ (from http://www.zope.org); not a file
+    Skipping link http://docs.zope.org/zope3/ (from http://www.zope.org); not a file
+    Skipping link http://docs.zope.org/zodb/zodbguide/ (from http://www.zope.org); not a file
+    Skipping link http://docs.zope.org/zodb/articles/ (from http://www.zope.org); not a file
+    Skipping link http://docs.zope.org/z3c.form/ (from http://www.zope.org); unknown archive format: .form
+    Skipping link http://docs.zope.org/z3c.formjs/ (from http://www.zope.org); unknown archive format: .formjs
+    Skipping link http://docs.zope.org/z3c.recipe.sphinxdoc/ (from http://www.zope.org); unknown archive format: .sphinxdoc
+    Skipping link http://docs.zope.org/z3c.table/ (from http://www.zope.org); unknown archive format: .table
+    Skipping link http://buildout.zope.org/ (from http://www.zope.org); not a file
+    Skipping link http://docs.zope.org/zopetoolkit/ (from http://www.zope.org); not a file
+    Skipping link http://www.python.org/ (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/Members/shaw/HowTo/ApacheFrontEnd (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/Documentation/Books/ZopeBook/current/Security.stx (from http://www.zope.org); unknown archive format: .stx
+    Skipping link http://www.zope.org/Documentation/Books/ZopeBook/current/AppendixC.stx (from http://www.zope.org); unknown archive format: .stx
+    Skipping link http://www.zope.org/Documentation/Books/ZopeBook/current/AppendixA.stx (from http://www.zope.org); unknown archive format: .stx
+    Skipping link http://www.zope.org/Documentation/Books/ZDG/current (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/Members/mcdonc/PDG/UnitTesting/view (from http://www.zope.org); not a file
+    Skipping link http://dev.zope.org/CVS/BugDays (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/Help (from http://www.zope.org); not a file
+    Skipping link mailto:webmaster@zope.org (from http://www.zope.org); unknown archive format: .org
+    Skipping link http://plone.org/events/training (from http://www.zope.org); not a file
+    Skipping link https://wave.google.com/wave/#restored:wave:googlewave.com%21w%252B4A-rF7onA (from http://www.zope.org); not a file
+    Skipping link http://planet.zope.org (from http://www.zope.org); not a file
+    Skipping link http://planet.zope.org/planet_rss10.xml (from http://www.zope.org); unknown archive format: .xml
+    Skipping link http://planet.plone.org (from http://www.zope.org); not a file
+    Skipping link http://planet.plone.org/rss20.xml (from http://www.zope.org); unknown archive format: .xml
+    Skipping link http://www.zope.org/Members/d2m/day2day/ (from http://www.zope.org); not a file
+    Skipping link http://zope.org/Members/d2m/day2day/rss.rdf (from http://www.zope.org); unknown archive format: .rdf
+    Skipping link http://www.zope.org/News/ (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/news.rss (from http://www.zope.org); unknown archive format: .rss
+    Skipping link http://www.zope.org/Products/Zope/2.11.5/Zope-2-11-5-released (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/Products/Zope/2.10.10/Zope-2-10-10-released (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/News/zope2.zope.org%20launched (from http://www.zope.org); unknown archive format: .org%20launched
+    Skipping link http://www.zope.org/Members/fafhrd/News_Item.2009-08-15.5843 (from http://www.zope.org); unknown archive format: .5843
+    Skipping link http://www.zope.org/Products/Zope/2.11.3/Zope-2.11.3-released (from http://www.zope.org); unknown archive format: .3-released
+    Skipping link http://www.zope.org/Products (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/products.rss (from http://www.zope.org); unknown archive format: .rss
+    Skipping link http://www.zope.org/Products/Zope/2.11.5 (from http://www.zope.org); unknown archive format: .5
+    Skipping link http://www.zope.org/Products/Zope/2.10.10 (from http://www.zope.org); unknown archive format: .10
+    Skipping link http://www.zope.org/Members/scamps/KMKey%20Makhno/KMKey (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/Products/Zope/2.9.11 (from http://www.zope.org); unknown archive format: .11
+    Skipping link http://www.zope.org/Products/Zope/2.8.11 (from http://www.zope.org); unknown archive format: .11
+    Skipping link http://www.zope.com/about_us/legal/legal_notice.html (from http://www.zope.org); unknown archive format: .html
+    Skipping link http://www.webstandards.org/upgrade/ (from http://www.zope.org); not a file
+  Could not find any downloads that satisfy the requirement zope3
+No distributions at all found for zope3
+Exception information:
+Traceback (most recent call last):
+  File "/home/gaby/demos_alterway/virtualenv/lib/python2.6/site-packages/pip-0.6.3-py2.6.egg/pip/basecommand.py", line 115, in main
+    self.run(options, args)
+  File "/home/gaby/demos_alterway/virtualenv/lib/python2.6/site-packages/pip-0.6.3-py2.6.egg/pip/commands/install.py", line 155, in run
+    requirement_set.install_files(finder, force_root_egg_info=self.bundle, bundle=self.bundle)
+  File "/home/gaby/demos_alterway/virtualenv/lib/python2.6/site-packages/pip-0.6.3-py2.6.egg/pip/req.py", line 823, in install_files
+    url = finder.find_requirement(req_to_install, upgrade=self.upgrade)
+  File "/home/gaby/demos_alterway/virtualenv/lib/python2.6/site-packages/pip-0.6.3-py2.6.egg/pip/index.py", line 117, in find_requirement
+    raise DistributionNotFound('No distributions at all found for %s' % req)
+DistributionNotFound: No distributions at all found for zope3
+------------------------------------------------------------
+/home/gaby/demos_alterway/virtualenv/bin/pip run on Mon Feb  8 20:14:37 2010
+Downloading/unpacking Zope3
+  Getting page http://pypi.python.org/simple/Zope3
+  Could not fetch URL http://pypi.python.org/simple/Zope3: HTTP Error 404: Not Found
+  Will skip URL http://pypi.python.org/simple/Zope3 when looking for download links for Zope3
+  Getting page http://pypi.python.org/simple/
+  Real name of requirement Zope3 is Zope2
+  URLs to search for versions for Zope3:
+  * http://pypi.python.org/simple/Zope2/
+  Getting page http://pypi.python.org/simple/Zope2/
+  Getting page http://www.zope.org
+  Analyzing links from page http://pypi.python.org/simple/Zope2/
+    Skipping link http://pypi.python.org/packages/2.6/Z/Zope2/Zope2-2.12.0b2-py2.6-win32.egg#md5=b91b60cc99288ae7ef9d5f79cd8ecab8 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/source/Z/Zope2/Zope2-2.12.0.a1.tar.gz#md5=605743c616c3f36621bc01f9f8f049be (from http://pypi.python.org/simple/Zope2/); wrong project name (not zope3)
+    Skipping link http://pypi.python.org/packages/source/Z/Zope2/Zope2-2.12.0a2.zip#md5=a30b244b87007556909c1c9d1ee81885 (from http://pypi.python.org/simple/Zope2/); wrong project name (not zope3)
+    Skipping link http://pypi.python.org/packages/source/Z/Zope2/Zope2-2.12.0c1.tar.gz#md5=3d8872dd94adcd8c7f3226d55f5a0dd4 (from http://pypi.python.org/simple/Zope2/); wrong project name (not zope3)
+    Skipping link http://pypi.python.org/packages/2.4/Z/Zope2/Zope2-2.12.0b1-py2.4-win32.egg#md5=5ffda2477370ddbdfd98c23c8946a0f0 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.4/Z/Zope2/Zope2-2.12.0a2-py2.4-win32.egg#md5=d56f2fc0f783e156926aa52edf7cb954 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.5/Z/Zope2/Zope2-2.12.0-py2.5-win32.egg#md5=4ca3c68655a37fe7c7573dd8e74f3384 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.4/Z/Zope2/Zope2-2.12.1-py2.4-win32.egg#md5=27859ca655b2f52178b392331907650f (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.5/Z/Zope2/Zope2-2.12.1-py2.5-win32.egg#md5=37a072dd1ab2fa7d345e9d542c1f6c27 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.4/Z/Zope2/Zope2-2.12.0-py2.4-win32.egg#md5=f666b4935c1c2e367d9c9a752d1631de (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.6/Z/Zope2/Zope2-2.12.0.a1-py2.6-win32.egg#md5=c965dd37a08e961b5cbbadefa9301620 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.6/Z/Zope2/Zope2-2.12.0b3-py2.6-win32.egg#md5=6c3c89b3e771b47e4c7ebaed84193e68 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.5/Z/Zope2/Zope2-2.12.0b3-py2.5-win32.egg#md5=64d0003b3997c0949170be1fcd5d3aa4 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/source/Z/Zope2/Zope2-2.12.0b3.tar.gz#md5=ffb11707b03581d54eb69b0705b834b9 (from http://pypi.python.org/simple/Zope2/); wrong project name (not zope3)
+    Skipping link http://pypi.python.org/packages/2.4/Z/Zope2/Zope2-2.12.0b3-py2.4-win32.egg#md5=8c3f38a65cc2986c7f592f5eb15ee099 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/source/Z/Zope2/Zope2-2.12.0.tar.gz#md5=f1b70591e27078ceef9211901b3871e7 (from http://pypi.python.org/simple/Zope2/); wrong project name (not zope3)
+    Skipping link http://pypi.python.org/packages/2.4/Z/Zope2/Zope2-2.12.0c1-py2.4-win32.egg#md5=9b39a23e21ace1e30a1ecf65db968ad2 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.5/Z/Zope2/Zope2-2.12.0c1-py2.5-win32.egg#md5=f527e900c1387779f40b8d0c49378c64 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.4/Z/Zope2/Zope2-2.12.0b2-py2.4-win32.egg#md5=c71a157ab60b0de0c01e6383118754b7 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.6/Z/Zope2/Zope2-2.12.0a3-py2.6-win32.egg#md5=b516f32658a48b402e0ae44f63cc2e5d (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.5/Z/Zope2/Zope2-2.12.0b1-py2.5-win32.egg#md5=d751207fcdc482c2ef68ba075b533340 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.4/Z/Zope2/Zope2-2.12.0a3-py2.4-win32.egg#md5=e7243a78acf2fd5c11cdc524454c16e1 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/source/Z/Zope2/Zope2-2.12.2.tar.gz#md5=3f029497ca579925e51457377ae10a8d (from http://pypi.python.org/simple/Zope2/); wrong project name (not zope3)
+    Skipping link http://pypi.python.org/packages/2.6/Z/Zope2/Zope2-2.12.0b1-py2.6-win32.egg#md5=4d5824b74d8f572edbc6d40114367de2 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/source/Z/Zope2/Zope2-2.12.0b1.tar.gz#md5=091746a59d161fb9551fc81d45a881c8 (from http://pypi.python.org/simple/Zope2/); wrong project name (not zope3)
+    Skipping link http://pypi.python.org/packages/2.5/Z/Zope2/Zope2-2.12.0b2-py2.5-win32.egg#md5=39449623241f00250da073d054779b20 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.6/Z/Zope2/Zope2-2.12.0-py2.6-win32.egg#md5=23bb0945e7668d0dcb5d385612930c45 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.5/Z/Zope2/Zope2-2.12.0a3-py2.5-win32.egg#md5=1b4703f50eb5cd0f63f1472744b70980 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.6/Z/Zope2/Zope2-2.12.0a2-py2.6-win32.egg#md5=570d96e292922f623c8b0ad075ec53dd (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/source/Z/Zope2/Zope2-2.12.0a3.zip#md5=36dcdb3e9dab49e2ba7715ce2523ab2e (from http://pypi.python.org/simple/Zope2/); wrong project name (not zope3)
+    Skipping link http://pypi.python.org/packages/2.4/Z/Zope2/Zope2-2.12.0.a1-py2.4-win32.egg#md5=d9589f91831e9f8a0aef40955e2ceb05 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/source/Z/Zope2/Zope2-2.12.0a2.tar.gz#md5=2301afbce4e175b7053abd3dc071dab5 (from http://pypi.python.org/simple/Zope2/); wrong project name (not zope3)
+    Skipping link http://pypi.python.org/packages/2.6/Z/Zope2/Zope2-2.12.1-py2.6-win32.egg#md5=e1ccdfb3ffc113a86d87c39c58cca707 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.6/Z/Zope2/Zope2-2.12.0c1-py2.6-win32.egg#md5=529599fec240ee2a033969f1a1046a8d (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/source/Z/Zope2/Zope2-2.12.1.tar.gz#md5=db030222f3a41f8208a29c17227b15ce (from http://pypi.python.org/simple/Zope2/); wrong project name (not zope3)
+    Skipping link http://pypi.python.org/packages/source/Z/Zope2/Zope2-2.12.0b4.tar.gz#md5=076de9d3329ddad72d559ca5a83c5463 (from http://pypi.python.org/simple/Zope2/); wrong project name (not zope3)
+    Skipping link http://pypi.python.org/packages/source/Z/Zope2/Zope2-2.12.3.tar.gz#md5=eb7610d0f66841ee3f7670871a87a55a (from http://pypi.python.org/simple/Zope2/); wrong project name (not zope3)
+    Skipping link http://pypi.python.org/packages/2.6/Z/Zope2/Zope2-2.12.3-py2.6-win-amd64.egg#md5=7cf34aaf68aa58c9c7b6f1396f1bd806 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.5/Z/Zope2/Zope2-2.12.2-py2.5-win32.egg#md5=7ba5b60b6ca67f2fac88113fa5765d3f (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.5/Z/Zope2/Zope2-2.12.3-py2.5-win32.egg#md5=5639a77af55e55abc6e478aad9218923 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.6/Z/Zope2/Zope2-2.12.3-py2.6-win32.egg#md5=611e4b48e527fdf74a4144c011c23cd9 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/source/Z/Zope2/Zope2-2.12.0a4.tar.gz#md5=ea318be582ea93c986b611199fcbf08c (from http://pypi.python.org/simple/Zope2/); wrong project name (not zope3)
+    Skipping link http://pypi.python.org/packages/2.5/Z/Zope2/Zope2-2.12.0.a1-py2.5-win32.egg#md5=0e32a0134e5b820e21923c16e0ebf9cf (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.5/Z/Zope2/Zope2-2.12.0a2-py2.5-win32.egg#md5=7a318b7037704ac2abe4d5cb7fef51ed (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.6/Z/Zope2/Zope2-2.12.2-py2.6-win32.egg#md5=70b8597a06b515b5af6b0ee643b2a025 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.4/Z/Zope2/Zope2-2.12.0b4-py2.4-win32.egg#md5=4cdccb9943c0646b2535a0a580a09900 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.5/Z/Zope2/Zope2-2.12.0b4-py2.5-win32.egg#md5=125e9bf45598b8c4cfe02de0447ebef7 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.6/Z/Zope2/Zope2-2.12.0b4-py2.6-win32.egg#md5=46f840d28fa2193b6b886b788cde6518 (from http://pypi.python.org/simple/Zope2/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/source/Z/Zope2/Zope2-2.12.0b2.tar.gz#md5=3f7699192ca22ddde6cc71fb6f5d44f8 (from http://pypi.python.org/simple/Zope2/); wrong project name (not zope3)
+    Skipping link http://www.zope.org (from http://pypi.python.org/simple/Zope2/); not a file
+    Skipping link http://codespeak.net/pipermail/z3-five/2007q2/002185.html (from http://pypi.python.org/simple/Zope2/); unknown archive format: .html
+    Skipping link http://docs.zope.org/ (from http://pypi.python.org/simple/Zope2/); not a file
+    Skipping link http://lists.w3.org/Archives/Public/w3c-dist-auth/2001JanMar/0099.html (from http://pypi.python.org/simple/Zope2/); unknown archive format: .html
+    Skipping link http://mail.zope.org/mailman/listinfo/zope (from http://pypi.python.org/simple/Zope2/); not a file
+    Skipping link https://bugs.launchpad.net/bugs/374816 (from http://pypi.python.org/simple/Zope2/); not a file
+    Skipping link https://bugs.launchpad.net/zope2 (from http://pypi.python.org/simple/Zope2/); not a file
+    Skipping link https://bugs.launchpad.net/zope2/+bug/367393 (from http://pypi.python.org/simple/Zope2/); not a file
+    Skipping link https://bugs.launchpad.net/zope2/+bug/372629 (from http://pypi.python.org/simple/Zope2/); not a file
+    Skipping link https://bugs.launchpad.net/zope2/+bug/372632 (from http://pypi.python.org/simple/Zope2/); not a file
+    Skipping link http://www.owasp.org/index.php/HTTPOnly (from http://pypi.python.org/simple/Zope2/); not a file
+    Skipping link http://www.zope.org/ (from http://pypi.python.org/simple/Zope2/); not a file
+    Skipping link http://www.zope.org/Collectors/Zope/2327 (from http://pypi.python.org/simple/Zope2/); not a file
+    Skipping link http://www.zope.org/Collectors/Zope/2333 (from http://pypi.python.org/simple/Zope2/); not a file
+    Skipping link mailto:zope-dev@zope.org (from http://pypi.python.org/simple/Zope2/); unknown archive format: .org
+    Skipping link mailto:zope-request@zope.org (from http://pypi.python.org/simple/Zope2/); unknown archive format: .org
+    Skipping link mailto:zope@zope.org (from http://pypi.python.org/simple/Zope2/); unknown archive format: .org
+  Analyzing links from page http://www.zope.org
+    Skipping link http://www.zope.org/ploneNS4.css (from http://www.zope.org); unknown archive format: .css
+    Skipping link http://www.zope.org/plonePrint.css (from http://www.zope.org); unknown archive format: .css
+    Skipping link http://www.zope.org/plonePresentation.css (from http://www.zope.org); unknown archive format: .css
+    Skipping link http://www.zope.org/favicon.ico (from http://www.zope.org); unknown archive format: .ico
+    Skipping link http://www.zope.org/search_form (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/login_form (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/portal_form/join_form (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/Products/ (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/Products/CMF/ (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/Resources/ (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/Collectors/ (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/Resources/MailingLists (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/Resources/UserGroups/ (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/Resources/License/ (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/Documentation/ (from http://www.zope.org); not a file
+    Skipping link http://wiki.zope.org/zope2/ (from http://www.zope.org); not a file
+    Skipping link http://wiki.zope.org/zope3/ (from http://www.zope.org); not a file
+    Skipping link http://docs.zope.org/zope2/zope2book/ (from http://www.zope.org); not a file
+    Skipping link http://docs.zope.org/zope2/zope2book/AppendixB.html (from http://www.zope.org); unknown archive format: .html
+    Skipping link http://docs.zope.org/zope2/zope2book/AppendixC.html (from http://www.zope.org); unknown archive format: .html
+    Skipping link http://docs.zope.org/zope2/zdgbook/ (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/Products/CMF/docs/ (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/Documentation/How-To/ (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/WhatIsZope (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/Resources/ZopePowered/ (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/About/ (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/Help/ (from http://www.zope.org); not a file
+    Skipping link http://foundation.zope.org/ (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/Resources/ZSP/ (from http://www.zope.org); not a file
+    Skipping link http://www.zope.com (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/Training/ (from http://www.zope.org); not a file
+    Skipping link http://dev.zope.org/ (from http://www.zope.org); not a file
+    Skipping link http://dev.zope.org/Projects/ (from http://www.zope.org); not a file
+    Skipping link http://dev.zope.org/Subversion/ (from http://www.zope.org); not a file
+    Skipping link http://dev.zope.org/CVS/ (from http://www.zope.org); not a file
+    Skipping link http://wiki.zope.org/zope2/Sites (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/mail_password_form (from http://www.zope.org); not a file
+    Skipping link javascript:this.print%28%29; (from http://www.zope.org); unknown archive format: .print%28%29;
+    Skipping link http://zope2.zope.org (from http://www.zope.org); not a file
+    Skipping link http://docs.zope.org (from http://www.zope.org); not a file
+    Skipping link http://docs.zope.org/developer/ (from http://www.zope.org); not a file
+    Skipping link http://docs.zope.org/developer/becoming-a-contributor.html (from http://www.zope.org); unknown archive format: .html
+    Skipping link http://docs.zope.org/zope2/releases/ (from http://www.zope.org); not a file
+    Skipping link http://docs.zope.org/zope3/ (from http://www.zope.org); not a file
+    Skipping link http://docs.zope.org/zodb/zodbguide/ (from http://www.zope.org); not a file
+    Skipping link http://docs.zope.org/zodb/articles/ (from http://www.zope.org); not a file
+    Skipping link http://docs.zope.org/z3c.form/ (from http://www.zope.org); unknown archive format: .form
+    Skipping link http://docs.zope.org/z3c.formjs/ (from http://www.zope.org); unknown archive format: .formjs
+    Skipping link http://docs.zope.org/z3c.recipe.sphinxdoc/ (from http://www.zope.org); unknown archive format: .sphinxdoc
+    Skipping link http://docs.zope.org/z3c.table/ (from http://www.zope.org); unknown archive format: .table
+    Skipping link http://buildout.zope.org/ (from http://www.zope.org); not a file
+    Skipping link http://docs.zope.org/zopetoolkit/ (from http://www.zope.org); not a file
+    Skipping link http://www.python.org/ (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/Members/shaw/HowTo/ApacheFrontEnd (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/Documentation/Books/ZopeBook/current/Security.stx (from http://www.zope.org); unknown archive format: .stx
+    Skipping link http://www.zope.org/Documentation/Books/ZopeBook/current/AppendixC.stx (from http://www.zope.org); unknown archive format: .stx
+    Skipping link http://www.zope.org/Documentation/Books/ZopeBook/current/AppendixA.stx (from http://www.zope.org); unknown archive format: .stx
+    Skipping link http://www.zope.org/Documentation/Books/ZDG/current (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/Members/mcdonc/PDG/UnitTesting/view (from http://www.zope.org); not a file
+    Skipping link http://dev.zope.org/CVS/BugDays (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/Help (from http://www.zope.org); not a file
+    Skipping link mailto:webmaster@zope.org (from http://www.zope.org); unknown archive format: .org
+    Skipping link http://plone.org/events/training (from http://www.zope.org); not a file
+    Skipping link https://wave.google.com/wave/#restored:wave:googlewave.com%21w%252B4A-rF7onA (from http://www.zope.org); not a file
+    Skipping link http://planet.zope.org (from http://www.zope.org); not a file
+    Skipping link http://planet.zope.org/planet_rss10.xml (from http://www.zope.org); unknown archive format: .xml
+    Skipping link http://planet.plone.org (from http://www.zope.org); not a file
+    Skipping link http://planet.plone.org/rss20.xml (from http://www.zope.org); unknown archive format: .xml
+    Skipping link http://www.zope.org/Members/d2m/day2day/ (from http://www.zope.org); not a file
+    Skipping link http://zope.org/Members/d2m/day2day/rss.rdf (from http://www.zope.org); unknown archive format: .rdf
+    Skipping link http://www.zope.org/News/ (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/news.rss (from http://www.zope.org); unknown archive format: .rss
+    Skipping link http://www.zope.org/Products/Zope/2.11.5/Zope-2-11-5-released (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/Products/Zope/2.10.10/Zope-2-10-10-released (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/News/zope2.zope.org%20launched (from http://www.zope.org); unknown archive format: .org%20launched
+    Skipping link http://www.zope.org/Members/fafhrd/News_Item.2009-08-15.5843 (from http://www.zope.org); unknown archive format: .5843
+    Skipping link http://www.zope.org/Products/Zope/2.11.3/Zope-2.11.3-released (from http://www.zope.org); unknown archive format: .3-released
+    Skipping link http://www.zope.org/Products (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/products.rss (from http://www.zope.org); unknown archive format: .rss
+    Skipping link http://www.zope.org/Products/Zope/2.11.5 (from http://www.zope.org); unknown archive format: .5
+    Skipping link http://www.zope.org/Products/Zope/2.10.10 (from http://www.zope.org); unknown archive format: .10
+    Skipping link http://www.zope.org/Members/scamps/KMKey%20Makhno/KMKey (from http://www.zope.org); not a file
+    Skipping link http://www.zope.org/Products/Zope/2.9.11 (from http://www.zope.org); unknown archive format: .11
+    Skipping link http://www.zope.org/Products/Zope/2.8.11 (from http://www.zope.org); unknown archive format: .11
+    Skipping link http://www.zope.com/about_us/legal/legal_notice.html (from http://www.zope.org); unknown archive format: .html
+    Skipping link http://www.webstandards.org/upgrade/ (from http://www.zope.org); not a file
+  Could not find any downloads that satisfy the requirement Zope3
+No distributions at all found for Zope3
+Exception information:
+Traceback (most recent call last):
+  File "/home/gaby/demos_alterway/virtualenv/lib/python2.6/site-packages/pip-0.6.3-py2.6.egg/pip/basecommand.py", line 115, in main
+    self.run(options, args)
+  File "/home/gaby/demos_alterway/virtualenv/lib/python2.6/site-packages/pip-0.6.3-py2.6.egg/pip/commands/install.py", line 155, in run
+    requirement_set.install_files(finder, force_root_egg_info=self.bundle, bundle=self.bundle)
+  File "/home/gaby/demos_alterway/virtualenv/lib/python2.6/site-packages/pip-0.6.3-py2.6.egg/pip/req.py", line 823, in install_files
+    url = finder.find_requirement(req_to_install, upgrade=self.upgrade)
+  File "/home/gaby/demos_alterway/virtualenv/lib/python2.6/site-packages/pip-0.6.3-py2.6.egg/pip/index.py", line 117, in find_requirement
+    raise DistributionNotFound('No distributions at all found for %s' % req)
+DistributionNotFound: No distributions at all found for Zope3
