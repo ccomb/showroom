@@ -12,7 +12,6 @@
      context=".models.MyModel"
      view=".views.app_list"
      name="app_list"
-     renderer="templates/mytemplate.pt"
      />
 
   <static
