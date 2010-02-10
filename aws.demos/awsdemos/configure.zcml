@@ -8,10 +8,17 @@
      view=".views.my_view"
      renderer="templates/mytemplate.pt"
      />
+
   <view
      context=".models.MyModel"
      view=".views.app_list"
      name="app_list"
+     />
+
+  <view
+     context=".models.MyModel"
+     view=".views.action"
+     name="action"
      />
 
   <static
