@@ -1,10 +1,10 @@
 /*
-functions for repoz.bfg demo manager
-
+    functions for repoz.bfg demo manager
 */
 
 function execute_command(url, app, command){
-    $('#loading_$app').innerHtml = '<img src="/static/images/loading.gif">';
+    $('#loading_'+app).css("display", "block");
     var result = $.getJSON(url+'app='+app+'&action='+command);
-    $('#loading_$app').innerHtml = '';
+    $('#loading_'+app).css("display", "none");
+    return result;
 }
