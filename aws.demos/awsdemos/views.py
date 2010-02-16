@@ -9,7 +9,8 @@ def my_view(request):
 
 def load_app_list():
     """
-
+    return a dict containing all apps and their respective commands defined in
+    config file.
     """
     demos = {}
     last = ""
@@ -26,7 +27,7 @@ def load_app_list():
 
 def app_list(context, request):
     """
-    
+    return the main page, with applications list, and actions.
     """
     demos = {}
     last = ""
@@ -48,6 +49,10 @@ def app_list(context, request):
 
 def LOG(string):
     print 'LOG: '+string
+    file = open('commands_demos.log', 'a+')
+    file.write(time.asctime(time.localtime())+'\n')
+    file.write(string+'\n')
+    file.close()
 
 def action(context, request):
     """
@@ -56,7 +61,6 @@ def action(context, request):
     FIXME: should verify if the user has access to the command.
     """
     command = load_app_list()[request.params['app']][request.params['action']]
-    LOG(time.asctime(time.localtime()))
     LOG(command)
     process = subprocess.Popen(command, shell=True)
     process.wait()
