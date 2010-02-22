@@ -37,7 +37,8 @@ def load_app_list():
     for k in conf.sections():
         demos[k] = {}
         for i in conf.items(k):
-            demos[k][conf.items(k)[0]] = conf.items(k)[1]
+            demos[k][i[0]] = i[1]
+    print demos
     return demos
 
 def app_list(context, request):
