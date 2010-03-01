@@ -22,7 +22,7 @@ def load_app_list():
     config file.
     """
     conf = ConfigParser()
-    conf.readfp(open('demos.cfg'))
+    conf.readfp(open('supervisor.cfg'))
     demos = {}
     #last = ""
     #file = open("awsdemos/demos.cfg")
