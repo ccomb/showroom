@@ -11,9 +11,11 @@ Basic usage:
 - we can access a web page with the list of preconfigured demos (created
   dynamically from the config file)
 - In the list, each demo item contains :
-    - a link to the demo
+    - the name of the demo
     - a status indicator (green = online and running, red: offline or broken)
-- if we click on a demo link, we can access the demo
+    - a button to reset the demo
+- if we click on the button, the demo is built, and the status becomes green
+- the demo title now is a link, and we can access it by clicking on it
 
 Admin usage:
 
