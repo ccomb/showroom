@@ -1,6 +1,7 @@
 import webob
 from repoze.bfg.chameleon_zpt import get_template
 from repoze.bfg.chameleon_zpt import render_template_to_response
+from repoze.bfg.exceptions import NotFound
 from repoze.bfg.security import (
     Allow,
     Everyone,
@@ -62,8 +63,16 @@ def action(context, request):
     finished.
     FIXME: should verify if the user has access to the command.
     """
-    command = load_app_list()[request.params['app']][request.params['action']]
+    app_list = load_app_list()
+    try:
+        app = request.params['app']
+        action = request.params['action']
+        command = app_list[app][action]
+    except KeyError:
+        raise NotFound
     LOG(command)
     process = subprocess.Popen(command, shell=True)
     process.wait()
     return webob.Response(str("action finished"))
+
+
