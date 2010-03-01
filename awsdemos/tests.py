@@ -1,7 +1,7 @@
-import unittest
-
-from repoze.bfg.configuration import Configurator
 from repoze.bfg import testing
+from repoze.bfg.configuration import Configurator
+from repoze.bfg.exceptions import NotFound
+import unittest
 
 class ViewTests(unittest.TestCase):
     def setUp(self):
@@ -11,10 +11,16 @@ class ViewTests(unittest.TestCase):
     def tearDown(self):
         self.config.end()
 
-    def test_my_view(self):
-        from awsdemos.views import my_view
+    def test_app_list(self):
+        from awsdemos.views import app_list
         request = testing.DummyRequest()
-        info = my_view(request)
-        self.assertEqual(info['project'], 'aws.demos')
+        info = app_list(request)
+        self.assertEqual(info.status, '200 OK')
+
+    def test_action(self):
+        from awsdemos.views import action
+        request = testing.DummyRequest()
+        # action without argument should raise NotFound
+        self.assertRaises(NotFound, action, request)
 
 

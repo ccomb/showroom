@@ -1,7 +1,10 @@
-import webob
+from ConfigParser import ConfigParser
 from repoze.bfg.chameleon_zpt import get_template
 from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.exceptions import NotFound
+import subprocess
+import time
+import webob
 from repoze.bfg.security import (
     Allow,
     Everyone,
@@ -10,9 +13,7 @@ from repoze.bfg.security import (
     has_permission,
     )
 
-import time
-import subprocess
-from ConfigParser import ConfigParser
+
 
 def load_app_list():
     """
@@ -39,16 +40,17 @@ def load_app_list():
     print demos
     return demos
 
-def app_list(context, request):
+
+def app_list(request):
     """
     return the main page, with applications list, and actions.
     """
     return render_template_to_response(
                 "templates/app_list.pt",
-                context=context,
                 request=request,
                 demos=load_app_list()
                 )
+
 
 def LOG(string):
     print 'LOG: '+string
@@ -57,7 +59,8 @@ def LOG(string):
     file.write(string+'\n')
     file.close()
 
-def action(context, request):
+
+def action(request):
     """
     execute the action bound to the name passed and return when the action is
     finished.
