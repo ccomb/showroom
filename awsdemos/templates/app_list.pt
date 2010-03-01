@@ -30,13 +30,13 @@ blah<br />
     <table id="application_list">
     <tr tal:repeat="demo demos">
         <td tal:content="demo">blob</td>
-        <td tal:repeat="command demos[demo]">
+        <td>
             <button
-            tal:content="command"
             tal:attributes="onclick
-            python:'execute_command(\'/action?\', \''+demo+'\', \''+command+'\')'
+            python:'execute_command(\'/action?\', \''+demo+'\')'
             "
             >
+            create
             </button>
         </td>
         <td>
