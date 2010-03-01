@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>Liste des démos</title>
+<meta name="keywords" content="python web application" />
+<meta name="description" content="repoze.bfg web application" />
+<script type="text/javascript" src="${request.application_url}/static/jquery-1.4.1.min.js"></script>
+<link href="${request.application_url}/static/default.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="${request.application_url}/static/functions.js"></script>
+
+</head>
+<body>
+<!-- start header -->
+<!--div tal:content="demos">debug</div-->
+<!--div id="debug"></div-->
+<div id="header">
+<span><img src='/static/images/Alter_Way_SOLUTIONS.png'
+/></span><span id="page_title"><h1>Applications de démonstration.</h1></span>
+</div>
+
+<!-- start content -->
+<div id='sidebar'>
+blah<br />
+blah<br />
+blah<br />
+</div>
+<div id='content'>
+    <table id="application_list">
+    <tr tal:repeat="demo demos">
+        <td tal:content="demo">blob</td>
+        <td tal:repeat="command demos[demo]">
+            <button
+            tal:content="command"
+            tal:attributes="onclick
+            python:'execute_command(\'/action?\', \''+demo+'\', \''+command+'\')'
+            "
+            >
+            </button>
+        </td>
+        <td>
+        <img tal:attributes="id string:loading_$demo" style="display:none;"
+        src='/static/images/loading.gif' />
+        </td>
+    </tr>
+    </table>
+</div>
+<!-- end content -->
+<!-- start footer -->
+
+<!-- end footer -->
+</body>
+</html>

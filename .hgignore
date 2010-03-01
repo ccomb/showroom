@@ -1,1 +1,9 @@
-aws.demos/aws.demos.egg-info/
+aws.demos.egg-info
+build/
+var/
+bin/
+dist/
+.installed.cfg
+awsdemos/Session.vim
+develop-eggs/
+.*\.swp$
