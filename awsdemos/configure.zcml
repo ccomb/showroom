@@ -3,23 +3,15 @@
   <!-- this must be included for the view declarations to work -->
   <include package="repoze.bfg.includes" />
 
-  <view
-     context=".models.MyModel"
-     view=".views.my_view"
-     renderer="templates/mytemplate.pt"
-     />
+  <route name="home"
+         path=""
+         view=".views.app_list"
+  />
 
-  <view
-     context=".models.MyModel"
-     view=".views.app_list"
-     name="app_list"
-     />
-
-  <view
-     context=".models.MyModel"
-     view=".views.action"
-     name="action"
-     />
+  <route name="action"
+         path="/action"
+         view=".views.action"
+  />
 
   <static
      name="static"

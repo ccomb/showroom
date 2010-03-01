@@ -13,9 +13,6 @@ import time
 import subprocess
 from ConfigParser import ConfigParser
 
-def my_view(request):
-    return {'project':'aws.demos'}
-
 def load_app_list():
     """
     return a dict containing all apps and their respective commands defined in
@@ -61,7 +58,7 @@ def LOG(string):
 
 def action(context, request):
     """
-    execute the action bind to the name passed and return when the action is
+    execute the action bound to the name passed and return when the action is
     finished.
     FIXME: should verify if the user has access to the command.
     """

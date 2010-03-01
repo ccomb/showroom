@@ -7,3 +7,5 @@ dist/
 awsdemos/Session.vim
 develop-eggs/
 .*\.swp$
+.*\.pyc$
+.*\.pyo$
