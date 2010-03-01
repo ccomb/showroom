@@ -1,4 +1,0 @@
-aws.demos README
-
-
-
