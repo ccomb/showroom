@@ -1,13 +1,20 @@
 #!/usr/bin/env sh
+set -e # explicit fail on errors
 # gabriel pettier, for alterway solution
 # 24/02/2010 11:03:42 (UTC+0100)
 
-set -e # explicit fail on errors
+# PARAMS: NAME
+if [ $# -ne 1 ]
+then
+    echo "not enough parameters"
+    exit
+fi
+
 # get params
 name=$1
 
 # load vars and fonctions
-. ./config.sh
+. scripts/config.sh
 
 # set virtualenv (just in case)
 . $VIRTUAL_ENV_PATH/bin/activate
@@ -70,3 +77,4 @@ redirect_stderr = false
 EOF
 
 echo $BASE_URL:$port/
+

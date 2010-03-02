@@ -21,9 +21,12 @@ def load_app_list():
     return a dict containing all apps and their respective commands defined in
     config file.
     """
-    demos = []
+    demos = {}
     for file in (i for i in os.listdir('scripts') if 'demo_' in i and '.sh' in i):
-        demos.append(file[5:-3])
+        for line in open(file).readlines():
+            if line.split(':')[0] == '# PARAMS':
+                params = line.split(':')[1].split(',')
+        demos[(file[5:-3])] = params
     return demos
 
 
@@ -47,12 +50,12 @@ def LOG(string):
 
 def action(request):
     """
-    execute the action bound to the name passed and return when the action is
+    Execute the action bound to the name passed and return when the action is
     finished.
     FIXME: should verify if the user has access to the command.
     """
     if request.params['app'] in load_app_list():
-        command = "demo_"+request.params['app']+".sh"
+        command = "scripts/demo_"+request.params['app']+".sh"
         LOG(command)
         process = subprocess.Popen(command, shell=True)
         stdout, stderr = process.communicate()
