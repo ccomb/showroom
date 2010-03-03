@@ -22,8 +22,11 @@ def load_app_list():
     config file.
     """
     demos = {}
-    for file in (i for i in os.listdir('scripts') if 'demo_' in i and '.sh' in i):
-        for line in open(file).readlines():
+    for file in (
+                    i for i in os.listdir('scripts')
+                    if i[:5] == 'demo_' and i[-3:] == '.sh'
+                ):
+        for line in open('scripts'+os.sep+file).readlines():
             if line.split(':')[0] == '# PARAMS':
                 params = line.split(':')[1].split(',')
         demos[(file[5:-3])] = params
