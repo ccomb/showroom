@@ -27,11 +27,16 @@ blah<br />
 blah<br />
 </div>
 <div id='content'>
-    <div id="application_list">
-    <div tal:repeat="demo demos">
-        <a tal:attributes="href string:/new?app=$demo" tal:content="demo">blob</a>
-    </div>
-    </div>
+    <form method="">
+    <span tal:repeat="param paramlist"><span tal:content="string:$param"></span>:
+    <input tal:attributes="name string:$param" />
+    </span>
+    </form>
+    <button tal:attributes="onclick
+    python:'execute_command(\'/action?\',\''+demo+',\''+','.join(paramlist)+'\')'">
+    create
+    </button>
+    <img style="display:none;" src='/static/images/loading.gif' />
 </div>
 <!-- end content -->
 <!-- start footer -->
@@ -39,3 +44,4 @@ blah<br />
 <!-- end footer -->
 </body>
 </html>
+

@@ -8,6 +8,11 @@
          view=".views.app_list"
   />
 
+  <route name="new"
+         path="/new"
+         view=".views.demo_form"
+  />
+
   <route name="action"
          path="/action"
          view=".views.action"

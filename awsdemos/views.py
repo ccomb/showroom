@@ -28,7 +28,7 @@ def load_app_list():
                 ):
         for line in open('scripts'+os.sep+file).readlines():
             if line.split(':')[0] == '# PARAMS':
-                params = line.split(':')[1].split(',')
+                params = line.split('\n')[0].split(':')[1].split(',')
         demos[(file[5:-3])] = params
     return demos
 
@@ -50,6 +50,22 @@ def LOG(string):
     file.write(string+'\n')
     file.close()
 
+def demo_form(request):
+    """
+    return the form to create a demo
+    """
+    if 'app' in request.params and request.params['app'] in load_app_list():
+        return render_template_to_response(
+            "templates/new_app.pt",
+            request=request,
+            paramlist=load_app_list()[request.params['app']],
+            demo=request.params['app']
+        )
+    else:
+        return webob.Response(str(
+            "No application name given or unknown application."
+            ))
+
 
 def action(request):
     """
@@ -60,7 +76,7 @@ def action(request):
     if request.params['app'] in load_app_list():
         command = "scripts/demo_"+request.params['app']+".sh"
         LOG(command)
-        process = subprocess.Popen(command, shell=True)
+        process = subprocess.Popen([command,]+request.params['params'], shell=True)
         stdout, stderr = process.communicate()
         return webob.Response(str("action finished"+str(stdout))+str(stderr))
     else:
