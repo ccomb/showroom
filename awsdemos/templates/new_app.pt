@@ -27,15 +27,14 @@ blah<br />
 blah<br />
 </div>
 <div id='content'>
-    <form method="">
-    <span tal:repeat="param paramlist"><span tal:content="string:$param"></span>:
+    <form method="get" action="action">
+    <input type='hidden' name="app" tal:attributes="value string:$demo" />
+    <div tal:repeat="param paramlist">
+    <span tal:content="string:$param"></span>:
     <input tal:attributes="name string:$param" />
-    </span>
+    </div>
+    <input type='submit'/>
     </form>
-    <button tal:attributes="onclick
-    python:'execute_command(\'/action?\',\''+demo+',\''+','.join(paramlist)+'\')'">
-    create
-    </button>
     <img style="display:none;" src='/static/images/loading.gif' />
 </div>
 <!-- end content -->

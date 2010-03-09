@@ -3,10 +3,10 @@ set -e # explicit fail on errors
 # gabriel pettier, for alterway solution
 # 24/02/2010 11:03:42 (UTC+0100)
 
-# PARAMS: NAME
-if [ $# -ne 1 ]
+# PARAMS:NAME,COMMENT
+if [ $# -ne 2 ]
 then
-    echo "not enough parameters"
+    echo "not enough parameters" $# $@
     exit
 fi
 

@@ -73,10 +73,14 @@ def action(request):
     finished.
     FIXME: should verify if the user has access to the command.
     """
+    print request.params
     if request.params['app'] in load_app_list():
         command = "scripts/demo_"+request.params['app']+".sh"
-        LOG(command)
-        process = subprocess.Popen([command,]+request.params['params'], shell=True)
+        params = tuple([
+            "'"+request.params[x]+"'" for x in load_app_list()[request.params['app']]
+            ])
+        LOG(command+' '+' '.join(params))
+        process = subprocess.Popen(command+' '+' '.join(params), shell=True)
         stdout, stderr = process.communicate()
         return webob.Response(str("action finished"+str(stdout))+str(stderr))
     else:
