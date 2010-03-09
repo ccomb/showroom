@@ -23,4 +23,11 @@ class ViewTests(unittest.TestCase):
         # action without argument should raise NotFound
         self.assertRaises(NotFound, action, request)
 
+    def test_new_app(self):
+        from awsdemos.views import demo_form
+        request = testing.DummyRequest(
+            params=(('app','not_existing'),), path='/new'
+            )
+        self.assertRaises(NotFound, action, request)
+
 
