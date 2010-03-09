@@ -2,8 +2,8 @@
 # config file for demos frontend
 
 # no "/" at end of path!
-VIRTUAL_ENV_PATH="/home/gaby/demos_alterway/virtualenv"
-DEMOS_BASE_DIR="/home/gaby/demos_alterway"
+VIRTUAL_ENV_PATH="~/demos_alterway/virtualenv"
+DEMOS_BASE_DIR="~/demos_alterway/demos/"
 
 BASE_URL="http://127.0.0.1"
 
