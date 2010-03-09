@@ -2,6 +2,7 @@ from ConfigParser import ConfigParser
 from repoze.bfg.chameleon_zpt import get_template
 from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.exceptions import NotFound
+from repoze.bfg import testing
 import subprocess
 import os
 import time
@@ -72,6 +73,10 @@ def action(request):
     Execute the action bound to the name passed and return when the action is
     finished.
     FIXME: should verify if the user has access to the command.
+
+    >>> request = testing.DummyRequest()
+    >>> action(request)
+    >>>
     """
     print request.params
     if request.params['app'] in load_app_list():
