@@ -24,7 +24,7 @@ class ViewTests(unittest.TestCase):
         self.assertRaises(NotFound, action, request)
 
     def test_new_app(self):
-        from awsdemos.views import demo_form
+        from awsdemos.views import demo_form, action
         request = testing.DummyRequest(
             params=(('app','not_existing'),), path='/new'
             )
@@ -39,5 +39,6 @@ def additional_tests():
     This is used to add doctests to the test suite
     """
     import awsdemos
-    return doctest.DocTestSuite(awsdemos.views)
+    return doctest.DocTestSuite(awsdemos.views,
+                                optionflags=doctest.ELLIPSIS)
 

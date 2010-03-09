@@ -138,3 +138,21 @@ Tue Mar  9 12:01:26 2010
 scripts/demo_repoze.bfg.sh'test' 'test'
 Tue Mar  9 12:02:17 2010
 scripts/demo_repoze.bfg.sh 'test' 'test'
+Tue Mar  9 15:38:07 2010
+scripts/demo_repoze.bfg.sh 'popo' ''
+Tue Mar  9 15:58:55 2010
+scripts/demo_repoze.bfg.sh 'popo' ''
+Tue Mar  9 15:58:57 2010
+scripts/demo_repoze.bfg.sh 'popo' ''
+Tue Mar  9 18:51:47 2010
+scripts/demo_repoze.bfg.sh 'foobar' 'commentaire'
+Tue Mar  9 18:52:13 2010
+scripts/demo_repoze.bfg.sh 'foobar' 'commentaire'
+Tue Mar  9 18:53:28 2010
+scripts/demo_repoze.bfg.sh 'foobar' 'commentaire'
+Tue Mar  9 18:54:00 2010
+scripts/demo_repoze.bfg.sh 'foobar' 'commentaire'
+Tue Mar  9 18:56:14 2010
+scripts/demo_repoze.bfg.sh 'foobar' 'commentaire'
+Tue Mar  9 18:56:28 2010
+scripts/demo_repoze.bfg.sh 'foobar' 'commentaire'
