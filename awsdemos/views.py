@@ -2,7 +2,7 @@ from ConfigParser import ConfigParser
 from repoze.bfg.chameleon_zpt import get_template
 from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.exceptions import NotFound
-from repoze.bfg import testing
+from repoze.bfg.testing import DummyRequest
 import subprocess
 import os
 import time
@@ -21,13 +21,16 @@ def load_app_list():
     """
     return a dict containing all apps and their respective commands defined in
     config file.
+
+    >>> load_app_list()
+    {'repoze.bfg': ['NAME', 'COMMENT']}
     """
     demos = {}
     for file in (
                     i for i in os.listdir('scripts')
-                    if i[:5] == 'demo_' and i[-3:] == '.sh'
+                    if i.startswith('demo_') and i.endswith('.sh')
                 ):
-        for line in open('scripts'+os.sep+file).readlines():
+        for line in open('scripts'+os.sep+file):
             if line.split(':')[0] == '# PARAMS':
                 params = line.split('\n')[0].split(':')[1].split(',')
         demos[(file[5:-3])] = params
@@ -74,10 +77,26 @@ def action(request):
     finished.
     FIXME: should verify if the user has access to the command.
 
-    >>> request = testing.DummyRequest()
-    >>> action(request)
-    >>>
+    If we don't specify an app, or we specify a non existing app, we get a 404:
+
+    >>> action(DummyRequest())
+    Traceback (most recent call last):
+    ...
+    NotFound
+    >>> action(DummyRequest({'app':'toto'}))
+    Traceback (most recent call last):
+    ...
+    NotFound
+
+    >>> action(DummyRequest({'app':'repoze.bfg',
+    ...                      'NAME':'foobar',
+    ...                      'COMMENT': 'commentaire'}))
+    LOG: scripts/demo_repoze.bfg.sh 'foobar' 'commentaire'
+    <Response at ... 200 OK>
+
     """
+    if 'app' not in request.params:
+        raise NotFound
     if request.params['app'] in load_app_list():
         command = "scripts/demo_"+request.params['app']+".sh"
         params = tuple([
@@ -88,11 +107,7 @@ def action(request):
         stdout, stderr = process.communicate()
         return webob.Response(str("action finished"+str(stdout))+str(stderr))
     else:
-        return webob.Response(str("unknown action"))
+        raise NotFound
 
 
-#def delete_app(request):
-    #"""
-    #Delete an application.
-    #"""
-    #if request.params[
+
