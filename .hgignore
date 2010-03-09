@@ -1,3 +1,4 @@
+.hgrc
 aws.demos.egg-info
 build/
 var/
@@ -9,3 +10,6 @@ develop-eggs/
 .*\.swp$
 .*\.pyc$
 .*\.pyo$
+virtualenv_*
+demos/*
+supervisor.conf

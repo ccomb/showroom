@@ -16,12 +16,15 @@ name=$1
 # load vars and fonctions
 . scripts/config.sh
 
+port=$(get_free_port)
+
 # set virtualenv (just in case)
-. $VIRTUAL_ENV_PATH/bin/activate
+virtualenv virtualenv_$name
+. virtualenv_$name/bin/activate
 
 # create and goto app dir
-mkdir $DEMOS_BASE_DIR/$name
-cd $DEMOS_BASE_DIR/$name
+mkdir -p demos/$name
+cd demos/$name
 
 # create buildout conf, bootstrap and launch buildout
 cat > buildout.cfg <<EOF
@@ -43,7 +46,6 @@ python bootstrap.py
 bin/buildout
 
 # create app conf
-port=$(get_free_port)
 
 cat > $name.cfg << EOF
 [DEFAULT]
@@ -70,7 +72,7 @@ cat >> supervisor.conf << EOF
 [program:$name]
 command = paster serve $name.ini
 process_name = $name
-directory = $DEMOS_BASE_DIR/$name/
+directory = demos/$name/
 priority = 10
 redirect_stderr = false
 
