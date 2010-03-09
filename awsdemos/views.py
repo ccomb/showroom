@@ -78,7 +78,6 @@ def action(request):
     >>> action(request)
     >>>
     """
-    print request.params
     if request.params['app'] in load_app_list():
         command = "scripts/demo_"+request.params['app']+".sh"
         params = tuple([
@@ -92,4 +91,8 @@ def action(request):
         return webob.Response(str("unknown action"))
 
 
-
+#def delete_app(request):
+    #"""
+    #Delete an application.
+    #"""
+    #if request.params[
