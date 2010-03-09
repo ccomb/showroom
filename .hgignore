@@ -13,3 +13,4 @@ develop-eggs/
 virtualenv_*
 demos/*
 supervisor.conf
+commands_demos.log
