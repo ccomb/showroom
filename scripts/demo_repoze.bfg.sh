@@ -19,7 +19,7 @@ name=$1
 port=$(get_free_port)
 
 # set virtualenv (just in case)
-virtualenv virtualenv_$name
+virtualenv virtualenv_$name --no-site-packages
 . virtualenv_$name/bin/activate
 
 # create and goto app dir
