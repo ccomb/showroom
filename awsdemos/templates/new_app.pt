@@ -22,9 +22,7 @@
 
 <!-- start content -->
 <div id='sidebar'>
-blah<br />
-blah<br />
-blah<br />
+
 </div>
 <div id='content'>
     <form method="get" action="action">

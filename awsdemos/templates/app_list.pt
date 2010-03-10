@@ -22,9 +22,8 @@
 
 <!-- start content -->
 <div id='sidebar'>
-blah<br />
-blah<br />
-blah<br />
+<a href="/">applications list</a><br />
+<a href="/demos">demos list</a><br />
 </div>
 <div id='content'>
     <div id="application_list">
