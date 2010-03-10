@@ -3,6 +3,11 @@
   <!-- this must be included for the view declarations to work -->
   <include package="repoze.bfg.includes" />
 
+  <route name="demos"
+         path="/demos"
+         view=".views.view_demos_list"
+  />
+
   <route name="home"
          path=""
          view=".views.app_list"

@@ -105,9 +105,66 @@ def action(request):
         LOG(command+' '+' '.join(params))
         process = subprocess.Popen(command+' '+' '.join(params), shell=True)
         stdout, stderr = process.communicate()
-        return webob.Response(str("action finished"+str(stdout))+str(stderr))
+        return view_demos_list(
+            request,
+            message="application "+params['NAME']+" created: "+stdout[:-1]
+            )
     else:
         raise NotFound
 
 
+def demos_list():
+    """
+    load the list of existing applications. with a boolean indicating if they
+    are activated in supervisor conf.
+
+    """
+    config = ConfigParser()
+    config.read('supervisor.conf')
+    return [
+        (
+            d,config.has_section('program:'+d)\
+            and config.has_option('program:'+d,'autostart')
+            and config.get('program:'+d,'autostart') == 'true'
+        )
+        for d in os.listdir('demos')
+        ]
+
+def view_demos_list(request, message=None):
+    return render_template_to_response(
+            'templates/demos_list.pt',
+            request=request,
+            message=message,
+            demos=demos_list()
+            )
+
+def delete_demo(request):
+    """
+    If an application of the name NAME is deployed, we delete it
+
+    """
+    name=request.params['NAME']
+
+    LOG("removing demo "+name)
+    config = ConfigParser()
+    config.read('supervisor.conf')
+    if not config.remove_section('program:'+name):
+        LOG("remove of "+name+"abborted, demo not found in conf")
+        raise ValueError(
+            "application "+name+" doesn't exists in configuration"
+        )
+    config.write('supervisor.conf')
+
+    if os.path.isdir('virtualenv_'+name):
+        os.rmdir('virtualenv_'+name)
+    else:
+        LOG("No virtualenv found for "+name)
+    if os.parh.isdir('demos'+os.sep+name):
+        os.rmdir('demos'+os.sep+name)
+    else:
+        LOG("ERROR: demo "+name+"'s directory not found in demos.")
+
+    return view_demos_list(
+        request, message='demo '+name+' successfully removed'
+        )
 
