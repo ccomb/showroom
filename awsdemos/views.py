@@ -103,11 +103,13 @@ def action(request):
             "'"+request.params[x]+"'" for x in load_app_list()[request.params['app']]
             ])
         LOG(command+' '+' '.join(params))
-        process = subprocess.Popen(command+' '+' '.join(params), shell=True)
+        process = subprocess.Popen(command+' '+' '.join(params), shell=True,
+        stdout=subprocess.PIPE)
         stdout, stderr = process.communicate()
+        print stdout.split('\n')
         return view_demos_list(
             request,
-            message="application "+params['NAME']+" created: "+stdout[:-1]
+            message="application "+request.params['NAME']+" created: "+stdout.split('\n')[-2]
             )
     else:
         raise NotFound
