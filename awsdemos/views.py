@@ -15,8 +15,6 @@ from repoze.bfg.security import (
     has_permission,
     )
 
-
-
 def load_app_list():
     """
     return a dict containing all apps and their respective commands defined in
@@ -41,10 +39,12 @@ def app_list(request):
     """
     return the main page, with applications list, and actions.
     """
+    master = get_template('templates/master.pt')
     return render_template_to_response(
         "templates/app_list.pt",
         request=request,
-        demos=load_app_list()
+        demos=load_app_list(),
+        master=master
         )
 
 def LOG(string):
@@ -133,11 +133,13 @@ def demos_list():
         ]
 
 def view_demos_list(request, message=None):
+    master = get_template('templates/master.pt')
     return render_template_to_response(
             'templates/demos_list.pt',
             request=request,
             message=message,
-            demos=demos_list()
+            demos=demos_list(),
+            master=master
             )
 
 def delete_demo(request):
