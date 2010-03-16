@@ -5,6 +5,7 @@ from repoze.bfg.exceptions import NotFound
 from repoze.bfg.testing import DummyRequest
 import subprocess
 import os
+from shutil import rmtree
 import time
 import webob
 from repoze.bfg.security import (
@@ -157,14 +158,14 @@ def delete_demo(request):
         raise ValueError(
             "application "+name+" doesn't exists in configuration"
         )
-    config.write('supervisor.conf')
+    config.write(open('supervisor.conf','w'))
 
     if os.path.isdir('virtualenv_'+name):
         os.rmdir('virtualenv_'+name)
     else:
         LOG("No virtualenv found for "+name)
     if os.parh.isdir('demos'+os.sep+name):
-        os.rmdir('demos'+os.sep+name)
+        rmtree('demos'+os.sep+name)
     else:
         LOG("ERROR: demo "+name+"'s directory not found in demos.")
 
