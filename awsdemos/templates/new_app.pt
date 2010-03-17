@@ -20,7 +20,7 @@
     <span tal:content="string:$param"></span>:
     <input tal:attributes="name string:$param" />
     </div>
-    <input type='submit'/>
+    <input type='submit' onclick="this.disabled=true"/>
     </form>
     <img style="display:none;" src='/static/images/loading.gif' />
 </div>
