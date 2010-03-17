@@ -17,15 +17,17 @@
     </div>
     <div id="demos_list">
     <table>
-        <tr>
-            <td>demo</td><td>activate</td><td>reset</td><td>delete</td>
-        </tr>
         <tr tal:repeat="demo demos">
             <td><a tal:attributes="href string:" tal:content="demo[0]">blob</a></td>
-            <td><button tal:content="python:demo[1] and 'activate' or 'deactivate'" ></button></td>
+            <td>
+                <button tal:content="python:demo[1] and 'activate' or 'deactivate'" >
+                </button>
+            </td>
             <td><button>reset</button></td>
-            <td><button tal:attributes="onclick
-            python:'window.location.href=\'delete?NAME='+demo[0]+'\''">delete</button></td>
+            <td><button tal:attributes="
+                onclick python:'window.location.href=\'delete?NAME='+demo[0]+'\''
+                ">delete</button>
+            </td>
         </tr>
     </table>
     </div>

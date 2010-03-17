@@ -11,19 +11,8 @@
 <script type="text/javascript" src="${request.application_url}/static/functions.js"></script>
 
 </head>
-<body>
-<!-- start header -->
-<!--div tal:content="demos">debug</div-->
-<!--div id="debug"></div-->
-<div id="header">
-<span><img src='/static/images/Alter_Way_SOLUTIONS.png'
-/></span><span id="page_title"><h1>Applications de démonstration.</h1></span>
-</div>
-
-<!-- start content -->
-<div id='sidebar'>
-
-</div>
+<body metal:use-macro="master.macros['master']">
+<metal:block fill-slot="content">
 <div id='content'>
     <form method="get" action="action">
     <input type='hidden' name="app" tal:attributes="value string:$demo" />
@@ -35,10 +24,7 @@
     </form>
     <img style="display:none;" src='/static/images/loading.gif' />
 </div>
-<!-- end content -->
-<!-- start footer -->
-
-<!-- end footer -->
+</metal:block>
 </body>
 </html>
 

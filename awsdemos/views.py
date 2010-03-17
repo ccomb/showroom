@@ -59,12 +59,14 @@ def demo_form(request):
     """
     return the form to create a demo
     """
+    master = get_template('templates/master.pt')
     if 'app' in request.params and request.params['app'] in load_app_list():
         return render_template_to_response(
             "templates/new_app.pt",
             request=request,
             paramlist=load_app_list()[request.params['app']],
-            demo=request.params['app']
+            demo=request.params['app'],
+            master=master
         )
     else:
         return webob.Response(str(
