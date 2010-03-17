@@ -161,10 +161,10 @@ def delete_demo(request):
     config.write(open('supervisor.conf','w'))
 
     if os.path.isdir('virtualenv_'+name):
-        os.rmdir('virtualenv_'+name)
+        rmtree('virtualenv_'+name)
     else:
         LOG("No virtualenv found for "+name)
-    if os.parh.isdir('demos'+os.sep+name):
+    if os.path.isdir('demos'+os.sep+name):
         rmtree('demos'+os.sep+name)
     else:
         LOG("ERROR: demo "+name+"'s directory not found in demos.")
