@@ -1,0 +1,34 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>Liste des démos</title>
+<meta name="keywords" content="python web application" />
+<meta name="description" content="repoze.bfg web application" />
+<script type="text/javascript" src="${request.application_url}/static/jquery-1.4.1.min.js"></script>
+<link href="${request.application_url}/static/default.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="${request.application_url}/static/functions.js"></script>
+
+</head>
+<body metal:use-macro="master.macros['master']">
+<metal:block fill-slot="content">
+    <div id="message" tal:content="message or ''">
+    </div>
+    <div id="demos_list">
+    <table>
+        <tr>
+            <td>demo</td><td>activate</td><td>reset</td><td>delete</td>
+        </tr>
+        <tr tal:repeat="demo demos">
+            <td><a tal:attributes="href string:" tal:content="demo[0]">blob</a></td>
+            <td><button tal:content="python:demo[1] and 'activate' or 'deactivate'" ></button></td>
+            <td><button>reset</button></td>
+            <td><button tal:attributes="onclick
+            python:'window.location.href=\'delete?NAME='+demo[0]+'\''">delete</button></td>
+        </tr>
+    </table>
+    </div>
+</metal:block>
+</body>
+</html>
