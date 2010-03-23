@@ -106,10 +106,44 @@ def action(request):
             "'"+request.params[x]+"'" for x in load_app_list()[request.params['app']]
             ])
         LOG(command+' '+' '.join(params))
+        config = ConfigParser()
+        config.read('supervisor.conf')
         process = subprocess.Popen(command+' '+' '.join(params), shell=True,
         stdout=subprocess.PIPE)
         stdout, stderr = process.communicate()
-        print stdout.split('\n')
+        config.add_section('program:'+request.params['NAME'])
+        config.set( 'program:'+request.params['NAME'],
+            'command', 'paster serve '+request.params['NAME']+'.cfg')
+        config.set( 'program:'+request.params['NAME'],
+            'process_name', request.params['NAME'])
+        config.set( 'program:'+request.params['NAME'],
+            'directory', os.path.join('demos',request.params['NAME']))
+        config.set( 'program:'+request.params['NAME'],
+            'priority', '10')
+        config.set( 'program:'+request.params['NAME'],
+            'redirect_stderr', 'false')
+        config.set( 'program:'+request.params['NAME'],
+            'comment', request.params['COMMENT'])
+        config.set( 'program:'+request.params['NAME'],
+            'port', stdout.split('\n')[-2].split(':')[-1][:-1])
+        config.set( 'program:'+request.params['NAME'],
+            'stdout_logfile', 'demos/'+request.params['NAME']+'/std_out.log')
+        config.set( 'program:'+request.params['NAME'],
+            'stderr_logfile', 'demos/'+request.params['NAME']+'/std_err.log')
+        config.set( 'program:'+request.params['NAME'],
+            'stdout_logfile_maxbytes', '1MB')
+        config.set( 'program:'+request.params['NAME'],
+            'stderr_logfile_maxbytes', '1MB')
+        config.set( 'program:'+request.params['NAME'],
+            'stdout_capture_maxbytes', '1MB')
+        config.set( 'program:'+request.params['NAME'],
+            'stderr_capture_maxbytes', '1MB')
+        config.set( 'program:'+request.params['NAME'],
+            'stderr_logfile_backups', '10')
+        config.set( 'program:'+request.params['NAME'],
+            'stderr_logfile_backups', '10')
+
+        config.write(open('supervisor.conf','w'))
         return view_demos_list(
             request,
             message="application "+request.params['NAME']+" created: "+stdout.split('\n')[-2]
@@ -128,9 +162,12 @@ def demos_list():
     config.read('supervisor.conf')
     return [
         (
-            d,config.has_section('program:'+d)\
+            d,
+            config.has_section('program:'+d)\
             and config.has_option('program:'+d,'autostart')
-            and config.get('program:'+d,'autostart') == 'true'
+            and config.get('program:'+d,'autostart') == 'true',
+            config.get('program:'+d, 'port'),
+            config.get('program:'+d, 'comment')
         )
         for d in os.listdir('demos')
         ]

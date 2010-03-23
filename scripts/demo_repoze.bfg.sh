@@ -52,7 +52,7 @@ cat > $name.cfg << EOF
 debug = true
 
 [app:main]
-use = egg:aws.demos#app
+use = egg:$name#app
 reload_templates = true
 debug_authorization = false
 debug_notfound = false
@@ -66,17 +66,6 @@ EOF
 
 #return to the supervisor directory
 cd -
-
-# add app conf to supervisor conf
-cat >> supervisor.conf << EOF
-[program:$name]
-command = paster serve $name.ini
-process_name = $name
-directory = demos/$name/
-priority = 10
-redirect_stderr = false
-
-EOF
 
 echo $BASE_URL:$port/
 
