@@ -200,7 +200,7 @@ def delete_demo(request):
         raise ValueError(
             "application "+name+" doesn't exists in configuration"
         )
-    conf.write(open(config.path.supervisor,'w'))
+    conf.write(open(config.paths.supervisor,'w'))
 
     if os.path.isdir(os.path.join(config.paths.demos, name)):
         rmtree(os.path.join(config.paths.demos, name))
