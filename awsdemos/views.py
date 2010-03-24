@@ -1,8 +1,10 @@
 from ConfigParser import ConfigParser
+from ConfigObject import ConfigObject
 from repoze.bfg.chameleon_zpt import get_template
 from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.exceptions import NotFound
 from repoze.bfg.testing import DummyRequest
+from awsdemos import config
 import subprocess
 import os
 from shutil import rmtree
@@ -106,49 +108,42 @@ def action(request):
             "'"+request.params[x]+"'" for x in load_app_list()[request.params['app']]
             ])
         LOG(command+' '+' '.join(params))
-        config = ConfigParser()
-        config.read('supervisor.conf')
+        conf = ConfigObject()
+        conf.read('supervisor.conf')
         process = subprocess.Popen(command+' '+' '.join(params), shell=True,
         stdout=subprocess.PIPE)
         stdout, stderr = process.communicate()
-        config.add_section('program:'+request.params['NAME'])
-        config.set( 'program:'+request.params['NAME'],
-            'command',
-            os.getcwd()+'/demos/'+request.params['NAME']+'/bin/paster\
-            serve '+request.params['NAME']+'.cfg')
-        config.set( 'program:'+request.params['NAME'],
-            'process_name', request.params['NAME'])
-        config.set( 'program:'+request.params['NAME'],
-            'directory', os.path.join('demos',request.params['NAME']))
-        config.set( 'program:'+request.params['NAME'],
-            'priority', '10')
-        config.set( 'program:'+request.params['NAME'],
-            'redirect_stderr', 'false')
-        config.set( 'program:'+request.params['NAME'],
-            'comment', request.params['COMMENT'])
-        config.set( 'program:'+request.params['NAME'],
-            'port', stdout.split('\n')[-2].split(':')[-1][:-1])
-        config.set( 'program:'+request.params['NAME'],
-            'stdout_logfile', 'demos/'+request.params['NAME']+'/std_out.log')
-        config.set( 'program:'+request.params['NAME'],
-            'stderr_logfile', 'demos/'+request.params['NAME']+'/std_err.log')
-        config.set( 'program:'+request.params['NAME'],
-            'stdout_logfile_maxbytes', '1MB')
-        config.set( 'program:'+request.params['NAME'],
-            'stderr_logfile_maxbytes', '1MB')
-        config.set( 'program:'+request.params['NAME'],
-            'stdout_capture_maxbytes', '1MB')
-        config.set( 'program:'+request.params['NAME'],
-            'stderr_capture_maxbytes', '1MB')
-        config.set( 'program:'+request.params['NAME'],
-            'stderr_logfile_backups', '10')
-        config.set( 'program:'+request.params['NAME'],
-            'stderr_logfile_backups', '10')
 
-        config.write(open('supervisor.conf','w'))
+        name = request.params['NAME']
+        section = 'program:%s' % name
+        path = os.path.join(
+                config.paths.demos,
+                name,
+                )
+        kwargs = dict(path=path, name=name)
+
+        conf[section] = {
+            'command': '%(path)s/bin/paster serve %(path)s/%(name)s.cfg' % kwargs,
+            'process_name': name,
+            'directory': path,
+            'priority': '10',
+            'redirect_stderr': 'false',
+            'comment': request.params['COMMENT'],
+            'port': stdout.split('\n')[-2].split(':')[-1][:-1],
+            'stdout_logfile': os.path.join(path, 'std_out.log'),
+            'stderr_logfile': os.path.join(path, 'std_err.log'),
+            'stdout_logfile_maxbytes': '1MB',
+            'stderr_logfile_maxbytes': '1MB',
+            'stdout_capture_maxbytes': '1MB',
+            'stderr_capture_maxbytes': '1MB',
+            'stderr_logfile_backups': '10',
+            'stderr_logfile_backups': '10',
+        }
+
+        conf.write(open('supervisor.conf','w'))
         return view_demos_list(
             request,
-            message="application "+request.params['NAME']+" created: "+stdout.split('\n')[-2]
+            message="application "+name+" created: "+stdout.split('\n')[-2]
             )
     else:
         raise NotFound
@@ -160,16 +155,14 @@ def demos_list():
     are activated in supervisor conf.
 
     """
-    config = ConfigParser()
-    config.read('supervisor.conf')
+    conf = ConfigObject()
+    conf.read('supervisor.conf')
     return [
         (
             d,
-            config.has_section('program:'+d)\
-            and config.has_option('program:'+d,'autostart')
-            and config.get('program:'+d,'autostart') == 'true',
-            config.get('program:'+d, 'port'),
-            config.get('program:'+d, 'comment')
+            conf['program:%s' % d].autostart.as_bool('false'),
+            conf['program:'+d].port,
+            conf['program:'+d].comment
         )
         for d in os.listdir('demos') if not os.path.isfile('demos'+os.sep+d)
         ]
@@ -192,14 +185,14 @@ def delete_demo(request):
     name=request.params['NAME']
 
     LOG("removing demo "+name)
-    config = ConfigParser()
-    config.read('supervisor.conf')
-    if not config.remove_section('program:'+name):
+    conf = ConfigParser()
+    conf.read('supervisor.conf')
+    if not conf.remove_section('program:'+name):
         LOG("remove of "+name+"abborted, demo not found in conf")
         raise ValueError(
             "application "+name+" doesn't exists in configuration"
         )
-    config.write(open('supervisor.conf','w'))
+    conf.write(open('supervisor.conf','w'))
 
     if os.path.isdir('virtualenv_'+name):
         rmtree('virtualenv_'+name)
