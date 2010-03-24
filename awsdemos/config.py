@@ -3,7 +3,7 @@ from ConfigObject import config_module
 import sys
 import os
 
-filename = sys.argv[-1]
+filename = os.path.abspath(sys.argv[-1])
 
 if not filename.endswith('.ini'):
     filename = os.path.join(

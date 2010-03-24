@@ -21,6 +21,10 @@ from repoze.bfg.security import (
 
 log = logging.getLogger(__name__)
 
+if not os.path.isdir(config.paths.demos):
+    os.makedirs(config.paths.demos)
+    log.info('%s created.', config.paths.demos)
+
 def load_app_list():
     """
     return a dict containing all apps and their respective commands defined in
@@ -102,11 +106,13 @@ def action(request):
         params = tuple([
             "'"+request.params[x]+"'" for x in load_app_list()[request.params['app']]
             ])
+        env = os.environ.copy()
+        env['DEMOS'] = config.paths.demos
         log.debug(command+' '+' '.join(params))
         conf = ConfigObject()
-        conf.read('supervisor.conf')
+        conf.read(config.paths.supervisor)
         process = subprocess.Popen(command+' '+' '.join(params), shell=True,
-        stdout=subprocess.PIPE)
+        stdout=subprocess.PIPE, env=env)
         stdout, stderr = process.communicate()
 
         name = request.params['NAME']
@@ -137,7 +143,7 @@ def action(request):
 
         log.info('section %s added', name)
 
-        conf.write(open('supervisor.conf','w'))
+        conf.write(open(config.paths.supervisor,'w'))
         return view_demos_list(
             request,
             message="application "+name+" created: "+stdout.split('\n')[-2]
@@ -153,7 +159,7 @@ def demos_list():
 
     """
     conf = ConfigObject()
-    conf.read('supervisor.conf')
+    conf.read(config.paths.supervisor)
     return [
         (
             d,
@@ -161,7 +167,7 @@ def demos_list():
             conf['program:'+d].port,
             conf['program:'+d].comment
         )
-        for d in os.listdir('demos') if not os.path.isfile('demos'+os.sep+d)
+        for d in os.listdir(config.paths.demos) if not os.path.isfile(os.path.join(config.paths.demos, d))
         ]
 
 def view_demos_list(request, message=None):
@@ -183,20 +189,17 @@ def delete_demo(request):
 
     log.warn("removing demo "+name)
     conf = ConfigParser()
-    conf.read('supervisor.conf')
+    import pdb;pdb.set_trace()
+    conf.read(config.paths.supervisor)
     if not conf.remove_section('program:'+name):
         log.debug("remove of "+name+"abborted, demo not found in conf")
         raise ValueError(
             "application "+name+" doesn't exists in configuration"
         )
-    conf.write(open('supervisor.conf','w'))
+    conf.write(open(config.path.supervisor,'w'))
 
-    if os.path.isdir('virtualenv_'+name):
-        rmtree('virtualenv_'+name)
-    else:
-        log.error("No virtualenv found for "+name)
-    if os.path.isdir('demos'+os.sep+name):
-        rmtree('demos'+os.sep+name)
+    if os.path.isdir(os.path.join(config.paths.demos, name)):
+        rmtree(os.path.join(config.paths.demos, name))
     else:
         log.error("demo "+name+"'s directory not found in demos.")
 

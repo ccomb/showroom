@@ -19,12 +19,10 @@ name=$1
 port=$(get_free_port)
 
 # set virtualenv (just in case)
-virtualenv virtualenv_$name --no-site-packages --distribute
-. virtualenv_$name/bin/activate
+virtualenv $DEMOS/$name --no-site-packages --distribute
+. $DEMOS/$name/bin/activate
 
-# create and goto app dir
-mkdir -p demos/$name
-cd demos/$name
+cd $DEMOS/$name
 
 # create buildout conf, bootstrap and launch buildout
 cat > buildout.cfg <<EOF
