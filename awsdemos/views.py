@@ -53,13 +53,6 @@ def app_list(request):
         master=master
         )
 
-def LOG(string):
-    print 'LOG: '+string
-    file = open('commands_demos.log', 'a+')
-    file.write(time.asctime(time.localtime())+'\n')
-    file.write(string+'\n')
-    file.close()
-
 def demo_form(request):
     """
     return the form to create a demo
@@ -99,7 +92,6 @@ def action(request):
     >>> action(DummyRequest({'app':'repoze.bfg',
     ...                      'NAME':'foobar',
     ...                      'COMMENT': 'commentaire'}))
-    LOG: scripts/demo_repoze.bfg.sh 'foobar' 'commentaire'
     <Response at ... 200 OK>
 
     """
@@ -110,7 +102,7 @@ def action(request):
         params = tuple([
             "'"+request.params[x]+"'" for x in load_app_list()[request.params['app']]
             ])
-        LOG(command+' '+' '.join(params))
+        log.debug(command+' '+' '.join(params))
         conf = ConfigObject()
         conf.read('supervisor.conf')
         process = subprocess.Popen(command+' '+' '.join(params), shell=True,
@@ -142,6 +134,8 @@ def action(request):
             'stderr_logfile_backups': '10',
             'stderr_logfile_backups': '10',
         }
+
+        log.info('section %s added', name)
 
         conf.write(open('supervisor.conf','w'))
         return view_demos_list(
@@ -187,11 +181,11 @@ def delete_demo(request):
     """
     name=request.params['NAME']
 
-    LOG("removing demo "+name)
+    log.warn("removing demo "+name)
     conf = ConfigParser()
     conf.read('supervisor.conf')
     if not conf.remove_section('program:'+name):
-        LOG("remove of "+name+"abborted, demo not found in conf")
+        log.debug("remove of "+name+"abborted, demo not found in conf")
         raise ValueError(
             "application "+name+" doesn't exists in configuration"
         )
@@ -200,11 +194,11 @@ def delete_demo(request):
     if os.path.isdir('virtualenv_'+name):
         rmtree('virtualenv_'+name)
     else:
-        LOG("No virtualenv found for "+name)
+        log.error("No virtualenv found for "+name)
     if os.path.isdir('demos'+os.sep+name):
         rmtree('demos'+os.sep+name)
     else:
-        LOG("ERROR: demo "+name+"'s directory not found in demos.")
+        log.error("demo "+name+"'s directory not found in demos.")
 
     return view_demos_list(
         request, message='demo '+name+' successfully removed'
