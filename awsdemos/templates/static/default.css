@@ -7,7 +7,7 @@ Released for free under a Creative Commons Attribution 2.5 License
 body {
         margin: 0;
         padding: 0;
-        background-color: #69BE89;
+        background-color: #b2b2ff;
         font-size: 13px;
         font-family: "Trebuchet MS", Georgia, "Times New Roman", Times, serif;
         text-align: justify;
@@ -210,7 +210,11 @@ input, textarea, select {
 #content {
         float: left;
         width: 410px;
-        
+}
+
+#application_list {
+        top: 4em;
+        text-align: center;
 }
 
 /* Post */

@@ -14,4 +14,4 @@ virtualenv_*
 demos/*
 supervisor.conf
 commands_demos.log
-num_port.count
+scripts/num_port.count

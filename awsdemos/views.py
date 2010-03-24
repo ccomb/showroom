@@ -108,6 +108,8 @@ def action(request):
             ])
         env = os.environ.copy()
         env['DEMOS'] = config.paths.demos
+        env['NAME'] = request.params['NAME']
+        env['COMMENT'] = request.params['COMMENT']
         log.debug(command+' '+' '.join(params))
         conf = ConfigObject()
         conf.read(config.paths.supervisor)
@@ -115,38 +117,41 @@ def action(request):
         stdout=subprocess.PIPE, env=env)
         stdout, stderr = process.communicate()
 
-        name = request.params['NAME']
-        section = 'program:%s' % name
+        section = 'program:%s' % env['NAME']
         path = os.path.join(
                 config.paths.demos,
-                name,
+                env['NAME'],
                 )
-        kwargs = dict(path=path, name=name)
+        kwargs = dict(path=path, name=env['NAME'])
 
-        conf[section] = {
-            'command': '%(path)s/bin/paster serve %(path)s/%(name)s.cfg' % kwargs,
-            'process_name': name,
-            'directory': path,
-            'priority': '10',
-            'redirect_stderr': 'false',
-            'comment': request.params['COMMENT'],
-            'port': stdout.split('\n')[-2].split(':')[-1][:-1],
-            'stdout_logfile': os.path.join(path, 'std_out.log'),
-            'stderr_logfile': os.path.join(path, 'std_err.log'),
-            'stdout_logfile_maxbytes': '1MB',
-            'stderr_logfile_maxbytes': '1MB',
-            'stdout_capture_maxbytes': '1MB',
-            'stderr_capture_maxbytes': '1MB',
-            'stderr_logfile_backups': '10',
-            'stderr_logfile_backups': '10',
-        }
+        if os.path.isfile(os.path.join(path, 'starter.sh')):
+            conf[section] = {
+                'command': os.path.join(path, 'starter.sh') % kwargs,
+                'process_name': name,
+                'directory': path,
+                'priority': '10',
+                'redirect_stderr': 'false',
+                'comment': request.params['COMMENT'],
+                'port': stdout.split('\n')[-2].split(':')[-1][:-1],
+                'stdout_logfile': os.path.join(path, 'std_out.log'),
+                'stderr_logfile': os.path.join(path, 'std_err.log'),
+                'stdout_logfile_maxbytes': '1MB',
+                'stderr_logfile_maxbytes': '1MB',
+                'stdout_capture_maxbytes': '1MB',
+                'stderr_capture_maxbytes': '1MB',
+                'stderr_logfile_backups': '10',
+                'stderr_logfile_backups': '10',
+            }
+        else:
+            #TODO: php?
+            pass
 
-        log.info('section %s added', name)
+        log.info('section %s added', env['NAME'])
 
         conf.write(open(config.paths.supervisor,'w'))
         return view_demos_list(
             request,
-            message="application "+name+" created: "+stdout.split('\n')[-2]
+            message="application "+env['NAME']+" created: "+stdout.split('\n')[-2]
             )
     else:
         raise NotFound
@@ -189,7 +194,6 @@ def delete_demo(request):
 
     log.warn("removing demo "+name)
     conf = ConfigParser()
-    import pdb;pdb.set_trace()
     conf.read(config.paths.supervisor)
     if not conf.remove_section('program:'+name):
         log.debug("remove of "+name+"abborted, demo not found in conf")
