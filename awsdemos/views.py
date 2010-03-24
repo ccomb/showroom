@@ -5,6 +5,7 @@ from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.exceptions import NotFound
 from repoze.bfg.testing import DummyRequest
 from awsdemos import config
+import logging
 import subprocess
 import os
 from shutil import rmtree
@@ -17,6 +18,8 @@ from repoze.bfg.security import (
     authenticated_userid,
     has_permission,
     )
+
+log = logging.getLogger(__name__)
 
 def load_app_list():
     """
