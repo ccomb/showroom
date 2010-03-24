@@ -113,7 +113,9 @@ def action(request):
         stdout, stderr = process.communicate()
         config.add_section('program:'+request.params['NAME'])
         config.set( 'program:'+request.params['NAME'],
-            'command', 'paster serve '+request.params['NAME']+'.cfg')
+            'command',
+            os.getcwd()+'/demos/'+request.params['NAME']+'/bin/paster\
+            serve '+request.params['NAME']+'.cfg')
         config.set( 'program:'+request.params['NAME'],
             'process_name', request.params['NAME'])
         config.set( 'program:'+request.params['NAME'],

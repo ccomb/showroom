@@ -19,7 +19,7 @@ name=$1
 port=$(get_free_port)
 
 # set virtualenv (just in case)
-virtualenv virtualenv_$name --no-site-packages
+virtualenv virtualenv_$name --no-site-packages --distribute
 . virtualenv_$name/bin/activate
 
 # create and goto app dir
@@ -33,7 +33,7 @@ parts=$name
 
 [$name]
 recipe = zc.recipe.egg
-eggs =  repoze.bfg
+eggs = repoze.bfg
         pastescript
         pastedeploy
         paste

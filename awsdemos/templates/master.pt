@@ -1,6 +1,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:tal="http://xml.zope.org/namespaces/tal">
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:define-macro="master">
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <title>Liste des démos</title>
@@ -11,20 +13,28 @@
 <script type="text/javascript" src="${request.application_url}/static/functions.js"></script>
 
 </head>
-<body metal:use-macro="master.macros['master']">
-<metal:block fill-slot="content">
-<div id='content'>
-    <form method="get" action="action">
-    <input type='hidden' name="app" tal:attributes="value string:$demo" />
-    <div tal:repeat="param paramlist">
-    <span tal:content="string:$param"></span>:
-    <input tal:attributes="name string:$param" />
-    </div>
-    <input type='submit' onclick="this.disabled=true;$('#loading').css('display', 'block')"/>
-    </form>
-    <img id="loading" style="display:none;" src='/static/images/loading.gif' />
+<body>
+<!-- start header -->
+<!--div tal:content="demos">debug</div-->
+<!--div id="debug"></div-->
+<div id="header">
+<span><img src='/static/images/Alter_Way_SOLUTIONS.png'
+/></span><span id="page_title"><h1>Applications de démonstration.</h1></span>
 </div>
-</metal:block>
+
+<!-- start content -->
+<div id='sidebar'>
+<a href="/">applications list</a><br />
+<a href="/demos">demos list</a><br />
+</div>
+
+<div id='content'>
+<metal:block define-slot="content" />
+</div>
+<!-- end content -->
+<!-- start footer -->
+
+<!-- end footer -->
 </body>
 </html>
 
