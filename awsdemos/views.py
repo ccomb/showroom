@@ -171,7 +171,7 @@ def demos_list():
             config.get('program:'+d, 'port'),
             config.get('program:'+d, 'comment')
         )
-        for d in os.listdir('demos')
+        for d in os.listdir('demos') if os.path.isfile(d)
         ]
 
 def view_demos_list(request, message=None):
