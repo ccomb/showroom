@@ -102,7 +102,7 @@ def action(request):
     if 'app' not in request.params:
         raise NotFound
     if request.params['app'] in load_app_list():
-        command = "scripts/demo_"+request.params['app']+".sh"
+        command = os.path.join(config.paths.scripts, "demo_"+request.params['app']+".sh")
         params = tuple([
             "'"+request.params[x]+"'" for x in load_app_list()[request.params['app']]
             ])
@@ -151,7 +151,7 @@ def action(request):
         conf.write(open(config.paths.supervisor,'w'))
         return view_demos_list(
             request,
-            message="application "+env['NAME']+" created: "+stdout.split('\n')[-2]
+            message="application "+env['NAME']+" created: "+stdout.read().split('\n')[-2]
             )
     else:
         raise NotFound

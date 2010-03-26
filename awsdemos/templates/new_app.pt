@@ -1,29 +1,18 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:tal="http://xml.zope.org/namespaces/tal">
-<head>
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<title>Liste des démos</title>
-<meta name="keywords" content="python web application" />
-<meta name="description" content="repoze.bfg web application" />
-<script type="text/javascript" src="${request.application_url}/static/jquery-1.4.1.min.js"></script>
-<link href="${request.application_url}/static/default.css" rel="stylesheet" type="text/css" />
-<script type="text/javascript" src="${request.application_url}/static/functions.js"></script>
-
-</head>
-<body metal:use-macro="master.macros['master']">
+  xmlns:tal="http://xml.zope.org/namespaces/tal"
+   metal:use-macro="master.macros['master']">
+<body>
 <metal:block fill-slot="content">
-<div id='content'>
     <form method="get" action="action">
-    <input type='hidden' name="app" tal:attributes="value string:$demo" />
+    <input type="hidden" name="app" tal:attributes="value string:$demo" />
     <div tal:repeat="param paramlist">
     <span tal:content="string:$param"></span>:
     <input tal:attributes="name string:$param" />
     </div>
-    <input type='submit' onclick="this.disabled=true;$('#loading').css('display', 'block')"/>
+    <input type="submit" oncclick="$(this).attr('disabled', 'disabled');$('#loading').css('display', 'block');return true;"/>
     </form>
-    <img id="loading" style="display:none;" src='/static/images/loading.gif' />
-</div>
+    <img id="loading" style="display:none;" src="/static/images/loading.gif" />
 </metal:block>
 </body>
 </html>

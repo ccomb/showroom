@@ -11,7 +11,7 @@ set -e # explicit fail on errors
 port=$(get_free_port)
 
 # set virtualenv (just in case)
-virtualenv $DEMOS/$NAME --no-site-packages --distribute
+bin/virtualenv $DEMOS/$NAME --no-site-packages --distribute
 . $DEMOS/$NAME/bin/activate
 
 cd $DEMOS/$NAME
@@ -23,11 +23,12 @@ parts=$NAME
 
 [$NAME]
 recipe = zc.recipe.egg
-eggs =  aws.demos.$NAME
-        repoze.bfg
-        pastescript
-        pastedeploy
-        paste
+eggs =  
+    repoze.bfg
+    pastescript
+    pastedeploy
+    paste
+    aws.demos.$NAME
 
 EOF
 
@@ -43,7 +44,7 @@ cat > deploy.cfg << EOF
 debug = true
 
 [app:main]
-use = egg:$NAME#app
+use = egg:aws.demos.$NAME#app
 reload_templates = true
 debug_authorization = false
 debug_notfound = false

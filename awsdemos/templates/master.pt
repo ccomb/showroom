@@ -18,18 +18,18 @@
 <!--div tal:content="demos">debug</div-->
 <!--div id="debug"></div-->
 <div id="header">
-<span><img src='/static/images/Alter_Way_SOLUTIONS.png'
-/></span><span id="page_title"><h1>Applications de démonstration.</h1></span>
+<span><img src="/static/images/Alter_Way_SOLUTIONS.png"/></span>
+<div id="page_title"><h1>Applications de démonstration.</h1></div>
 </div>
 
 <!-- start content -->
-<div id='sidebar'>
+<div id="sidebar">
 <a href="/">applications list</a><br />
 <a href="/demos">demos list</a><br />
 </div>
 
-<div id='content'>
-<metal:block define-slot="content" />
+<div id="content">
+  <metal:block define-slot="content"></metal:block>
 </div>
 <!-- end content -->
 <!-- start footer -->
