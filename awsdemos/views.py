@@ -127,7 +127,7 @@ def action(request):
         if os.path.isfile(os.path.join(path, 'starter.sh')):
             conf[section] = {
                 'command': os.path.join(path, 'starter.sh') % kwargs,
-                'process_name': name,
+                'process_name': env['NAME'],
                 'directory': path,
                 'priority': '10',
                 'redirect_stderr': 'false',
@@ -151,7 +151,7 @@ def action(request):
         conf.write(open(config.paths.supervisor,'w'))
         return view_demos_list(
             request,
-            message="application "+env['NAME']+" created: "+stdout.read().split('\n')[-2]
+            message="application "+env['NAME']+" created: "+stdout.split('\n')[-2]
             )
     else:
         raise NotFound
