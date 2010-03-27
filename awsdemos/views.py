@@ -99,9 +99,7 @@ def action(request):
         env['PORT'] = str(port)
         env['DEMOS'] = config.paths.demos
         log.debug(command+' '+' '.join(params))
-        process = subprocess.Popen(command+' '+' '.join(params), shell=True,
-        stdout=subprocess.PIPE, env=env)
-        stdout, stderr = process.communicate()
+        subprocess.call(command+' '+' '.join(params), shell=True, env=env)
 
         path = os.path.join(
                 config.paths.demos,
