@@ -1,21 +1,23 @@
 # -*- coding: utf-8 -*-
 from restkit.ext.wsgi_proxy import Proxy
-from awsdemos import utils
 from webob import Request, exc
+from awsdemos import utils
+import urllib
 
 class AppProxy(object):
 
     proxy = Proxy(allowed_methods=['GET', 'HEAD', 'POST'])
 
     def rewrite(self, name, app, req):
+        path_info = urllib.quote(req.path_info)
         if app.type == 'repoze.bfg':
-            path_info = '/%s%s' % (name, req.path_info)
+            path_info = '/%s%s' % (name, path_info)
         elif app.type == 'plone':
             host = req.host
             if ':' not in host:
                 host = '%s:80' % host
-            path_info = '/VirtualHostBase/http/%s/VirtualHostRoot/%s%s' % (host, name, req.path_info or '/')
-        req.path_info = path_info.replace(' ', '%20')
+            path_info = '/VirtualHostBase/http/%s/VirtualHostRoot/%s%s' % (host, name, path_info)
+        req.path_info = path_info
         return req
 
     def __call__(self, environ, start_response):
