@@ -8,8 +8,6 @@ set -e # explicit fail on errors
 # load vars and fonctions
 . scripts/config.sh
 
-port=$(get_free_port)
-
 # set virtualenv (just in case)
 bin/virtualenv $DEMOS/$NAME --no-site-packages --distribute
 . $DEMOS/$NAME/bin/activate
@@ -63,16 +61,20 @@ cat > deploy.cfg << EOF
 debug = true
 
 [app:main]
+use = egg:Paste#urlmap
+/$NAME = app
+
+[app:app]
 use = egg:$NAME#app
 reload_templates = true
 debug_authorization = false
 debug_notfound = false
-zobd_uri = file://%(here)s/Data.fs
+zodb_uri = file://%(here)s/Data.fs
 
 [server:main]
 use = egg:Paste#http
 host = 127.0.0.1
-port = $port
+port = $PORT
 
 EOF
 
@@ -85,6 +87,4 @@ EOF
 
 #return to the supervisor directory
 cd -
-
-echo $BASE_URL:$port/
 

@@ -18,14 +18,14 @@
 <!--div tal:content="demos">debug</div-->
 <!--div id="debug"></div-->
 <div id="header">
-<span><img src="/static/images/Alter_Way_SOLUTIONS.png"/></span>
+<span><img src="${request.application_url}/static/images/Alter_Way_SOLUTIONS.png"/></span>
 <div id="page_title"><h1>Applications de démonstration.</h1></div>
 </div>
 
 <!-- start content -->
 <div id="sidebar">
-<a href="/">applications list</a><br />
-<a href="/demos">demos list</a><br />
+<a href="${request.application_url}">applications list</a><br />
+<a href="${request.application_url}/demos">demos list</a><br />
 </div>
 
 <div id="content">

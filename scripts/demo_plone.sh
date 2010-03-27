@@ -8,8 +8,6 @@ set -e # explicit fail on errors
 # load vars and fonctions
 . scripts/config.sh
 
-port=$(get_free_port)
-
 # set virtualenv (just in case)
 python2.4 bin/virtualenv $DEMOS/$NAME --no-site-packages --distribute
 . $DEMOS/$NAME/bin/activate
@@ -30,7 +28,7 @@ find-links =
     http://download.zope.org/ppix/
     http://download.zope.org/distribution/
     http://effbot.org/downloads
-eggs =
+eggs = PILwoTk
 develop =
 
 [zope2]
@@ -41,7 +39,7 @@ url = \${versions:zope2-url}
 recipe = plone.recipe.zope2instance
 zope2-location = \${zope2:location}
 user = admin:admin
-http-address = $port
+http-address = $PORT
 debug-mode = off
 verbose-security = off
 eggs =
@@ -61,8 +59,30 @@ cd $DEMOS/$NAME
 bin/instance fg
 EOF
 
+# create site
+cat > bin/initialize.py << EOF
+# -*- coding: utf-8 -*-
+import os
+import transaction
+from AccessControl.SecurityManagement import newSecurityManager
+from Testing.makerequest import makerequest
+app=makerequest(app)
+
+user = app.acl_users.getUserById('admin')
+user = user.__of__(app.acl_users)
+newSecurityManager(None, user)
+
+print 'Adding plone site'
+app.manage_addProduct['CMFPlone'].addPloneSite(os.environ['NAME'])
+site = app[os.environ['NAME']]
+
+print 'Adding user. Dont work for now'
+site.portal_registration.addMember('admin', 'admin', ['Manager'])
+transaction.commit()
+EOF
+
+bin/instance run bin/initialize.py
+
 #return to the supervisor directory
 cd -
-
-echo $BASE_URL:$port/
 

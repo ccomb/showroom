@@ -31,6 +31,7 @@ setup(name='aws.demos',
       entry_points = """\
       [paste.app_factory]
       app = awsdemos.run:app
+      proxy = awsdemos.proxy:make_proxy
       """
       )
 
