@@ -24,10 +24,12 @@
                 </button>
             </td>
             <td><button>reset</button></td>
+            <tal:repeat tal:repeat="cmd python: ['start', 'stop', 'restart']">
             <td><button tal:attributes="
-                onclick python:'window.location.href=\''+request.application_url+'/daemon?NAME='+demo['name']+'&amp;COMMAND=restart\''
-                ">restart</button>
+                onclick python:'window.location.href=\''+request.application_url+'/daemon?NAME='+demo['name']+'&amp;COMMAND='+cmd+'\''
+                " tal:content="cmd">restart</button>
             </td>
+            </tal:repeat>
             <td><button tal:attributes="
                 onclick python:'window.location.href=\''+request.application_url+'/delete?NAME='+demo['name']+'\''
                 ">delete</button>

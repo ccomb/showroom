@@ -23,11 +23,23 @@ def get_app(name):
 def daemon(name, command='restart'):
     app = get_app(name)
     if app.daemon == 'supervisor':
-        cmd = '%s %s %s' % (os.path.join(config.paths.bin, 'supervisorctl'), command, name)
+        cmd = [os.path.join(config.paths.bin, 'supervisorctl'), command, name]
     elif app.daemon:
-        cmd = '%s %s' % (app.daemon, command)
-    log.warn('%sing %s: %s', command, name, cmd)
-    subprocess.call(cmd, shell=True)
+        cmd = [app.daemon, command]
+    else:
+        cmd = None
+    if cmd:
+        log.warn('%sing %s: %s', command, name, ' '.join(cmd))
+        p = subprocess.Popen(cmd)
+        ret = p.wait()
+        try:
+            p.terminate()
+        except OSError:
+            pass
+        return ret
+    else:
+        log.error('no such demo %s', name)
+        return -1
 
 def load_app_list():
     """

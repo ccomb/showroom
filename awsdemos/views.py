@@ -206,19 +206,17 @@ def delete_demo(request):
     """
     name=request.params['NAME']
 
+    utils.daemon(name, 'stop')
+
     log.warn("removing demo "+name)
     apps = utils.get_apps()
 
     del apps[name]
     apps.write(open(config.paths.apps, 'w'))
 
-    conf = ConfigParser()
+    conf = ConfigObject()
     conf.read(config.paths.supervisor)
-    if not conf.remove_section('program:'+name):
-        log.debug("remove of "+name+"abborted, demo not found in conf")
-        raise ValueError(
-            "application "+name+" doesn't exists in configuration"
-        )
+    del conf['program:'+name]
     conf.write(open(config.paths.supervisor,'w'))
 
     if os.path.isdir(os.path.join(config.paths.demos, name)):
