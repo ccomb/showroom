@@ -53,11 +53,12 @@ python bootstrap.py
 
 bin/buildout
 
-cat > starter.sh << EOF
+cat > daemon.sh << EOF
 #!/usr/bin/env sh
 cd $DEMOS/$NAME
-bin/instance fg
+bin/instance \$1
 EOF
+chmod +x daemon.sh
 
 # create site
 cat > bin/initialize.py << EOF

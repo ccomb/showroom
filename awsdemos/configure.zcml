@@ -23,6 +23,11 @@
          view=".views.action"
   />
 
+  <route name="daemon"
+        path="/daemon"
+        view=".views.daemon"
+  />
+
   <route name="delete"
         path="/delete"
         view=".views.delete_demo"

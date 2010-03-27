@@ -89,24 +89,32 @@ def action(request):
         env = os.environ.copy()
         env.update(request.params)
         name = request.params['NAME']
-        port = utils.next_port()
+        app = utils.get_app(name)
+        if app.port:
+            log.warn('demo %s already exist. reusing port' % name)
+            utils.daemon(name, 'stop')
+            port = app.port
+        else:
+            port = utils.next_port()
         env['PORT'] = str(port)
         env['DEMOS'] = config.paths.demos
         log.debug(command+' '+' '.join(params))
-        conf = ConfigObject()
-        conf.read(config.paths.supervisor)
         process = subprocess.Popen(command+' '+' '.join(params), shell=True,
         stdout=subprocess.PIPE, env=env)
         stdout, stderr = process.communicate()
 
-        section = 'program:%s' % name
         path = os.path.join(
                 config.paths.demos,
                 name,
                 )
         kwargs = dict(path=path, name=name)
 
+        apps = utils.get_apps()
+        conf = ConfigObject()
+        conf.read(config.paths.supervisor)
+
         if os.path.isfile(os.path.join(path, 'starter.sh')):
+            section = 'program:%s' % name
             conf[section] = {
                 'command': os.path.join(path, 'starter.sh') % kwargs,
                 'process_name': name,
@@ -124,18 +132,24 @@ def action(request):
                 'stderr_logfile_backups': '10',
                 'stderr_logfile_backups': '10',
             }
+            conf.write(open(config.paths.supervisor,'w'))
+            apps[name] = dict(port=port, path=path,
+                              type=request.params['app'],
+                              daemon='supervisor')
+        if os.path.isfile(os.path.join(path, 'daemon.sh')):
+            apps[name] = dict(port=port, path=path,
+                              type=request.params['app'],
+                              daemon=os.path.join(path, 'daemon.sh'))
         else:
             #TODO: php?
             pass
 
-        conf.write(open(config.paths.supervisor,'w'))
 
-        apps = utils.get_apps()
-        apps[name] = dict(port=port, path=path,
-                          type=request.params['app'])
         apps.write(open(config.paths.apps, 'w+'))
 
         log.info('section %s added', name)
+
+        utils.daemon(name, 'start')
 
         return view_demos_list(
             request,
@@ -175,6 +189,17 @@ def view_demos_list(request, message=None):
             demos=demos_list(),
             master=master
             )
+
+def daemon(request):
+    name = request.params.get('NAME', '_')
+    command = request.params.get('COMMAND', 'restart')
+    app = utils.get_app(name)
+    if app.port:
+        utils.daemon(name, command.lower())
+        return view_demos_list(
+            request, message='demo %s successfully %sed' % (name, command.lower())
+            )
+    raise NotFound
 
 def delete_demo(request):
     """

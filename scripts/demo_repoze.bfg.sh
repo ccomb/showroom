@@ -82,8 +82,8 @@ cat > starter.sh << EOF
 #!/usr/bin/env sh
 cd $DEMOS/$NAME
 bin/paster serve deploy.cfg
-
 EOF
+chmod +x starter.sh
 
 #return to the supervisor directory
 cd -
