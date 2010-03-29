@@ -6,10 +6,10 @@ set -e # explicit fail on errors
 # PARAMS:NAME,COMMENT
 
 # load vars and fonctions
-. scripts/config.sh
+. $SCRIPTS/config.sh
 
 # set virtualenv (just in case)
-bin/virtualenv $DEMOS/$NAME --no-site-packages --distribute
+$BIN/virtualenv $DEMOS/$NAME --no-site-packages --distribute
 . $DEMOS/$NAME/bin/activate
 
 cd $DEMOS/$NAME

@@ -6,10 +6,10 @@ set -e # explicit fail on errors
 # PARAMS:NAME,COMMENT
 
 # load vars and fonctions
-. scripts/config.sh
+. $SCRIPTS/config.sh
 
 # set virtualenv (just in case)
-python2.4 bin/virtualenv $DEMOS/$NAME --no-site-packages --distribute
+python2.4 $BIN/virtualenv $DEMOS/$NAME --no-site-packages --distribute
 . $DEMOS/$NAME/bin/activate
 
 cd $DEMOS/$NAME
@@ -48,7 +48,7 @@ eggs =
 zcml = 
 EOF
 
-wget http://svn.zope.org/*checkout*/zc.buildout/trunk/bootstrap/bootstrap.py
+bootstrap
 python bootstrap.py
 
 bin/buildout

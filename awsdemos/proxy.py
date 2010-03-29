@@ -10,13 +10,13 @@ class AppProxy(object):
 
     def rewrite(self, name, app, req):
         path_info = urllib.quote(req.path_info)
-        if app.type == 'repoze.bfg':
-            path_info = '/%s%s' % (name, path_info)
-        elif app.type == 'plone':
+        if app.type == 'plone':
             host = req.host
             if ':' not in host:
                 host = '%s:80' % host
             path_info = '/VirtualHostBase/http/%s/VirtualHostRoot/%s%s' % (host, name, path_info)
+        else:
+            path_info = '/%s%s' % (name, path_info)
         req.path_info = path_info
         return req
 

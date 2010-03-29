@@ -97,6 +97,8 @@ def action(request):
         else:
             port = utils.next_port()
         env['PORT'] = str(port)
+        env['BIN'] = config.paths.bin
+        env['SCRIPTS'] = config.paths.scripts
         env['DEMOS'] = config.paths.demos
         log.debug(command+' '+' '.join(params))
         subprocess.call(command+' '+' '.join(params), shell=True, env=env)
