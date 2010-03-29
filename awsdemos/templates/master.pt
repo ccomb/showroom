@@ -1,10 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:tal="http://xml.zope.org/namespaces/tal"
-      xmlns:metal="http://xml.zope.org/namespaces/metal"
-      metal:define-macro="master">
+      xmlns:metal="http://xml.zope.org/namespaces/metal">
 <head>
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta http-equiv="content-type" content="text/xml+xhtml; charset=utf-8" />
 <title>Liste des démos</title>
 <meta name="keywords" content="python web application" />
 <meta name="description" content="repoze.bfg web application" />
@@ -13,28 +12,58 @@
 <script type="text/javascript" src="${request.application_url}/static/functions.js"></script>
 
 </head>
+
 <body>
 <!-- start header -->
 <!--div tal:content="demos">debug</div-->
 <!--div id="debug"></div-->
 <div id="header">
-<span><img src="${request.application_url}/static/images/Alter_Way_SOLUTIONS.png"/></span>
-<div id="page_title"><h1>Applications de démonstration.</h1></div>
+    <span><img src="${request.application_url}/static/images/Alter_Way_SOLUTIONS.png"/></span>
+    <div id="page_title"><h1>Applications de démonstration.</h1></div>
 </div>
 
 <!-- start content -->
 <div id="sidebar">
-<a href="${request.application_url}">applications list</a><br />
-<a href="${request.application_url}/demos">demos list</a><br />
+    <form id="app_form" method="get" action="action">
+        <select name="app" onchange="update_app_form(this.value)">
+        <option>créer une démo</option>
+        <option tal:repeat="app apps" tal:content="python:app">placeholder</option>
+        </select>
+        <span id="app_form_dynamic"></span>
+        <img id="loading" style="display:none;"
+        src="/static/images/loading.gif" /><br />
+        <input id="app_form_submit" type="submit" onclick="on_valid_form();"/>
+    </form>
 </div>
 
 <div id="content">
-  <metal:block define-slot="content"></metal:block>
+    <div id="message" tal:content="message or ''"> </div>
+    <div id="demos_list">
+        <table>
+            <tr tal:repeat="demo demos">
+              <td><a tal:attributes="href python:'/'+demo['name']" tal:content="python: demo['name']">blob</a></td>
+                <td>
+                    <button tal:content="python:demo['autostart'] and 'activate' or 'deactivate'" >
+                    </button>
+                </td>
+                <td><button>reset</button></td>
+                <tal:repeat tal:repeat="cmd python: ['start', 'stop', 'restart']" >
+                <td><button tal:attributes="
+                    onclick python:'window.location.href=\''+request.application_url+'/daemon?NAME='+demo['name']+'&amp;COMMAND='+cmd+'\''
+                    " tal:content="cmd">restart</button>
+                </td>
+                </tal:repeat>
+                <td><button tal:attributes="
+                    onclick python:'window.location.href=\''+request.application_url+'/delete?NAME='+demo['name']+'\''
+                    ">delete</button>
+                </td>
+            </tr>
+        </table>
+    </div>
 </div>
+
 <!-- end content -->
 <!-- start footer -->
-
 <!-- end footer -->
 </body>
 </html>
-

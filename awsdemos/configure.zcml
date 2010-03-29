@@ -15,7 +15,7 @@
 
   <route name="new"
          path="/new"
-         view=".views.demo_form"
+         view=".views.app_form"
   />
 
   <route name="action"
@@ -24,13 +24,19 @@
   />
 
   <route name="daemon"
-        path="/daemon"
-        view=".views.daemon"
+         path="/daemon"
+         view=".views.daemon"
   />
 
   <route name="delete"
-        path="/delete"
-        view=".views.delete_demo"
+         path="/delete"
+         view=".views.delete_demo"
+  />
+
+  <route name="demo_params"
+         path="/demo_params"
+         view=".views.app_params"
+         renderer="json"
   />
 
   <static

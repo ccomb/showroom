@@ -29,13 +29,21 @@ def app_list(request):
     """
     master = get_template('templates/master.pt')
     return render_template_to_response(
-        "templates/app_list.pt",
+        "templates/master.pt",
         request=request,
-        demos=utils.load_app_list(),
-        master=master
+        message=None,
+        apps=utils.load_app_list(),
+        demos=utils.demos_list(),
         )
 
-def demo_form(request):
+def app_params(request):
+    """
+    return the params of a given demo, in a json list.
+
+    """
+    return utils.load_app_list()[request.params['app']]
+
+def app_form(request):
     """
     return the form to create a demo
     """
@@ -159,34 +167,13 @@ def action(request):
         raise NotFound
 
 
-def demos_list():
-    """
-    load the list of existing applications. with a boolean indicating if they
-    are activated in supervisor conf.
-
-    """
-    conf = ConfigObject()
-    conf.read(config.paths.supervisor)
-
-    apps = utils.get_apps()
-    demos = []
-    for name in apps.sections():
-        app = apps[name]
-        demos.append(dict(
-            name=name,
-            comment=app.comment,
-            port=app.port,
-            autostart= conf['program:%s' % name].autostart.as_bool('false'),
-        ))
-    return demos
-
 def view_demos_list(request, message=None):
     master = get_template('templates/master.pt')
     return render_template_to_response(
             'templates/demos_list.pt',
             request=request,
             message=message,
-            demos=demos_list(),
+            demos=utils.demos_list(),
             master=master
             )
 

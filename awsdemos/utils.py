@@ -57,7 +57,29 @@ def load_app_list():
         for line in open('scripts'+os.sep+file):
             if line.split(':')[0] == '# PARAMS':
                 params = line.split('\n')[0].split(':')[1].split(',')
+                break
         demos[(file[5:-3])] = params
+    return demos
+
+def demos_list():
+    """
+    load the list of existing applications. with a boolean indicating if they
+    are activated in supervisor conf.
+
+    """
+    conf = ConfigObject()
+    conf.read(config.paths.supervisor)
+
+    apps = get_apps()
+    demos = []
+    for name in apps.sections():
+        app = apps[name]
+        demos.append(dict(
+            name=name,
+            comment=app.comment,
+            port=app.port,
+            autostart= conf['program:%s' % name].autostart.as_bool('false'),
+        ))
     return demos
 
 def next_port():
