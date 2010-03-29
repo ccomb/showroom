@@ -18,9 +18,6 @@ $BIN/virtualenv --no-site-packages --distribute .
 bin/python bootstrap.py -d
 bin/buildout -N buildout:eggs-directory=$HOME/eggs
 
-ZEO_PORT=$(echo $PORT|perl -pe 's/^9/7/')
-SUPERVISOR_PORT=$(echo $PORT|perl -pe 's/^9/6/')
-
 perl -pe "s/8886/$ZEO_PORT/" -i etc/zeo.conf
 perl -pe "s/8886/$ZEO_PORT/" -i etc/karl.ini
 perl -pe "s/6543/$PORT/" -i etc/karl.ini
@@ -35,22 +32,6 @@ use = egg:Paste#urlmap
 
 EOF
 
-
-cat > daemon.sh << EOF
-#!/usr/bin/env sh
-cd $DEMOS/$NAME
-case "\$1" in
-  start)
-    $DEMOS/$NAME/bin/supervisord
-    ;;
-  stop)
-    $DEMOS/$NAME/bin/supervisorctl shutdown
-    ;;
-  *)
-    $DEMOS/$NAME/bin/supervisorctl \$1 all
-esac
-
-EOF
-chmod +x daemon.sh
+supervisor_daemon_sh
 
 cd -

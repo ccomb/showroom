@@ -27,6 +27,7 @@ eggs =
     pastescript
     pastedeploy
     paste
+
 EOF
 
 wget http://svn.zope.org/*checkout*/zc.buildout/trunk/bootstrap/bootstrap.py
@@ -39,7 +40,7 @@ bin/paster create -t bfg_zodb $NAME
 cat > buildout.cfg <<EOF
 [buildout]
 newest = false
-parts=eggs
+parts=eggs supervisor
 develop = $NAME
 
 [eggs]
@@ -50,13 +51,21 @@ eggs =
     pastedeploy
     paste
     $NAME
+
+[supervisor]
+recipe=collective.recipe.supervisor
+port=$SUPERVISOR_PORT
+serverurl=http://localhost:$SUPERVISOR_PORT
+programs=
+    10 app \${buildout:directory}/bin/paster [serve deploy.ini] \${buildout:directory}/ true
+
 EOF
 
 bin/buildout
 
 # create app conf
 
-cat > deploy.cfg << EOF
+cat > deploy.ini << EOF
 [DEFAULT]
 debug = true
 
@@ -78,12 +87,7 @@ port = $PORT
 
 EOF
 
-cat > starter.sh << EOF
-#!/usr/bin/env sh
-cd $DEMOS/$NAME
-bin/paster serve deploy.cfg
-EOF
-chmod +x starter.sh
+supervisor_daemon_sh
 
 #return to the supervisor directory
 cd -
