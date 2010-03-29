@@ -100,7 +100,10 @@ def action(request):
         app = utils.get_app(name)
         if app.port:
             log.warn('demo %s already exist. reusing port' % name)
-            utils.daemon(name, 'stop')
+            try:
+                utils.daemon(name, 'stop')
+            except:
+                pass
             port = app.port
         else:
             port = utils.next_port()
