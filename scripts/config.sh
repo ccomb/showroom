@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 # config file for demos frontend
 
-ZEO_PORT=$(echo $PORT|perl -pe 's/^9/7/')
+PORT2=$(echo $PORT|perl -pe 's/^9/7/')
 SUPERVISOR_PORT=$(echo $PORT|perl -pe 's/^9/6/')
 
 bootstrap () {
