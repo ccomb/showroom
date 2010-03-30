@@ -12,12 +12,6 @@
 
 </head>
 <body metal:use-macro="master.macros['master']">
-<metal:block fill-slot="content">
-    <div id="application_list">
-    <div tal:repeat="demo demos">
-        <a tal:attributes="href string:${request.application_url}/new?app=$demo" tal:content="demo">blob</a>
-    </div>
-    </div>
 </metal:block>
 </body>
 </html>
