@@ -28,6 +28,8 @@ eggs =
     dj.paste
     repoze.bfg
     PasteScript
+    lxml
+    SaladeDeFruits
 extra-paths =
     \${django:extra-paths}
     \${buildout:directory}
@@ -38,14 +40,30 @@ port=$SUPERVISOR_PORT
 serverurl=http://localhost:$SUPERVISOR_PORT
 programs=
     10 app \${buildout:directory}/bin/paster [serve deploy.ini] \${buildout:directory}/ true
+    20 proxy \${buildout:directory}/bin/paster [serve proxy.ini] \${buildout:directory}/ true
 
 EOF
 
 bootstrap
 bin/python bootstrap.py -d
-bin/buildout -N -c demo.cfg buildout:eggs-directory=$HOME/eggs
+STATIC_DEPS=true bin/buildout -N -c demo.cfg buildout:eggs-directory=$HOME/eggs
 
 cat > deploy.ini << EOF
+[DEFAULT]
+debug = true
+
+[app:main]
+use=egg:dj.paste
+django_settings_module=lfc_project.settings
+
+[server:main]
+use = egg:Paste#http
+host = 127.0.0.1
+port = $PORT2
+
+EOF
+
+cat > proxy.ini << EOF
 [DEFAULT]
 debug = true
 
@@ -54,21 +72,13 @@ use = egg:Paste#urlmap
 /$NAME = app
 
 [app:app]
-use=egg:dj.paste
-django_settings_module=lfc_project.settings
+use=egg:SaladeDeFruits#rewrite
+uri = http://127.0.0.1:$PORT2/
 
 [server:main]
 use = egg:Paste#http
 host = 127.0.0.1
 port = $PORT
-
-EOF
-
-cat >> lfc_project/settings.py << EOF
-
-# demo
-MEDIA_URL = '/$NAME/media/'
-ADMIN_MEDIA_PREFIX = '/$NAME/media/admin/'
 
 EOF
 

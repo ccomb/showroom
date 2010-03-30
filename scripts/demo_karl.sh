@@ -18,8 +18,8 @@ $BIN/virtualenv --no-site-packages --distribute .
 bin/python bootstrap.py -d
 bin/buildout -N buildout:eggs-directory=$HOME/eggs
 
-perl -pe "s/8886/$ZEO_PORT/" -i etc/zeo.conf
-perl -pe "s/8886/$ZEO_PORT/" -i etc/karl.ini
+perl -pe "s/8886/$PORT2/" -i etc/zeo.conf
+perl -pe "s/8886/$PORT2/" -i etc/karl.ini
 perl -pe "s/6543/$PORT/" -i etc/karl.ini
 perl -pe "s/9037/$SUPERVISOR_PORT/" -i etc/supervisord.conf
 
