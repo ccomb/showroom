@@ -3,14 +3,9 @@
   <!-- this must be included for the view declarations to work -->
   <include package="repoze.bfg.includes" />
 
-  <route name="demos"
-         path="/demos"
-         view=".views.view_demos_list"
-  />
-
   <route name="home"
          path=""
-         view=".views.app_list"
+         view=".views.view_app_list"
   />
 
   <route name="new"
@@ -33,8 +28,8 @@
          view=".views.delete_demo"
   />
 
-  <route name="demo_params"
-         path="/demo_params"
+  <route name="app_params"
+         path="/app_params"
          view=".views.app_params"
          renderer="json"
   />

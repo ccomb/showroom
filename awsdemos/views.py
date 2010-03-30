@@ -23,7 +23,7 @@ from repoze.bfg.security import (
 log = logging.getLogger(__name__)
 
 
-def app_list(request):
+def view_app_list(request, message=None):
     """
     return the main page, with applications list, and actions.
     """
@@ -31,7 +31,7 @@ def app_list(request):
     return render_template_to_response(
         "templates/master.pt",
         request=request,
-        message=None,
+        message=message,
         apps=utils.load_app_list(),
         demos=utils.demos_list(),
         )
@@ -41,7 +41,11 @@ def app_params(request):
     return the params of a given demo, in a json list.
 
     """
-    return utils.load_app_list()[request.params['app']]
+    app_list = utils.load_app_list()
+    if 'app' in request.params and request.params['app'] in app_list:
+        return utils.load_app_list()[request.params['app']]
+    else:
+        return ("No application name given or unknown application.",)
 
 def app_form(request):
     """
@@ -162,23 +166,12 @@ def action(request):
 
         utils.daemon(name, 'start')
 
-        return view_demos_list(
+        return view_app_list(
             request,
             message="application %s created at port %s" % (name, port)
             )
     else:
         raise NotFound
-
-
-def view_demos_list(request, message=None):
-    master = get_template('templates/master.pt')
-    return render_template_to_response(
-            'templates/demos_list.pt',
-            request=request,
-            message=message,
-            demos=utils.demos_list(),
-            master=master
-            )
 
 def daemon(request):
     name = request.params.get('NAME', '_')
@@ -186,7 +179,7 @@ def daemon(request):
     app = utils.get_app(name)
     if app.port:
         utils.daemon(name, command.lower())
-        return view_demos_list(
+        return view_app_list(
             request, message='demo %s successfully %sed' % (name, command.lower())
             )
     raise NotFound
@@ -216,7 +209,7 @@ def delete_demo(request):
     else:
         log.error("demo "+name+"'s directory not found in demos.")
 
-    return view_demos_list(
+    return view_app_list(
         request, message='demo '+name+' successfully removed'
         )
 

@@ -18,9 +18,22 @@ function on_valid_form(button){
 }
 
 function update_app_form(app){
-    params = jQuery.getJSON("/app_params?app="+app);
     $("#app_form_dynamic").empty();
-    for (param in params){
-        $("#app_form_dynamic").append('<input name="'+param+'"></input>');
+    if (app !=""){
+        jQuery.getJSON(
+            "app_params?app="+app,
+            function(data){
+                for (param in data){
+                    $("#app_form_dynamic").append(
+                        '<br/>'+data[param]+':<input name="'+data[param]+'"></input>'
+                    );
+                }
+                $("#app_form_dynamic").append(
+                    '<input id="app_form_submit" type="submit"'+
+                    'onclick="on_valid_form();"/>'
+                )
+            }
+        ); // makes me sad
     }
 }
+
