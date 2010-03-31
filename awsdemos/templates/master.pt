@@ -17,14 +17,12 @@
 <!-- start header -->
 <!--div tal:content="demos">debug</div-->
 <!--div id="debug"></div-->
-<div id="header">
-    <span><img src="${request.application_url}/static/images/Alter_Way_SOLUTIONS.png"/></span>
-    <div id="page_title"><h1>Applications de démonstration.</h1></div>
-</div>
 
 <!-- start content -->
 <div id="sidebar">
-    <form id="app_form" method="get" action="action">
+    <span id="title">
+        <img src="${request.application_url}/static/images/Alter_Way_SOLUTIONS.png"/></span>
+    <form id="app_form" method="POST" action="action">
         <div>créer une démo</div>
         <select name="app" onchange="update_app_form(this.value)">
         <option></option>
@@ -37,9 +35,12 @@
 </div>
 
 <div id="content">
+    <div id="header"><h1>Applications de démonstration.</h1></div>
+    <tal:if condition="message is not None">
     <div id="message" tal:content="message or ''"> </div>
-    <div id="demos_list">
-        <table>
+    </tal:if>
+    <div>
+        <table id="demos_list">
             <tr tal:repeat="demo demos">
               <td><a tal:attributes="href python:'/'+demo['name']" tal:content="python: demo['name']">blob</a></td>
                 <td>

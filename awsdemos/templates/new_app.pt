@@ -1,4 +1,0 @@
-<div tal:repeat="param paramlist">
-<span tal:content="string:$param"></span>:
-<input tal:attributes="name string:$param" />
-</div>

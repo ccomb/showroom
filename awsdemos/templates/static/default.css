@@ -49,6 +49,15 @@ a:visited {
         color: #5A55DB;
 }
 
+#message {
+        width: 100%;
+        text-align: middle;
+        margin: 1em;
+        padding: 2em;
+        border-color: #85A5FF;
+        -moz-border-radius: 1em 1em;
+        background-color: #85A5FF;
+}
 img {
         border: none;
 }
@@ -98,12 +107,6 @@ input, textarea, select {
         width: 100%;
         background-color: #BC0071;
         height: 93px;
-}
-
-#header > img{
-        width: 200px;
-        left: 0;
-        clear: both;
 }
 
 #page_title{
@@ -207,9 +210,21 @@ input, textarea, select {
 
 /* Content */
 
+#demos_list {
+        margin: 1em;
+        padding: 1em;
+        -moz-border-radius: 1em 1em;
+        background-color: #BDCEFF;
+}
+
 #content {
+        top: 0;
+        position: relative;
+        left: 0;
+        width: 100%;
+        margin-left: 200px;
+        padding-left: 200px;
         float: left;
-        width: 410px;
 }
 
 #application_list {
@@ -282,9 +297,10 @@ input, textarea, select {
 
 #sidebar {
         width: 200px;
-        height: 100%;
-        float: left;
+        position: relative;
         margin: 0;
+        top: 0;
+        float: left;
         padding: 0;
         background-color: #FFC7B6;
 }
