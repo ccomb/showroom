@@ -18,10 +18,12 @@
 <!--div tal:content="demos">debug</div-->
 <!--div id="debug"></div-->
 
-<!-- start content -->
+<span id="title">
+    <img src="${request.application_url}/static/images/Alter_Way_SOLUTIONS.png"/>
+    Applications de démonstration.
+</span>
+
 <div id="sidebar">
-    <span id="title">
-        <img src="${request.application_url}/static/images/Alter_Way_SOLUTIONS.png"/></span>
     <form id="app_form" method="POST" action="action">
         <div>créer une démo</div>
         <select name="app" onchange="update_app_form(this.value)">
@@ -33,9 +35,9 @@
         src="/admin/static/images/loading.gif" /><br />
     </form>
 </div>
-
+<!-- start content -->
 <div id="content">
-    <div id="header"><h1>Applications de démonstration.</h1></div>
+
     <tal:if condition="message is not None">
     <div id="message" tal:content="message or ''"> </div>
     </tal:if>
