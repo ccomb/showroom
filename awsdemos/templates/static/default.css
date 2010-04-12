@@ -12,6 +12,8 @@ body {
         font-family: "Trebuchet MS", Georgia, "Times New Roman", Times, serif;
         text-align: justify;
         color: #000000;
+        height: 100%;
+        width: 100%;
 }
 
 h1, h2, h3 {
@@ -64,17 +66,47 @@ a:visited {
 img {
         border: none;
 }
-
-#title{
-    width: 100%;
-    top: 0;
-    background-color: #d9b2ff;
-    height: 93;
-    font-size: 3em;
+td {
+        vertical-align: top;
+        text-align: middle;
 }
 
+td#logo {
+        height: 93px;
+        margin: 0;
+        padding: 0;
+}
+
+td#logo > img {
+        display: block;
+}
+
+#title{
+        top: 0;
+        background-color: #d9b2ff;
+        height: 93px;
+        font-size: 3em;
+        text-align: center;
+        vertical-align: middle;
+        margin:0;
+        padding: 0;
+}
+
+table#layout {
+        width: 100%;
+        height: 100%;
+        border: 0;
+        border-collapse: collapse;
+}
+
+table#layout > tr {
+        border-spacing: 0;
+}
 
 #demos_list {
+        margin-left: 20%;
+        margin-right: 20%;
+        text-align: middle;
         margin: 1em;
         padding: 1em;
         -moz-border-radius: 1em 1em;
@@ -82,7 +114,6 @@ img {
 }
 
 #content {
-        position: absolute;
         top: 93px;
         left: 200px;
 }
@@ -108,7 +139,13 @@ img {
         background-color: #FFC7B6;
 }
 
-#legal {
+#app_form {
+        top: 2em;
+        padding-top: 1em;
+        padding-left: 0.5em;
+}
+
+#footer {
         clear: both;
         padding-top: 17px;
         text-align: center;

@@ -10,7 +10,15 @@
 <script type="text/javascript" src="${request.application_url}/static/jquery-1.4.1.min.js"></script>
 <link href="${request.application_url}/static/default.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="${request.application_url}/static/functions.js"></script>
-
+<script type="text/javascript">
+$('document').ready(function(){
+    jQuery('#sidebar').css(
+        'height',
+        $(window).height()-130+'px'
+        );
+    }
+)
+</script>
 </head>
 
 <body>
@@ -18,55 +26,62 @@
 <!--div tal:content="demos">debug</div-->
 <!--div id="debug"></div-->
 
-<span id="title">
-    <img src="${request.application_url}/static/images/Alter_Way_SOLUTIONS.png"/>
-    Applications de démonstration.
-</span>
-
-<div id="sidebar">
-    <form id="app_form" method="POST" action="action">
-        <div>créer une démo</div>
-        <select name="app" onchange="update_app_form(this.value)">
-        <option></option>
-        <option tal:repeat="app apps" tal:content="python:app">placeholder</option>
-        </select>
-        <span id="app_form_dynamic"></span>
-        <img id="loading" style="display:none;"
-        src="/admin/static/images/loading.gif" /><br />
-    </form>
-</div>
-<!-- start content -->
-<div id="content">
-
-    <tal:if condition="message is not None">
-    <div id="message" tal:content="message or ''"> </div>
-    </tal:if>
-    <div>
-        <table id="demos_list">
-            <tr tal:repeat="demo demos">
-              <td><a tal:attributes="href python:'/'+demo['name']" tal:content="python: demo['name']">blob</a></td>
-                <td>
-                    <button tal:content="python:demo['autostart'] and 'activate' or 'deactivate'" >
-                    </button>
-                </td>
-                <td><button>reset</button></td>
-                <tal:repeat tal:repeat="cmd python: ['start', 'stop', 'restart']" >
-                <td><button tal:attributes="
-                    onclick python:'window.location.href=\''+request.application_url+'/daemon?NAME='+demo['name']+'&amp;COMMAND='+cmd+'\''
-                    " tal:content="cmd">restart</button>
-                </td>
-                </tal:repeat>
-                <td><button tal:attributes="
-                    onclick python:'window.location.href=\''+request.application_url+'/delete?NAME='+demo['name']+'\''
-                    ">delete</button>
-                </td>
-            </tr>
-        </table>
-    </div>
-</div>
-
-<!-- end content -->
-<!-- start footer -->
+<table id="layout" cellspacing="0" cellpadding="0">
+    <tr>
+        <td id="logo">
+            <a href="${request.application_url}"><img src="${request.application_url}/static/images/Alter_Way_SOLUTIONS.png"/></a>
+        </td>
+        <td id="title">
+            Applications de démonstration.
+        </td>
+    </tr>
+    <tr>
+        <td id="sidebar">
+            <form id="app_form" method="POST" action="action">
+                <div>créer une démo</div>
+                <select name="app" onchange="update_app_form(this.value)">
+                <option></option>
+                <option tal:repeat="app apps" tal:content="python:app">placeholder</option>
+                </select>
+                <span id="app_form_dynamic"></span>
+                <img id="loading" style="display:none;"
+                src="http://www.ajaxload.info/cache/FF/C7/B6/77/E0/6B/20-1.gif" /><br />
+            </form>
+        </td>
+        <td id="content">
+            <tal:if condition="message is not None">
+                <div id="message" tal:content="message or ''"> </div>
+            </tal:if>
+            <table id="demos_list">
+                <tr tal:repeat="demo demos">
+                  <td><a tal:attributes="href python:'/'+demo['name']" tal:content="python: demo['name']">blob</a></td>
+                    <td>
+                        <button tal:content="python:demo['autostart'] and 'activate' or 'deactivate'" >
+                        </button>
+                    </td>
+                    <td><button>reset</button></td>
+                    <tal:repeat tal:repeat="cmd python: ['start', 'stop', 'restart']" >
+                    <td><button tal:attributes="
+                        onclick python:'window.location.href=\''+request.application_url+'/daemon?NAME='+demo['name']+'&amp;COMMAND='+cmd+'\''
+                        " tal:content="cmd">restart</button>
+                    </td>
+                    </tal:repeat>
+                    <td><button tal:attributes="
+                        onclick python:'window.location.href=\''+request.application_url+'/delete?NAME='+demo['name']+'\''
+                        ">delete</button>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <!-- end content -->
+        <!-- start footer -->
+        <td colspan="2" id="footer">
+            footer
+        </td>
+    </tr>
+</table>
 <!-- end footer -->
 </body>
 </html>
