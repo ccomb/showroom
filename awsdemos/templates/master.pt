@@ -45,7 +45,7 @@ $('document').ready(function(){
                 </select>
                 <span id="app_form_dynamic"></span>
                 <img id="loading" style="display:none;"
-                src="http://www.ajaxload.info/cache/FF/C7/B6/77/E0/6B/20-1.gif" /><br />
+                src="admin/static/images/loading.gif" /><br />
             </form>
         </td>
         <td id="content">

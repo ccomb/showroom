@@ -77,7 +77,8 @@ td#logo {
         padding: 0;
 }
 
-td#logo > img {
+td#logo a,
+td#logo img {
         display: block;
 }
 
