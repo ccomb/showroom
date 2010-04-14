@@ -17,11 +17,11 @@ function on_valid_form(button){
     return true;
 }
 
-function update_app_form(app){
+function update_app_form(url, app){
     $("#app_form_dynamic").empty();
     if (app !=""){
         jQuery.getJSON(
-            "app_params?app="+app,
+            url+"/app_params?app="+app,
             function(data){
                 for (param in data){
                     $("#app_form_dynamic").append(
