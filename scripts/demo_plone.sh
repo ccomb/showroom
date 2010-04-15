@@ -84,6 +84,7 @@ EOF
 
 bin/instance run bin/initialize.py
 
+echo $COMMENT > about.txt
 #return to the supervisor directory
 cd -
 

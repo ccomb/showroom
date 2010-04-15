@@ -82,5 +82,6 @@ port = $PORT
 
 EOF
 
+echo $COMMENT > about.txt
 supervisor_daemon_sh
 

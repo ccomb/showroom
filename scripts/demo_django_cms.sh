@@ -108,5 +108,7 @@ python manage.py migrate
 cd ..
 cp example/cms.db cms.db
 
+echo $COMMENT > about.txt
+
 supervisor_daemon_sh
 

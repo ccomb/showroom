@@ -32,6 +32,7 @@ use = egg:Paste#urlmap
 
 EOF
 
+echo $COMMENT > about.txt
 supervisor_daemon_sh
 
 cd -

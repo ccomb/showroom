@@ -90,6 +90,7 @@ EOF
 
 supervisor_daemon_sh
 
+echo $COMMENT > about.txt
 #return to the supervisor directory
 cd -
 
