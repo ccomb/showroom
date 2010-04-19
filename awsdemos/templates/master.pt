@@ -37,7 +37,8 @@ $('document').ready(function(){
     </tr>
     <tr>
         <td id="sidebar">
-            <form id="app_form" method="POST" action="action">
+            <form id="app_form" method="POST"
+            action="${request.application_url}/action">
                 <div>créer une démo</div>
                 <select name="app"
                 onchange="update_app_form('${request.application_url}', this.value)">

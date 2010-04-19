@@ -61,6 +61,19 @@ def load_app_list():
         demos[(file[5:-3])] = params
     return demos
 
+def get_demo_comment(demo_name):
+    """
+    return the content of "about.txt" in the directory of the application, if
+    it exists.
+
+    """
+    if 'about.txt' in os.listdir(os.path.join(config.paths.demos, demo_name)):
+        return open(
+            os.path.join(config.paths.demos, demo_name, 'about.txt')
+            ).read()
+    else:
+        return ''
+
 def demos_list():
     """
     load the list of existing applications. with a boolean indicating if they
@@ -76,9 +89,9 @@ def demos_list():
         app = apps[name]
         demos.append(dict(
             name=name,
-            comment=app.comment,
             port=app.port,
             autostart= conf['program:%s' % name].autostart.as_bool('false'),
+            comment=get_demo_comment(name)
         ))
     return demos
 

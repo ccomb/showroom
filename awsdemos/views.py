@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from ConfigParser import ConfigParser
 from ConfigObject import ConfigObject
 from repoze.bfg.chameleon_zpt import get_template
@@ -116,7 +117,11 @@ def action(request):
         env['SCRIPTS'] = config.paths.scripts
         env['DEMOS'] = config.paths.demos
         log.debug(command+' '+' '.join(params))
-        subprocess.call(command+' '+' '.join(params), shell=True, env=env)
+        subprocess.call(
+            command+' '+' '.join(params).encode('utf-8'),
+            shell=True,
+            env=env
+            )
 
         path = os.path.join(
                 config.paths.demos,
