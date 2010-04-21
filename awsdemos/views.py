@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -ø- coding:utf-8 -ø-
 from ConfigParser import ConfigParser
 from ConfigObject import ConfigObject
 from repoze.bfg.chameleon_zpt import get_template
@@ -23,6 +24,21 @@ from repoze.bfg.security import (
 
 log = logging.getLogger(__name__)
 
+def admin(view):
+    """
+    decorator used to limit some (most?) views to logged user (admin).
+
+    """
+    def decorated(request):
+        if authenticated_userid(request):
+            return view(request)
+        else:
+            return render_template_to_response(
+                'templates/login.pt',
+                request=request,
+                message="veuillez vous identifier pour accéder à cette page"
+                )
+    return decorated
 
 def view_app_list(request, message=None):
     """
@@ -47,6 +63,23 @@ def app_params(request):
         return utils.load_app_list()[request.params['app']]
     else:
         return ("No application name given or unknown application.",)
+
+def login(request):
+    """
+    allow the user to login
+
+    """
+    #if 'user' in request.params\
+    #and 'password' in request.params\
+    #and request.params['user'] == 'admin'\
+    #and request.params['password'] == 'alterway':
+            #
+    #else:
+    return render_template_to_response(
+        'templates/login.pt',
+        request=request,
+        message=None,
+        )
 
 def app_form(request):
     """

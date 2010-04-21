@@ -80,7 +80,7 @@ $('document').ready(function(){
         <!-- end content -->
         <!-- start footer -->
         <td colspan="2" id="footer">
-            footer
+            Application propulsée par <a href="http://repoze.org">Repoze.BFG</a>
         </td>
     </tr>
 </table>

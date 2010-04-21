@@ -1,7 +1,10 @@
-class MyModel(object):
-    pass
+from repoze.bfg.security import Allow
 
-root = MyModel()
+class RootFactory(object):
+    """
+    this class allow us to setup security policies in the application.
 
-def get_root(request):
-    return root
+    """
+    __acl__ = [ (Allow, 'admin', 'view'), ]
+    def __init__(self, request):
+        self.__dict__.update(request.matchdict)
