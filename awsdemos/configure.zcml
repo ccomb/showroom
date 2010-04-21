@@ -6,7 +6,6 @@
   <route name="home"
          path=""
          view=".views.view_app_list"
-         view_permission="admin"
   />
 
   <route name="new"
@@ -28,19 +27,16 @@
   <route name="daemon"
          path="/daemon"
          view=".views.daemon"
-         view_permission="admin"
   />
 
   <route name="delete"
          path="/delete"
          view=".views.delete_demo"
-         view_permission="admin"
   />
 
   <route name="app_params"
          path="/app_params"
          view=".views.app_params"
-         renderer="json"
          view_permission="admin"
   />
 
