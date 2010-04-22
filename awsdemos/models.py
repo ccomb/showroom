@@ -7,4 +7,4 @@ class RootFactory(object):
     """
     __acl__ = [ (Allow, 'admin', 'view'), ]
     def __init__(self, request):
-        self.__dict__.update(request.matchdict)
+        self.__dict__.update(getattr(request, 'matchdict', {}))
