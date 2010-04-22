@@ -11,7 +11,6 @@
   <route name="new"
          path="/new"
          view=".views.app_form"
-         view_permission="admin"
   />
 
   <route name="action"
@@ -22,6 +21,11 @@
   <route name="login"
          path="/login"
          view=".views.login"
+  />
+
+  <route name="logout"
+         path="/logout"
+         view=".views.logout"
   />
 
   <route name="daemon"
@@ -37,7 +41,7 @@
   <route name="app_params"
          path="/app_params"
          view=".views.app_params"
-         view_permission="admin"
+         renderer="json"
   />
 
     <authtktauthenticationpolicy

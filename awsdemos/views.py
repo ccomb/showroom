@@ -1,25 +1,29 @@
 #!/usr/bin/env python
 # -ø- coding:utf-8 -ø-
-from ConfigParser import ConfigParser
 from ConfigObject import ConfigObject
+from ConfigParser import ConfigParser
+from awsdemos import config
 from repoze.bfg.chameleon_zpt import get_template
 from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.exceptions import NotFound
 from repoze.bfg.testing import DummyRequest
-from awsdemos import config
-import logging
-import subprocess
-import os
+from repoze.bfg.url import route_url
 from shutil import rmtree
+from webob.exc import HTTPFound
+import logging
+import os
+import subprocess
 import time
-import webob
 import utils
+import webob
 from repoze.bfg.security import (
     Allow,
     Everyone,
     Authenticated,
     authenticated_userid,
     has_permission,
+    forget,
+    remember,
     )
 
 log = logging.getLogger(__name__)
@@ -63,6 +67,37 @@ def app_params(request):
         return utils.load_app_list()[request.params['app']]
     else:
         return ("No application name given or unknown application.",)
+
+def login(request):
+    login_url = route_url('login', request)
+    referrer = request.url
+    if referrer == login_url:
+        referrer = '/' # never use the login form itself as came_from
+    came_from = request.params.get('came_from', referrer)
+    message = ''
+    login = ''
+    password = ''
+    if 'form.submitted' in request.params:
+        login = request.params['login']
+        password = request.params['password']
+        if USERS.get(login) == password:
+            headers = remember(request, login)
+            return HTTPFound(location = came_from,
+                             headers = headers)
+        message = 'Failed login'
+
+    return dict(
+        message = message,
+        url = request.application_url + '/login',
+        came_from = came_from,
+        login = login,
+        password = password,
+        )
+
+def logout(request):
+    headers = forget(request)
+    return HTTPFound(location = route_url('view_wiki', request),
+                     headers = headers)
 
 def login(request):
     """

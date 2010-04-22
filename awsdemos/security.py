@@ -1,4 +1,3 @@
-
 USERS = {'admin':'admin'}
 GROUPS = {'admin':['groups.admin']}
 
