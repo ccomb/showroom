@@ -1,14 +1,14 @@
 #!/usr/bin/env python
-# -ø- coding:utf-8 -ø-
-from ConfigObject import ConfigObject
-from ConfigParser import ConfigParser
-from awsdemos import config
+# coding: utf-8
+from ConfigParser import SafeConfigParser, NoSectionError
+from os.path import join, isfile, isdir
 from repoze.bfg.chameleon_zpt import get_template
 from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.exceptions import NotFound
 from repoze.bfg.testing import DummyRequest
 from repoze.bfg.url import route_url
 from shutil import rmtree
+from utils import PATHS, APPS_CONF
 from webob.exc import HTTPFound
 import logging
 import os
@@ -28,10 +28,9 @@ from repoze.bfg.security import (
 
 log = logging.getLogger(__name__)
 
-def admin(view):
-    """
-    decorator used to limit some (most?) views to logged user (admin).
 
+def admin(view):
+    """ decorator used to limit some (most?) views to logged user (admin).
     """
     def decorated(request):
         if authenticated_userid(request):
@@ -44,9 +43,9 @@ def admin(view):
                 )
     return decorated
 
+
 def view_app_list(request, message=None):
-    """
-    return the main page, with applications list, and actions.
+    """ return the main page, with applications list, and actions.
     """
     master = get_template('templates/master.pt')
     return render_template_to_response(
@@ -57,16 +56,16 @@ def view_app_list(request, message=None):
         demos=utils.demos_list(),
         )
 
-def app_params(request):
-    """
-    return the params of a given demo, in a json list.
 
+def app_params(request):
+    """ return the params of a given demo, in a json list.
     """
     app_list = utils.load_app_list()
     if 'app' in request.params and request.params['app'] in app_list:
         return utils.load_app_list()[request.params['app']]
     else:
         return ("No application name given or unknown application.",)
+
 
 def login(request):
     login_url = route_url('login', request)
@@ -94,10 +93,12 @@ def login(request):
         password = password,
         )
 
+
 def logout(request):
     headers = forget(request)
     return HTTPFound(location = route_url('view_wiki', request),
                      headers = headers)
+
 
 def login(request):
     """
@@ -115,6 +116,7 @@ def login(request):
         request=request,
         message=None,
         )
+
 
 def app_form(request):
     """
@@ -163,27 +165,25 @@ def action(request):
         raise NotFound
     app_list = utils.load_app_list()
     if request.params['app'] in app_list:
-        command = os.path.join(config.paths.scripts, "demo_"+request.params['app']+".sh")
+        command = join(PATHS['scripts'], "demo_"+request.params['app']+".sh")
         params = tuple([
             "'"+request.params[x]+"'" for x in app_list[request.params['app']]
             ])
         env = os.environ.copy()
         env.update(request.params)
         name = request.params['NAME']
-        app = utils.get_app(name)
-        if app.port:
-            log.warn('demo %s already exist. reusing port' % name)
-            try:
-                utils.daemon(name, 'stop')
-            except:
-                pass
-            port = app.port
+        try:
+            port = APPS_CONF.get(name, 'port')
+        except NoSectionError:
+            port = utils.next_port()
         else:
+            log.warn('demo %s already exist. reusing port' % name)
+            utils.daemon(name, 'stop')
             port = utils.next_port()
         env['PORT'] = str(port)
-        env['BIN'] = config.paths.bin
-        env['SCRIPTS'] = config.paths.scripts
-        env['DEMOS'] = config.paths.demos
+        env['BIN'] = PATHS['bin']
+        env['SCRIPTS'] = PATHS['scripts']
+        env['DEMOS'] = PATHS['demos']
         log.debug(command+' '+' '.join(params))
         subprocess.call(
             command+' '+' '.join(params).encode('utf-8'),
@@ -191,49 +191,49 @@ def action(request):
             env=env
             )
 
-        path = os.path.join(
-                config.paths.demos,
+        path = join(
+                PATHS['demos'],
                 name,
                 )
         kwargs = dict(path=path, name=name)
 
-        apps = utils.get_apps()
-        conf = ConfigObject()
-        conf.read(config.paths.supervisor)
+        conf = SafeConfigParser()
+        conf.read(PATHS['supervisor'])
 
-        if os.path.isfile(os.path.join(path, 'starter.sh')):
+        if isfile(join(path, 'starter.sh')):
             section = 'program:%s' % name
-            conf[section] = {
-                'command': os.path.join(path, 'starter.sh') % kwargs,
-                'process_name': name,
-                'directory': path,
-                'priority': '10',
-                'redirect_stderr': 'false',
-                'comment': request.params.get('COMMENT', '-'),
-                'port': port,
-                'stdout_logfile': os.path.join(path, 'std_out.log'),
-                'stderr_logfile': os.path.join(path, 'std_err.log'),
-                'stdout_logfile_maxbytes': '1MB',
-                'stderr_logfile_maxbytes': '1MB',
-                'stdout_capture_maxbytes': '1MB',
-                'stderr_capture_maxbytes': '1MB',
-                'stderr_logfile_backups': '10',
-                'stderr_logfile_backups': '10',
-            }
-            conf.write(open(config.paths.supervisor,'w'))
-            apps[name] = dict(port=port, path=path,
-                              type=request.params['app'],
-                              daemon='supervisor')
-        if os.path.isfile(os.path.join(path, 'daemon.sh')):
-            apps[name] = dict(port=port, path=path,
-                              type=request.params['app'],
-                              daemon=os.path.join(path, 'daemon.sh'))
+            conf.add_section(section)
+            conf.set(section, 'command', join(path, 'starter.sh') % kwargs)
+            conf.set(section, 'process_name', name)
+            conf.set(section, 'directory', path)
+            conf.set(section, 'priority', '10')
+            conf.set(section, 'redirect_stderr', 'false')
+            conf.set(section, 'comment', request.params.get('COMMENT', '-'))
+            conf.set(section, 'port', port)
+            conf.set(section, 'stdout_logfile', join(path, 'std_out.log'))
+            conf.set(section, 'stderr_logfile', join(path, 'std_err.log'))
+            conf.set(section, 'stdout_logfile_maxbytes', '1MB')
+            conf.set(section, 'stderr_logfile_maxbytes', '1MB')
+            conf.set(section, 'stdout_capture_maxbytes', '1MB')
+            conf.set(section, 'stderr_capture_maxbytes', '1MB')
+            conf.set(section, 'stderr_logfile_backups', '10')
+            conf.set(section, 'stderr_logfile_backups', '10')
+
+            with open(PATHS['supervisor'],'w') as configfile:
+                conf.write(configfile)
+        APPS_CONF.add_section(name)
+        APPS_CONF.set(name, 'port', str(port))
+        APPS_CONF.set(name, 'path', path)
+        APPS_CONF.set(name, 'type', request.params['app'])
+        APPS_CONF.set(name, 'daemon', 'supervisor')
+        if isfile(join(path, 'daemon.sh')):
+            APPS_CONF.set(name, 'daemon', join(path, 'daemon.sh'))
         else:
             #TODO: php?
             pass
 
-
-        apps.write(open(config.paths.apps, 'w+'))
+        with open(PATHS['apps'], 'w+') as configfile:
+            APPS_CONF.write(configfile)
 
         log.info('section %s added', name)
 
@@ -246,16 +246,17 @@ def action(request):
     else:
         raise NotFound
 
+
 def daemon(request):
     name = request.params.get('NAME', '_')
     command = request.params.get('COMMAND', 'restart')
-    app = utils.get_app(name)
-    if app.port:
+    if APPS_CONF.get(name, 'port'):
         utils.daemon(name, command.lower())
         return view_app_list(
             request, message='demo %s successfully %sed' % (name, command.lower())
             )
     raise NotFound
+
 
 def delete_demo(request):
     """
@@ -267,18 +268,19 @@ def delete_demo(request):
     utils.daemon(name, 'stop')
 
     log.warn("removing demo "+name)
-    apps = utils.get_apps()
 
-    del apps[name]
-    apps.write(open(config.paths.apps, 'w'))
+    APPS_CONFIG.remove_section(name)
+    with open(PATHS['apps'], 'w') as configfile:
+        APPS_CONFIG.write(configfile)
 
-    conf = ConfigObject()
-    conf.read(config.paths.supervisor)
-    del conf['program:'+name]
-    conf.write(open(config.paths.supervisor,'w'))
+    conf = SafeConfigParser()
+    conf.read(PATHS['supervisor'])
+    conf.remove_section('program:'+name)
+    with open(PATHS['supervisor'], 'w') as configfile:
+        conf.write(configfile)
 
-    if os.path.isdir(os.path.join(config.paths.demos, name)):
-        rmtree(os.path.join(config.paths.demos, name))
+    if isdir(join(PATHS['demos'], name)):
+        rmtree(join(PATHS['demos'], name))
     else:
         log.error("demo "+name+"'s directory not found in demos.")
 

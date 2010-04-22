@@ -8,9 +8,9 @@ class AppProxy(object):
 
     proxy = Proxy(allowed_methods=['GET', 'HEAD', 'POST'])
 
-    def rewrite(self, name, app, req):
+    def rewrite(self, name, conf, req):
         path_info = urllib.quote(req.path_info)
-        if app.type == 'plone':
+        if conf.get(name, 'type') == 'plone':
             host = req.host
             if ':' not in host:
                 host = '%s:80' % host
@@ -23,13 +23,13 @@ class AppProxy(object):
     def __call__(self, environ, start_response):
         req = Request(environ)
         name = req.path_info_pop().strip('/')
-        app = utils.get_app(name)
-        if app.port:
+        conf = utils.APPS_CONF
+        if conf.get(name, 'port'):
             req.script_name = None
             req.content_length = len(req.body)
-            self.rewrite(name, app, req)
+            self.rewrite(name, conf, req)
             req.environ['SERVER_NAME'] = '127.0.0.1'
-            req.environ['SERVER_PORT'] = app.port
+            req.environ['SERVER_PORT'] = conf.get(name, 'port')
             resp = req.get_response(self.proxy)
             return resp(environ, start_response)
         return exc.HTTPNotFound()(environ, start_response)

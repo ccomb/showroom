@@ -1,31 +1,39 @@
 # -*- coding: utf-8 -*-
-import os
-import sys
+from ConfigParser import SafeConfigParser
+from os.path import isdir, isfile, join, abspath
 import logging
+import os
 import subprocess
-from awsdemos import config
-from ConfigObject import ConfigObject
+import sys
 
 log = logging.getLogger(__name__)
 
-if not os.path.isdir(config.paths.demos):
-    os.makedirs(config.paths.demos)
-    log.info('%s created.', config.paths.demos)
+config = SafeConfigParser()
+PATH = os.path.dirname(abspath(sys.argv[-1]))
+config.read(join(PATH, 'aws.demos.ini'))
+PATHS = {
+  'bin' : join(PATH, config.get('paths', 'bin')),
+  'scripts' : join(PATH, config.get('paths', 'scripts')),
+  'demos' : join(PATH, config.get('paths', 'demos')),
+  'port' : join(PATH, config.get('paths', 'port')),
+  'apps' : join(PATH, config.get('paths', 'apps')),
+  'supervisor' : join(PATH, config.get('paths', 'supervisor')),
+}
 
-def get_apps():
-    conf = ConfigObject()
-    conf.read(config.paths.apps)
-    return conf
+if not isdir(PATHS['demos']):
+    os.makedirs(PATHS['demos'])
+    log.info('%s created.', PATHS['demos'])
 
-def get_app(name):
-    return get_apps()[name]
+APPS_CONF = SafeConfigParser()
+APPS_CONF.read(PATHS['apps'])
+
 
 def daemon(name, command='restart'):
-    app = get_app(name)
-    if app.daemon == 'supervisor':
-        cmd = [os.path.join(config.paths.bin, 'supervisorctl'), command, name]
-    elif app.daemon:
-        cmd = [app.daemon, command]
+    daemon = APPS_CONF.get(name, 'daemon')
+    if daemon == 'supervisor':
+        cmd = [join(PATHS['bin'], 'supervisorctl'), command, name]
+    elif daemon:
+        cmd = [daemon, command]
     else:
         cmd = None
     if cmd:
@@ -40,6 +48,7 @@ def daemon(name, command='restart'):
     else:
         log.error('no such demo %s', name)
         return -1
+
 
 def load_app_list():
     """
@@ -61,39 +70,39 @@ def load_app_list():
         demos[(file[5:-3])] = params
     return demos
 
+
 def get_demo_comment(demo_name):
     """
     return the content of "about.txt" in the directory of the application, if
     it exists.
 
     """
-    if 'about.txt' in os.listdir(os.path.join(config.paths.demos, demo_name)):
+    if 'about.txt' in os.listdir(join(PATHS['demos'], demo_name)):
         return open(
-            os.path.join(config.paths.demos, demo_name, 'about.txt')
+            join(PATHS['demos'], demo_name, 'about.txt')
             ).read()
     else:
         return ''
+
 
 def demos_list():
     """
     load the list of existing applications. with a boolean indicating if they
     are activated in supervisor conf.
-
     """
-    conf = ConfigObject()
-    conf.read(config.paths.supervisor)
+    conf = SafeConfigParser()
+    conf.read(PATHS['supervisor'])
 
-    apps = get_apps()
     demos = []
-    for name in apps.sections():
-        app = apps[name]
+    for name in APPS_CONF.sections():
         demos.append(dict(
             name=name,
-            port=app.port,
-            autostart= conf['program:%s' % name].autostart.as_bool('false'),
+            port=APPS_CONF.get(name, 'port'),
+            autostart=APPS_CONF.has_option(name, 'autostart') and APPS_CONF.getboolean(name, 'autostart'),
             comment=get_demo_comment(name)
         ))
     return demos
+
 
 def next_port():
     """
@@ -101,8 +110,8 @@ def next_port():
     >>> next_port() == port +1
     True
     """
-    path = config.paths.port
-    if os.path.isfile(path):
+    path = PATHS['port']
+    if isfile(path):
         port = int(open(path).read())
         port += 1
     else:

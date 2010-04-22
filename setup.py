@@ -6,7 +6,10 @@ here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.txt')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
-requires = ['repoze.bfg',]
+requires = [
+    'repoze.bfg',
+    'restkit',
+]
 
 setup(name='aws.demos',
       version='0.0',
