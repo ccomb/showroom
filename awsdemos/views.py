@@ -28,22 +28,6 @@ from repoze.bfg.security import (
 
 log = logging.getLogger(__name__)
 
-def admin(view):
-    """
-    decorator used to limit some (most?) views to logged user (admin).
-
-    """
-    def decorated(request):
-        if authenticated_userid(request):
-            return view(request)
-        else:
-            return render_template_to_response(
-                'templates/login.pt',
-                request=request,
-                message="veuillez vous identifier pour accéder à cette page"
-                )
-    return decorated
-
 def view_app_list(request, message=None):
     """
     return the main page, with applications list, and actions.
@@ -86,9 +70,9 @@ def login(request):
                              headers = headers)
         message = 'Failed login'
 
-    return dict(
+    return render_template_to_response(
+        "templates/login.pt",
         message = message,
-        url = request.application_url + '/login',
         came_from = came_from,
         login = login,
         password = password,

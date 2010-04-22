@@ -1,4 +1,3 @@
-
 #!/usr/bin/env sh
 set -e # explicit fail on errors
 # gabriel pettier, for alterway solution
