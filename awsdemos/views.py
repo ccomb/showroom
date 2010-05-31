@@ -10,6 +10,7 @@ from repoze.bfg.testing import DummyRequest
 from repoze.bfg.url import route_url
 from shutil import rmtree
 from webob.exc import HTTPFound
+from awsdemos.security import USERS
 import logging
 import os
 import subprocess
@@ -32,6 +33,7 @@ def view_app_list(request, message=None):
     """
     return the main page, with applications list, and actions.
     """
+    logged_in = authenticated_userid(request)
     master = get_template('templates/master.pt')
     return render_template_to_response(
         "templates/master.pt",
@@ -39,6 +41,7 @@ def view_app_list(request, message=None):
         message=message,
         apps=utils.load_app_list(),
         demos=utils.demos_list(),
+        logged_in=authenticated_userid(request),
         )
 
 def app_params(request):
@@ -53,10 +56,14 @@ def app_params(request):
         return ("No application name given or unknown application.",)
 
 def login(request):
+    """
+    allow to login to the application to do admin tasks.
+
+    """
     login_url = route_url('login', request)
     referrer = request.url
     if referrer == login_url:
-        referrer = '/' # never use the login form itself as came_from
+        referrer = '/admin' # never use the login form itself as came_from
     came_from = request.params.get('came_from', referrer)
     message = ''
     login = ''
@@ -66,39 +73,27 @@ def login(request):
         password = request.params['password']
         if USERS.get(login) == password:
             headers = remember(request, login)
+            print "user logged "+login+':'+password
             return HTTPFound(location = came_from,
                              headers = headers)
         message = 'Failed login'
 
-    return render_template_to_response(
-        "templates/login.pt",
-        message = message,
-        came_from = came_from,
-        login = login,
-        password = password,
-        )
+    return dict(
+            message = message,
+            url = request.application_url + '/login',
+            came_from = came_from,
+            login = login,
+            password = password,
+            )
 
-def logout(request):
+def logout(context, request):
+    """
+    Logout of the application.
+
+    """
     headers = forget(request)
-    return HTTPFound(location = route_url('view_wiki', request),
-                     headers = headers)
-
-def login(request):
-    """
-    allow the user to login
-
-    """
-    #if 'user' in request.params\
-    #and 'password' in request.params\
-    #and request.params['user'] == 'admin'\
-    #and request.params['password'] == 'alterway':
-            #
-    #else:
-    return render_template_to_response(
-        'templates/login.pt',
-        request=request,
-        message=None,
-        )
+    return HTTPFound(location = route_url(context, request),
+                             headers = headers)
 
 def app_form(request):
     """
@@ -112,13 +107,13 @@ def app_form(request):
             request=request,
             paramlist=app_list[request.params['app']],
             demo=request.params['app'],
-            master=master
+            master=master,
+            logged_in=authenticated_userid(request),
         )
     else:
         return webob.Response(str(
             "No application name given or unknown application."
             ))
-
 
 def action(request):
     """

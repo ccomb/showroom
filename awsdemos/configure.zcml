@@ -3,6 +3,22 @@
   <!-- this must be included for the view declarations to work -->
   <include package="repoze.bfg.includes" />
 
+  <authtktauthenticationpolicy
+      callback=".security.groupfinder"
+      path='/'
+      secret="68b329da9893e34099c7d8ad5cb9c940"
+      timeout="3600"
+      reissue_time="600"
+  />
+
+  <aclauthorizationpolicy />
+
+  <forbidden
+  view=".views.login"
+  renderer="templates/login.pt"
+  />
+
+
   <route name="home"
          path=""
          view=".views.view_app_list"
@@ -21,6 +37,7 @@
   <route name="login"
          path="/login"
          view=".views.login"
+         view_renderer="templates/login.pt"
   />
 
   <route name="logout"
@@ -36,6 +53,7 @@
   <route name="delete"
          path="/delete"
          view=".views.delete_demo"
+         view_permission="edit"
   />
 
   <route name="app_params"
@@ -43,10 +61,6 @@
          view=".views.app_params"
          renderer="json"
   />
-
-    <authtktauthenticationpolicy
-       secret="iamsosecret"/>
-    <aclauthorizationpolicy/>
 
   <static
      name="static"

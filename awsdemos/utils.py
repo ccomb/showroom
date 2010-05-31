@@ -51,9 +51,9 @@ def load_app_list():
     """
     demos = {}
     for file in (
-                    i for i in os.listdir('scripts')
-                    if i.startswith('demo_') and i.endswith('.sh')
-                ):
+            i for i in os.listdir('scripts')
+            if i.startswith('demo_') and i.endswith('.sh')
+            ):
         for line in open('scripts'+os.sep+file):
             if line.split(':')[0] == '# PARAMS':
                 params = line.split('\n')[0].split(':')[1].split(',')

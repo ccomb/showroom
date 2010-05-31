@@ -37,6 +37,11 @@ $('document').ready(function(){
     </tr>
     <tr>
         <td id="sidebar">
+        <div id="user_ID">
+            connecté en tant que: ${logged_in}<br/> <a
+            href='${request.application_url}/logout'> se déconnecter</a>
+        </div>
+
             <form id="app_form" method="POST"
             action="${request.application_url}/action">
                 <div>créer une démo</div>
@@ -54,6 +59,11 @@ $('document').ready(function(){
             <tal:if condition="message is not None">
                 <div id="message" tal:content="message or ''"> </div>
             </tal:if>
+            <!--div id="login"
+                 tal:content="currently logged as ${logged_in},
+                              <a href='${request.application_url}/logout'>
+                              logout</a>">
+            </div-->
             <table id="demos_list">
                 <tr tal:repeat="demo demos">
                   <td><a tal:attributes="href python:'/'+demo['name']" tal:content="python: demo['name']">blob</a></td>
