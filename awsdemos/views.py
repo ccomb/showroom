@@ -10,7 +10,7 @@ from repoze.bfg.testing import DummyRequest
 from repoze.bfg.url import route_url
 from shutil import rmtree
 from webob.exc import HTTPFound
-from awsdemos.security import USERS
+from awsdemos.security import ldaplogin
 import logging
 import os
 import subprocess
@@ -71,13 +71,14 @@ def login(request):
     if 'form.submitted' in request.params:
         login = request.params['login']
         password = request.params['password']
-        if USERS.get(login) == password:
+        if ldaplogin(login, password):
+            print 'authenticated'
             headers = remember(request, login)
-            print "user logged "+login+':'+password
             return HTTPFound(location = came_from,
                              headers = headers)
         message = 'Failed login'
 
+    print 'not authenticated'
     return dict(
             message = message,
             url = request.application_url + '/login',
@@ -86,14 +87,13 @@ def login(request):
             password = password,
             )
 
-def logout(context, request):
+def logout(request):
     """
     Logout of the application.
 
     """
     headers = forget(request)
-    return HTTPFound(location = route_url(context, request),
-                             headers = headers)
+    return HTTPFound(location = '/admin', headers=headers)
 
 def app_form(request):
     """

@@ -4,7 +4,6 @@
   <include package="repoze.bfg.includes" />
 
   <authtktauthenticationpolicy
-      callback=".security.groupfinder"
       path='/'
       secret="68b329da9893e34099c7d8ad5cb9c940"
       timeout="3600"
@@ -22,22 +21,26 @@
   <route name="home"
          path=""
          view=".views.view_app_list"
+         view_permission="edit"
   />
 
   <route name="new"
          path="/new"
          view=".views.app_form"
+         view_permission="edit"
   />
 
   <route name="action"
          path="/action"
          view=".views.action"
+         view_permission="edit"
   />
 
   <route name="login"
          path="/login"
          view=".views.login"
          view_renderer="templates/login.pt"
+         view_permission="edit"
   />
 
   <route name="logout"
@@ -48,6 +51,7 @@
   <route name="daemon"
          path="/daemon"
          view=".views.daemon"
+         view_permission="edit"
   />
 
   <route name="delete"
@@ -60,6 +64,7 @@
          path="/app_params"
          view=".views.app_params"
          renderer="json"
+         view_permission="edit"
   />
 
   <static

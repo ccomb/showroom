@@ -1,11 +1,25 @@
-USERS = {'admin':'admin'}
-GROUPS = {'admin':['group.admin']}
+from repoze.bfg.security import Authenticated
 
-def groupfinder(userid, request):
-    """
-    return the different groups the user belong to.
+from dataflake.ldapconnection.connection import LDAPConnection as ldap
+from ldap import INVALID_CREDENTIALS as invalid_credentials
 
-    """
-    if userid in USERS:
-        return GROUPS.get(userid, [])
+def ldaplogin(username, password):
+    conn = ldap(
+        host='ldap.alterway.fr',
+        bind_dn="cn="+username+",ou=users,dc=alterway,dc=fr",
+        bind_pwd=password
+        )
+    try:
+        short_name = conn.search(
+            base='dc=alterway,dc=fr',
+            fltr='cn='+username
+            )['results'][0]['uid'][0]
+
+        return short_name in conn.search(
+            base='dc=alterway,dc=fr',
+            fltr='cn=allstaff'
+            )['results'][0]['memberUid']
+
+    except invalid_credentials:
+        return False
 
