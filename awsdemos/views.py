@@ -44,6 +44,12 @@ def view_app_list(request, message=None):
         logged_in=authenticated_userid(request),
         )
 
+def json_app_list(request):
+    """
+    return a json view of all apps and their params/plugins
+    """
+    return utils.load_app_list()
+
 def app_params(request):
     """
     return the params of a given demo, in a json list.
@@ -51,7 +57,18 @@ def app_params(request):
     """
     app_list = utils.load_app_list()
     if 'app' in request.params and request.params['app'] in app_list:
-        return utils.load_app_list()[request.params['app']]
+        return utils.load_app_list()[request.params['app']][0]
+    else:
+        return ("No application name given or unknown application.",)
+
+def app_plugins(request):
+    """
+    return the params of a given demo, in a json list.
+
+    """
+    app_list = utils.load_app_list()
+    if 'app' in request.params and request.params['app'] in app_list:
+        return utils.load_app_list()[request.params['app']][1]
     else:
         return ("No application name given or unknown application.",)
 
@@ -144,7 +161,8 @@ def action(request):
     if request.params['app'] in app_list:
         command = os.path.join(config.paths.scripts, "demo_"+request.params['app']+".sh")
         params = tuple([
-            "'"+request.params[x]+"'" for x in app_list[request.params['app']]
+            "'"+request.params[x]+"'" for x in
+            app_list[request.params['app']][0]
             ])
         env = os.environ.copy()
         env.update(request.params)

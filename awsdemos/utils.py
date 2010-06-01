@@ -54,11 +54,15 @@ def load_app_list():
             i for i in os.listdir('scripts')
             if i.startswith('demo_') and i.endswith('.sh')
             ):
+        params = []
+        plugins = []
         for line in open('scripts'+os.sep+file):
             if line.split(':')[0] == '# PARAMS':
                 params = line.split('\n')[0].split(':')[1].split(',')
-                break
-        demos[(file[5:-3])] = params
+            elif line.split(':')[0] == '# PLUGINS':
+                plugins = line.split('\n')[0].split(':')[1].split(',')
+
+        demos[(file[5:-3])] = (params, plugins)
     return demos
 
 def get_demo_comment(demo_name):

@@ -1,5 +1,6 @@
 #!/usr/bin/env sh
 # PARAMS:NAME,COMMENT
+
 set -e # explicit fail on errors
 
 # load vars and fonctions

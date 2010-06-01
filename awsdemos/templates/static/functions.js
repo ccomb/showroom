@@ -28,12 +28,27 @@ function update_app_form(url, app){
                         '<br/>'+data[param]+':<input name="'+data[param]+'"></input>'
                     );
                 }
-                $("#app_form_dynamic").append(
-                    '<input id="app_form_submit" type="submit"'+
-                    'onclick="on_valid_form();"/>'
-                )
             }
         ); // makes me sad
+        jQuery.getJSON(
+            url+"/app_plugins?app="+app,
+            function(data){
+                if (data.length > 0){
+                    $('#app_form_dynamic').append(
+                        '<select id="app_form_dynamic_plugins" name="plugins" multiple="multiple" </select>'
+                        )
+                    for (plugin in data){
+                        $("#app_form_dynamic_plugins").append(
+                            '<option>'+data[plugin]+'</option>'
+                        );
+                    }
+                }
+            }
+        ); // makes me sad
+        $("#app_form_dynamic").append(
+            '<input id="app_form_submit" type="submit"'+
+            'onclick="on_valid_form();"/>'
+        )
     }
 }
 

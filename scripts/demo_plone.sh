@@ -3,7 +3,8 @@ set -e # explicit fail on errors
 # gabriel pettier, for alterway solution
 # 24/02/2010 11:03:42 (UTC+0100)
 
-# PARAMS:NAME,COMMENT,PRODUCTS=PILowTK
+# PARAMS:NAME,COMMENT
+# PLUGINS:aws.minisite,Products.collage,collective.plonefinder,Products.FCKeditor
 
 # load vars and fonctions
 . $SCRIPTS/config.sh
@@ -28,7 +29,7 @@ find-links =
     http://download.zope.org/ppix/
     http://download.zope.org/distribution/
     http://effbot.org/downloads
-eggs = $PRODUCTS
+eggs = PILwoTk $PRODUCTS
 develop =
 
 [zope2]

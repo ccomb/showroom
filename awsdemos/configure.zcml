@@ -60,9 +60,23 @@
          view_permission="edit"
   />
 
+  <route name="json_app_list"
+         path="/json_app_list"
+         view=".views.json_app_list"
+         renderer="json"
+         view_permission="edit"
+  />
+
   <route name="app_params"
          path="/app_params"
          view=".views.app_params"
+         renderer="json"
+         view_permission="edit"
+  />
+
+  <route name="app_plugins"
+         path="/app_plugins"
+         view=".views.app_plugins"
          renderer="json"
          view_permission="edit"
   />
