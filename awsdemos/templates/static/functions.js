@@ -25,7 +25,7 @@ function update_app_form(url, app){
             function(data){
                 for (param in data){
                     $("#app_form_dynamic").append(
-                        '<br/>'+data[param]+':<input name="'+data[param]+'"></input>'
+                        '<br/>'+data[param]+':<input '+(data[param].toLowerCase()=='password' && 'type="password"')+'name="'+data[param]+'"></input>'
                     );
                 }
             }
@@ -34,7 +34,7 @@ function update_app_form(url, app){
             url+"/app_plugins?app="+app,
             function(data){
                 if (data.length > 0){
-                    $('#app_form_dynamic').append(
+                    $('#app_form_dynamic').append('PLUGINS'+
                         '<select id="app_form_dynamic_plugins" name="plugins" multiple="multiple" </select>'
                         )
                     for (plugin in data){

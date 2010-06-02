@@ -22,7 +22,7 @@ parts=eggs
 
 [eggs]
 recipe = zc.recipe.egg
-eggs =  
+eggs =
     repoze.bfg
     pastescript
     pastedeploy
