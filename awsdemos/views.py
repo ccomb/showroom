@@ -181,6 +181,7 @@ def action(request):
         env['BIN'] = config.paths.bin
         env['SCRIPTS'] = config.paths.scripts
         env['DEMOS'] = config.paths.demos
+        env['PLUGINS'] = ' '.join(app_list[request.params['app']][1])
         log.debug(command+' '+' '.join(params))
         subprocess.call(
             command+' '+' '.join(params).encode('utf-8'),

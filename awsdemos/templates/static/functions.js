@@ -29,7 +29,7 @@ function update_app_form(url, app){
                     );
                 }
             }
-        ); // makes me sad
+        );
         jQuery.getJSON(
             url+"/app_plugins?app="+app,
             function(data){
@@ -44,7 +44,7 @@ function update_app_form(url, app){
                     }
                 }
             }
-        ); // makes me sad
+        );
         $("#app_form_dynamic").append(
             '<input id="app_form_submit" type="submit"'+
             'onclick="on_valid_form();"/>'

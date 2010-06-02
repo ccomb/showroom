@@ -29,7 +29,15 @@ find-links =
     http://download.zope.org/ppix/
     http://download.zope.org/distribution/
     http://effbot.org/downloads
-eggs = PILwoTk $PRODUCTS
+eggs =
+    PILwoTk
+EOF
+for plugin in $PLUGINS
+do
+    echo '    '$plugin >> buildout.cfg
+done
+
+cat >> buildout.cfg << EOF
 develop =
 
 [zope2]
