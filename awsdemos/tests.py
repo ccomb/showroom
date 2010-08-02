@@ -32,6 +32,8 @@ class ViewTests(unittest.TestCase):
 
 
 
+
+
 def additional_tests():
     """Setuptools/Distribute looks for this additional function when searching
     tests through the 'test_suite' argument of setup()
