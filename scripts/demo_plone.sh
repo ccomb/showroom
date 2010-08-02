@@ -87,7 +87,7 @@ app.manage_addProduct['CMFPlone'].addPloneSite(os.environ['NAME'])
 site = app[os.environ['NAME']]
 
 #print 'Adding user. Dont work for now'
-#site.portal_registration.addMember('$LOGIN', '$PASSWORD', ['Manager'])
+site.portal_registration.addMember('$LOGIN', '$PASSWORD', ['Manager'])
 transaction.commit()
 EOF
 

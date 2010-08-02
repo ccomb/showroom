@@ -45,7 +45,7 @@ develop = $NAME
 
 [eggs]
 recipe = zc.recipe.egg
-eggs =  
+eggs = 
     repoze.bfg
     pastescript
     pastedeploy

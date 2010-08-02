@@ -28,7 +28,7 @@ class AppProxy(object):
             req.script_name = None
             req.content_length = len(req.body)
             self.rewrite(name, app, req)
-            req.environ['SERVER_NAME'] = '127.0.0.1'
+            req.environ['SERVER_NAME'] = 'localhost'
             req.environ['SERVER_PORT'] = app.port
             resp = req.get_response(self.proxy)
             return resp(environ, start_response)
