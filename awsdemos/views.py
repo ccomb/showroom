@@ -31,7 +31,7 @@ log = logging.getLogger(__name__)
 
 
 def admin(view):
-    """ decorator used to limit some (most?) views to logged user (admin).
+    """ decorator used to limit views to logged user (admin).
     """
     def decorated(request):
         if authenticated_userid(request):
@@ -70,7 +70,7 @@ def app_params(request):
     """
     app_list = utils.load_app_list()
     if 'app' in request.params and request.params['app'] in app_list:
-        return utils.load_app_list()[request.params['app']]
+        return utils.load_app_list()[request.params['app']][0]
     else:
         return ("No application name given or unknown application.",)
 
@@ -101,13 +101,12 @@ def login(request):
     if 'form.submitted' in request.params:
         login = request.params['login']
         password = request.params['password']
-        if USERS.get(login) == password:
+        if ldaplogin(login, password):
             headers = remember(request, login)
             return HTTPFound(location = came_from,
                              headers = headers)
         message = 'Failed login'
 
-    print 'not authenticated'
     return dict(
         message = message,
         url = request.application_url + '/login',
@@ -125,27 +124,8 @@ def logout(request):
                      headers = headers)
 
 
-def login(request):
-    """
-    allow the user to login
-
-    """
-    #if 'user' in request.params\
-    #and 'password' in request.params\
-    #and request.params['user'] == 'admin'\
-    #and request.params['password'] == 'alterway':
-            #
-    #else:
-    return render_template_to_response(
-        'templates/login.pt',
-        request=request,
-        message=None,
-        )
-
-
 def app_form(request):
-    """
-    return the form to create a demo
+    """ return the form to create a demo
     """
     master = get_template('templates/master.pt')
     app_list = utils.load_app_list()
@@ -154,6 +134,7 @@ def app_form(request):
             "templates/new_app.pt",
             request=request,
             paramlist=app_list[request.params['app']],
+            logged_in=authenticated_userid(request),
             demo=request.params['app'],
             master=master
         )
@@ -192,7 +173,7 @@ def action(request):
     if request.params['app'] in app_list:
         command = join(PATHS['scripts'], "demo_"+request.params['app']+".sh")
         params = tuple([
-            "'"+request.params[x]+"'" for x in app_list[request.params['app']]
+            "'"+request.params[x]+"'" for x in app_list[request.params['app']][0]
             ])
         env = os.environ.copy()
         env.update(request.params)
@@ -284,9 +265,7 @@ def daemon(request):
 
 
 def delete_demo(request):
-    """
-    If an application of the name NAME is deployed, we delete it
-
+    """ If an application of the name NAME is deployed, we delete it
     """
     name=request.params['NAME']
 
@@ -294,9 +273,9 @@ def delete_demo(request):
 
     log.warn("removing demo "+name)
 
-    APPS_CONFIG.remove_section(name)
+    APPS_CONF.remove_section(name)
     with open(PATHS['apps'], 'w') as configfile:
-        APPS_CONFIG.write(configfile)
+        APPS_CONF.write(configfile)
 
     conf = SafeConfigParser()
     conf.read(PATHS['supervisor'])

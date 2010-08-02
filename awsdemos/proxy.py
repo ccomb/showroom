@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
 from restkit.ext.wsgi_proxy import Proxy
 from webob import Request, exc
-from awsdemos import utils
+from awsdemos.utils import APPS_CONF
 import urllib
 
 class AppProxy(object):
 
     proxy = Proxy(allowed_methods=['GET', 'HEAD', 'POST'])
 
-    def rewrite(self, name, app, req):
+    def _rewrite(self, name, req):
         path_info = urllib.quote(req.path_info)
-        if app.type == 'plone':
+        app_type = APPS_CONF.get(name, 'type')
+        if app_type == 'plone':
             host = req.host
             if ':' not in host:
                 host = '%s:80' % host
@@ -23,16 +24,17 @@ class AppProxy(object):
     def __call__(self, environ, start_response):
         req = Request(environ)
         name = req.path_info_pop().strip('/')
-        app = utils.get_app(name)
-        if app.port:
+        if APPS_CONF.has_section(name):
+            port = APPS_CONF.get(name, 'port')
             req.script_name = None
             req.content_length = len(req.body)
-            self.rewrite(name, app, req)
+            self._rewrite(name, req)
             req.environ['SERVER_NAME'] = 'localhost'
-            req.environ['SERVER_PORT'] = app.port
+            req.environ['SERVER_PORT'] = port
             resp = req.get_response(self.proxy)
             return resp(environ, start_response)
-        return exc.HTTPNotFound()(environ, start_response)
+        else:
+            return exc.HTTPNotFound()(environ, start_response)
 
 def make_proxy(global_conf, **local_conf):
     return AppProxy()
