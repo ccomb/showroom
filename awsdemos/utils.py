@@ -6,48 +6,59 @@ import os
 import subprocess
 import sys
 
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
-config = SafeConfigParser()
+CONFIG = SafeConfigParser()
 PATH = os.path.dirname(abspath(sys.argv[-1]))
-config.read(join(PATH, 'aws.demos.ini'))
+
+CONFIG.read(join(PATH, 'aws.demos.ini'))
 PATHS = {
-  'bin' : join(PATH, config.get('paths', 'bin')),
-  'scripts' : join(PATH, config.get('paths', 'scripts')),
-  'demos' : join(PATH, config.get('paths', 'demos')),
-  'port' : join(PATH, config.get('paths', 'port')),
-  'apps' : join(PATH, config.get('paths', 'apps')),
-  'supervisor' : join(PATH, config.get('paths', 'supervisor')),
+  'bin' : join(PATH, CONFIG.get('paths', 'bin')),
+  'scripts' : join(PATH, CONFIG.get('paths', 'scripts')),
+  'demos' : join(PATH, CONFIG.get('paths', 'demos')),
+  'port' : join(PATH, CONFIG.get('paths', 'port')),
+  'apps' : join(PATH, CONFIG.get('paths', 'apps')),
 }
 
 if not isdir(PATHS['demos']):
     os.makedirs(PATHS['demos'])
-    log.info('%s created.', PATHS['demos'])
+    LOG.info('%s created.', PATHS['demos'])
 
+# FIXME global variable
 APPS_CONF = SafeConfigParser()
 APPS_CONF.read(PATHS['apps'])
 
 
 def daemon(name, command='restart'):
-    daemon = APPS_CONF.get(name, 'daemon')
-    if daemon == 'supervisor':
-        cmd = [join(PATHS['bin'], 'supervisorctl'), command, name]
-    elif daemon:
-        cmd = [daemon, command]
+    """function that start, stop or restart the demo.
+    We read the command in the apps config file
+    """
+    if (not APPS_CONF.has_section(name)
+        or not APPS_CONF.has_option(name, command)):
+        print 'command %s not found for %s' % (command, name)
+        return
+
+    demopath = APPS_CONF.get(name, 'path')
+
+    # if we don't have a stop command, kill the app
+    if (command == 'stop'
+      and APPS_CONF.get(name, command).strip() == ''
+      and os.path.exists(join(demopath, 'pid'))):
+        cmd = "kill %s" % open(join(demopath, 'pid')).read()
     else:
-        cmd = None
-    if cmd:
-        log.warn('%sing %s: %s', command, name, ' '.join(cmd))
-        p = subprocess.Popen(cmd)
-        ret = p.wait()
-        try:
-            p.terminate()
-        except OSError:
-            pass
-        return ret
+        cmd = join(demopath, APPS_CONF.get(name, command))
+
+
+    if cmd.strip() == '':
+        print "unable to %s %s" % (name, command)
+        return
     else:
-        log.error('no such demo %s', name)
-        return -1
+        LOG.warn('%sing %s: %s', command, name, cmd)
+        pid = subprocess.Popen(cmd.split(), cwd=demopath).pid
+        if pid and command == 'start':
+            with open(join(demopath, 'pid'), 'w') as pidfile:
+                pidfile.write(str(pid))
+                return pid
 
 
 def load_app_list():
@@ -91,12 +102,8 @@ def get_demo_comment(demo_name):
 
 def demos_list():
     """
-    load the list of existing applications. with a boolean indicating if they
-    are activated in supervisor conf.
+    load the list of existing applications.
     """
-    conf = SafeConfigParser()
-    conf.read(PATHS['supervisor'])
-
     demos = []
     for name in APPS_CONF.sections():
         demos.append(dict(
@@ -110,6 +117,9 @@ def demos_list():
 
 def next_port():
     """
+    store the last used port in a file and return the next one
+    FIXME : do the same without storing a file
+
     >>> port = next_port()
     >>> next_port() == port +1
     True

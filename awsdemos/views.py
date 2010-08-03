@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 from ConfigParser import SafeConfigParser, NoSectionError
+from awsdemos.security import ldaplogin
 from os.path import join, isfile, isdir
 from repoze.bfg.chameleon_zpt import get_template
 from repoze.bfg.chameleon_zpt import render_template_to_response
@@ -10,13 +11,13 @@ from repoze.bfg.url import route_url
 from shutil import rmtree
 from utils import PATHS, APPS_CONF
 from webob.exc import HTTPFound
-from awsdemos.security import ldaplogin
 import logging
 import os
 import subprocess
 import time
 import utils
 import webob
+
 from repoze.bfg.security import (
     Allow,
     Everyone,
@@ -27,7 +28,7 @@ from repoze.bfg.security import (
     remember,
     )
 
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 
 def admin(view):
@@ -76,7 +77,7 @@ def app_params(request):
 
 def app_plugins(request):
     """
-    return the params of a given demo, in a json list.
+    return the plugins of a given demo, in a json list.
 
     """
     app_list = utils.load_app_list()
@@ -126,6 +127,7 @@ def logout(request):
 
 def app_form(request):
     """ return the form to create a demo
+    FIXME: seems not used
     """
     master = get_template('templates/master.pt')
     app_list = utils.load_app_list()
@@ -171,93 +173,86 @@ def action(request):
         raise NotFound
     app_list = utils.load_app_list()
     if request.params['app'] in app_list:
+        # rebuild the name of the deployment script
         command = join(PATHS['scripts'], "demo_"+request.params['app']+".sh")
+
+        # get the creation params of the app
         params = tuple([
             "'"+request.params[x]+"'" for x in app_list[request.params['app']][0]
             ])
+
+        # add environment variables for the deployment script
         env = os.environ.copy()
         env.update(request.params)
-        name = request.params['NAME']
+        app_name = request.params['NAME']
         try:
-            port = APPS_CONF.get(name, 'port')
+            port = APPS_CONF.get(app_name, 'port')
         except NoSectionError:
             port = utils.next_port()
         else:
-            log.warn('demo %s already exist. reusing port' % name)
-            utils.daemon(name, 'stop')
+            LOG.warn('demo %s already exist. reusing port' % app_name)
+            utils.daemon(app_name, 'stop')
             port = utils.next_port()
         env['PORT'] = str(port)
-        env['BIN'] = PATHS['bin']
-        env['SCRIPTS'] = PATHS['scripts']
-        env['DEMOS'] = PATHS['demos']
-        log.debug(command+' '+' '.join(params))
+        # put the virtualenv path first
+        env['PATH'] = os.path.abspath('bin') + ':' + env['PATH']
+
+        # create the directory for the demo
+        demopath = join(PATHS['demos'], app_name)
+        if not os.path.exists(demopath):
+            os.mkdir(demopath)
+        else:
+            print "this app already exists" # FIXME
+            raise NotFound
+
+        # run the deployment script
+        LOG.debug(command+' '+' '.join(params))
         subprocess.call(
             command+' '+' '.join(params).encode('utf-8'),
             shell=True,
+            cwd=demopath,
             env=env
             )
 
-        path = join(
-                PATHS['demos'],
-                name,
-                )
-        kwargs = dict(path=path, name=name)
+        # add our new application in the apps config file
+        APPS_CONF.add_section(app_name)
 
-        conf = SafeConfigParser()
-        conf.read(PATHS['supervisor'])
-
-        if isfile(join(path, 'starter.sh')):
-            section = 'program:%s' % name
-            conf.add_section(section)
-            conf.set(section, 'command', join(path, 'starter.sh') % kwargs)
-            conf.set(section, 'process_name', name)
-            conf.set(section, 'directory', path)
-            conf.set(section, 'priority', '10')
-            conf.set(section, 'redirect_stderr', 'false')
-            conf.set(section, 'comment', request.params.get('COMMENT', '-'))
-            conf.set(section, 'port', port)
-            conf.set(section, 'stdout_logfile', join(path, 'std_out.log'))
-            conf.set(section, 'stderr_logfile', join(path, 'std_err.log'))
-            conf.set(section, 'stdout_logfile_maxbytes', '1MB')
-            conf.set(section, 'stderr_logfile_maxbytes', '1MB')
-            conf.set(section, 'stdout_capture_maxbytes', '1MB')
-            conf.set(section, 'stderr_capture_maxbytes', '1MB')
-            conf.set(section, 'stderr_logfile_backups', '10')
-            conf.set(section, 'stderr_logfile_backups', '10')
-
-            with open(PATHS['supervisor'],'w') as configfile:
-                conf.write(configfile)
-        APPS_CONF.add_section(name)
-        APPS_CONF.set(name, 'port', str(port))
-        APPS_CONF.set(name, 'path', path)
-        APPS_CONF.set(name, 'type', request.params['app'])
-        APPS_CONF.set(name, 'daemon', 'supervisor')
-        if isfile(join(path, 'daemon.sh')):
-            APPS_CONF.set(name, 'daemon', join(path, 'daemon.sh'))
-        else:
-            #TODO: php?
-            pass
+        # our deployment should have created a democonfig.ini file
+        # we copy the configuration from this file to the apps conf
+        democonfig = SafeConfigParser()
+        democonfig.read(join(demopath, 'democonfig.ini'))
+        for name, value in democonfig.items('democonfig'):
+            APPS_CONF.set(app_name, name, value)
+        APPS_CONF.set(app_name, 'port', str(port))
+        APPS_CONF.set(app_name, 'path', demopath)
+        APPS_CONF.set(app_name, 'type', request.params['app'])
+        os.remove(join(demopath, 'democonfig.ini'))
 
         with open(PATHS['apps'], 'w+') as configfile:
             APPS_CONF.write(configfile)
 
-        log.info('section %s added', name)
+        LOG.info('section %s added', app_name)
 
-        utils.daemon(name, 'start')
+        # start our application
+        utils.daemon(app_name, 'start')
 
+        # FIXME replace this with a flashmessage + redirect
         return view_app_list(
             request,
-            message="application %s created at port %s" % (name, port)
+            message="application %s created at port %s" % (app_name, port)
             )
     else:
         raise NotFound
 
 
 def daemon(request):
+    """ view that starts, stops or restarts the demo
+    """
     name = request.params.get('NAME', '_')
     command = request.params.get('COMMAND', 'restart')
     if APPS_CONF.get(name, 'port'):
         utils.daemon(name, command.lower())
+        # FIXME replace this with a flashmessage + redirect
         return view_app_list(
             request, message='demo %s successfully %sed' % (name, command.lower())
             )
@@ -271,22 +266,19 @@ def delete_demo(request):
 
     utils.daemon(name, 'stop')
 
-    log.warn("removing demo "+name)
+    LOG.warn("removing demo "+name)
 
     APPS_CONF.remove_section(name)
     with open(PATHS['apps'], 'w') as configfile:
         APPS_CONF.write(configfile)
 
     conf = SafeConfigParser()
-    conf.read(PATHS['supervisor'])
     conf.remove_section('program:'+name)
-    with open(PATHS['supervisor'], 'w') as configfile:
-        conf.write(configfile)
 
     if isdir(join(PATHS['demos'], name)):
         rmtree(join(PATHS['demos'], name))
     else:
-        log.error("demo "+name+"'s directory not found in demos.")
+        LOG.error("demo "+name+"'s directory not found in demos.")
 
     return view_app_list(
         request, message='demo '+name+' successfully removed'

@@ -7,8 +7,11 @@ README = open(os.path.join(here, 'README.txt')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
 requires = [
+    'setuptools',
     'repoze.bfg',
     'restkit',
+    'afpy.ldap',
+    'python-ldap',
 ]
 
 setup(name='aws.demos',

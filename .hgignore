@@ -5,6 +5,7 @@ dist
 eggs
 parts
 var/
+sandbox/
 develop-eggs
 docs/_build/
 docs/modules/
