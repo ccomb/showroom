@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # coding: utf-8
 from ConfigParser import SafeConfigParser, NoSectionError
 from awsdemos.security import ldaplogin
@@ -17,6 +16,7 @@ import subprocess
 import time
 import utils
 import webob
+from xmlrpclib import ServerProxy
 
 from repoze.bfg.security import (
     Allow,
@@ -29,6 +29,12 @@ from repoze.bfg.security import (
     )
 
 LOG = logging.getLogger(__name__)
+
+# start supervisor
+subprocess.Popen([join('bin', 'supervisord'), '-n', '-c', 'supervisord.cfg'])
+# connect to supervisor
+XMLRPC = ServerProxy('http://localhost:9001')
+
 
 
 def admin(view):
@@ -191,7 +197,7 @@ def action(request):
             port = utils.next_port()
         else:
             LOG.warn('demo %s already exist. reusing port' % app_name)
-            utils.daemon(app_name, 'stop')
+            XMLRPC.supervisor.stopProcess(app_name)
             port = utils.next_port()
         env['PORT'] = str(port)
         # put the virtualenv path first
@@ -233,8 +239,20 @@ def action(request):
 
         LOG.info('section %s added', app_name)
 
+        # add a supervisor conf
+        supervisor_conf = SafeConfigParser()
+        section = 'program:%s' % app_name
+        supervisor_conf.add_section(section)
+        supervisor_conf.set(section, 'command', APPS_CONF.get(app_name, 'start'))
+        supervisor_conf.set(section, 'directory', demopath)
+        with open(join(demopath, 'supervisor.cfg'), 'w') as supervisor_file:
+            supervisor_conf.write(supervisor_file)
+
+
+        # reload supervisord config
+        XMLRPC.supervisor.reloadConfig()
         # start our application
-        utils.daemon(app_name, 'start')
+        XMLRPC.supervisor.startProcess(app_name)
 
         # FIXME replace this with a flashmessage + redirect
         return view_app_list(
@@ -249,14 +267,17 @@ def daemon(request):
     """ view that starts, stops or restarts the demo
     """
     name = request.params.get('NAME', '_')
-    command = request.params.get('COMMAND', 'restart')
-    if APPS_CONF.get(name, 'port'):
-        utils.daemon(name, command.lower())
-        # FIXME replace this with a flashmessage + redirect
-        return view_app_list(
-            request, message='demo %s successfully %sed' % (name, command.lower())
-            )
-    raise NotFound
+    command = request.params.get('COMMAND', 'restart').lower()
+
+    if command in ('stop', 'restart'):
+        XMLRPC.supervisor.stopProcess(name)
+    if command in ('start', 'restart'):
+        XMLRPC.supervisor.startProcess(name)
+
+    # FIXME replace this with a flashmessage + redirect
+    return view_app_list(
+        request, message='demo %s successfully %sed' % (name, command.lower())
+        )
 
 
 def delete_demo(request):
@@ -264,7 +285,7 @@ def delete_demo(request):
     """
     name=request.params['NAME']
 
-    utils.daemon(name, 'stop')
+    XMLRPC.supervisor.stopProcess(name)
 
     LOG.warn("removing demo "+name)
 
