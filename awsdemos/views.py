@@ -47,12 +47,18 @@ def admin(view):
             return render_template_to_response(
                 'templates/login.pt',
                 request=request,
-                message="veuillez vous identifier pour accéder à cette page"
+                message="Veuillez vous identifier pour accéder à cette page"
                 )
     return decorated
 
 
-def view_app_list(request, message=None):
+def _flash_message(request, message):
+    """send a message through the session to the next url
+    """
+    request.environ['beaker.session']['message'] = message
+    request.environ['beaker.session'].save()
+
+def view_app_list(request):
     """ return the main page, with applications list, and actions.
     """
     logged_in = authenticated_userid(request)
@@ -60,7 +66,6 @@ def view_app_list(request, message=None):
     return render_template_to_response(
         "templates/master.pt",
         request=request,
-        message=message,
         apps=utils.load_app_list(),
         demos=utils.demos_list(),
         logged_in=authenticated_userid(request),
@@ -239,7 +244,7 @@ def action(request):
 
         LOG.info('section %s added', app_name)
 
-        # add a supervisor conf
+        # add a supervisor include file for this program
         supervisor_conf = SafeConfigParser()
         section = 'program:%s' % app_name
         supervisor_conf.add_section(section)
@@ -252,13 +257,10 @@ def action(request):
         # reload the config and start the process
         XMLRPC.supervisor.reloadConfig()
         XMLRPC.supervisor.addProcessGroup(app_name)
-        XMLRPC.supervisor.startProcess(app_name)
 
-        # FIXME replace this with a flashmessage + redirect
-        return view_app_list(
-            request,
-            message="application %s created at port %s" % (app_name, port)
-            )
+        _flash_message(request,
+            u"application %s created at port %s" % (app_name, port))
+        return HTTPFound(location='/admin')
     else:
         raise NotFound
 
@@ -269,16 +271,18 @@ def daemon(request):
     name = request.params.get('NAME', '_')
     command = request.params.get('COMMAND', 'restart').lower()
     state = XMLRPC.supervisor.getProcessInfo(name)['statename']
+    message = u'Nothing changed'
 
     if state == 'RUNNING' and command in ('stop', 'restart'):
         XMLRPC.supervisor.stopProcess(name)
+        message = u'%s stopped!' % (name)
+
     if state == 'STOPPED' and command in ('start', 'restart'):
         XMLRPC.supervisor.startProcess(name)
+        message = u'%s started!' % (name)
 
-    # FIXME replace this with a flashmessage + redirect
-    return view_app_list(
-        request, message='demo %s successfully %sed' % (name, command.lower())
-        )
+    _flash_message(request, message)
+    return HTTPFound(location='/admin')
 
 
 def delete_demo(request):
@@ -303,9 +307,8 @@ def delete_demo(request):
     if isdir(join(PATHS['demos'], name)):
         rmtree(join(PATHS['demos'], name))
     else:
-        LOG.error("demo "+name+"'s directory not found in demos.")
+        LOG.error("directory not found for %s in demos." % name)
 
-    return view_app_list(
-        request, message='demo '+name+' successfully removed'
-        )
+    _flash_message(request, '%s deleted!' % name)
+    return HTTPFound(location='/admin')
 

@@ -56,9 +56,11 @@ $('document').ready(function(){
             </form>
         </td>
         <td id="content">
-            <tal:if condition="message is not None">
-                <div id="message" tal:content="message or ''"> </div>
-            </tal:if>
+            <div id="message"
+                 tal:condition="python: 'message' in request.environ['beaker.session']"
+                 tal:content="python:request.environ['beaker.session']['message']">
+                    message placeholder
+            </div>
             <table id="demos_list">
                 <tr tal:repeat="demo demos">
                   <td><a tal:attributes="href python:'/'+demo['name']" tal:content="python: demo['name']">blob</a></td>

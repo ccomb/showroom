@@ -12,6 +12,7 @@ requires = [
     'restkit',
     'afpy.ldap',
     'python-ldap',
+    'Beaker',
 ]
 
 setup(name='aws.demos',
