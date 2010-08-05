@@ -243,15 +243,15 @@ def action(request):
         supervisor_conf = SafeConfigParser()
         section = 'program:%s' % app_name
         supervisor_conf.add_section(section)
-        supervisor_conf.set(section, 'command', APPS_CONF.get(app_name, 'start'))
+        supervisor_conf.set(section, 'command', join(demopath, APPS_CONF.get(app_name, 'start')))
         supervisor_conf.set(section, 'directory', demopath)
         with open(join(demopath, 'supervisor.cfg'), 'w') as supervisor_file:
             supervisor_conf.write(supervisor_file)
 
 
-        # reload supervisord config
+        # reload the config and start the process
         XMLRPC.supervisor.reloadConfig()
-        # start our application
+        XMLRPC.supervisor.addProcessGroup(app_name)
         XMLRPC.supervisor.startProcess(app_name)
 
         # FIXME replace this with a flashmessage + redirect
@@ -268,10 +268,11 @@ def daemon(request):
     """
     name = request.params.get('NAME', '_')
     command = request.params.get('COMMAND', 'restart').lower()
+    state = XMLRPC.supervisor.getProcessInfo(name)['statename']
 
-    if command in ('stop', 'restart'):
+    if state == 'RUNNING' and command in ('stop', 'restart'):
         XMLRPC.supervisor.stopProcess(name)
-    if command in ('start', 'restart'):
+    if state == 'STOPPED' and command in ('start', 'restart'):
         XMLRPC.supervisor.startProcess(name)
 
     # FIXME replace this with a flashmessage + redirect
@@ -285,7 +286,10 @@ def delete_demo(request):
     """
     name=request.params['NAME']
 
-    XMLRPC.supervisor.stopProcess(name)
+    state = XMLRPC.supervisor.getProcessInfo(name)['statename']
+    if state == 'RUNNING':
+        XMLRPC.supervisor.stopProcess(name)
+        XMLRPC.supervisor.removeProcessGroup(name)
 
     LOG.warn("removing demo "+name)
 
