@@ -5,9 +5,12 @@ from webob import Request, exc
 import urllib
 
 class AppProxy(object):
-    """ wsgi application that acts as a proxy
+    """ wsgi middleware that acts as a proxy, or directs to the admin
     """
     proxy = Proxy(allowed_methods=['GET', 'HEAD', 'POST'])
+
+    def __init__(self, app):
+        self.app = app
 
     def __call__(self, environ, start_response):
         request = Request(environ)
@@ -17,7 +20,7 @@ class AppProxy(object):
         if '.' in request.host:
             demo_name = request.host.split('.')[0]
 
-        # redirect to the correct port
+        # redirect to the correct port, or redirect to the admin
         if APPS_CONF.has_section(demo_name):
             port = APPS_CONF.get(demo_name, 'port')
             request.script_name = None
@@ -30,8 +33,14 @@ class AppProxy(object):
             response = request.get_response(self.proxy)
             return response(environ, start_response)
         else:
-            return exc.HTTPNotFound()(environ, start_response)
+            return self.app(environ, start_response)
+            return exc.HTTPFound(location='admin')
 
-def make_proxy(global_conf, **local_conf):
-    return AppProxy()
+def make_filter(global_conf, **local_conf):
+    """factory for the [paste.filter_factory] entry-point
+    (see setup.py)
+    """
+    def filter(app):
+        return AppProxy(app)
+    return filter
 
