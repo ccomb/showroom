@@ -63,22 +63,20 @@ $('document').ready(function(){
             </div>
             <table id="demos_list">
                 <tr tal:repeat="demo demos">
-                  <td><a tal:attributes="href python:'/'+demo['name']" tal:content="python: demo['name']">blob</a></td>
-                    <td>
-                        <button tal:content="python:demo['autostart'] and 'activate' or 'deactivate'" >
-                        </button>
+                  <td class="demo_title">
+                    <a tal:attributes="href python:'/'+demo['name']" tal:content="python: demo['name']">
+                        app name
+                    </a>
+                  </td>
+                  <td class="demo_button" tal:repeat="cmd python: ['start', 'stop', 'restart']">
+                    <button tal:attributes="
+                      onclick python:'window.location.href=\''+request.application_url+'/daemon?NAME='+demo['name']+'&amp;COMMAND='+cmd+'\''"
+                            tal:content="cmd">restart</button>
                     </td>
-                    <td><button>reset</button></td>
-                    <tal:repeat tal:repeat="cmd python: ['start', 'stop', 'restart']" >
-                    <td><button tal:attributes="
-                        onclick python:'window.location.href=\''+request.application_url+'/daemon?NAME='+demo['name']+'&amp;COMMAND='+cmd+'\''
-                        " tal:content="cmd">restart</button>
-                    </td>
-                    </tal:repeat>
-                    <td><button tal:attributes="
-                        onclick python:'window.location.href=\''+request.application_url+'/delete?NAME='+demo['name']+'\''
-                        ">delete</button>
-                    </td>
+                  <td><button tal:attributes="
+                      onclick python:'window.location.href=\''+request.application_url+'/delete?NAME='+demo['name']+'\''
+                      ">delete</button>
+                  </td>
                 </tr>
             </table>
         </td>

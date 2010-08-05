@@ -180,22 +180,19 @@ def action(request):
     <Response at ... 200 OK>
 
     """
-    if 'app' not in request.params:
+    params = request.params.copy()
+    params['NAME'] = params['NAME'].replace(' ', '_') # FIXME
+    if 'app' not in params:
         raise NotFound
     app_list = utils.load_app_list()
-    if request.params['app'] in app_list:
+    if params['app'] in app_list:
         # rebuild the name of the deployment script
-        command = join(PATHS['scripts'], "demo_"+request.params['app']+".sh")
-
-        # get the creation params of the app
-        params = tuple([
-            "'"+request.params[x]+"'" for x in app_list[request.params['app']][0]
-            ])
+        script = join(PATHS['scripts'], "demo_"+params['app']+".sh")
 
         # add environment variables for the deployment script
         env = os.environ.copy()
-        env.update(request.params)
-        app_name = request.params['NAME']
+        env.update(params)
+        app_name = params['NAME']
         try:
             port = APPS_CONF.get(app_name, 'port')
         except NoSectionError:
@@ -217,13 +214,8 @@ def action(request):
             raise NotFound
 
         # run the deployment script
-        LOG.debug(command+' '+' '.join(params))
-        subprocess.call(
-            command+' '+' '.join(params).encode('utf-8'),
-            shell=True,
-            cwd=demopath,
-            env=env
-            )
+        LOG.debug(script)
+        subprocess.call(script, shell=True, cwd=demopath, env=env)
 
         # add our new application in the apps config file
         APPS_CONF.add_section(app_name)
@@ -236,7 +228,7 @@ def action(request):
             APPS_CONF.set(app_name, name, value)
         APPS_CONF.set(app_name, 'port', str(port))
         APPS_CONF.set(app_name, 'path', demopath)
-        APPS_CONF.set(app_name, 'type', request.params['app'])
+        APPS_CONF.set(app_name, 'type', params['app'])
         os.remove(join(demopath, 'democonfig.ini'))
 
         with open(PATHS['apps'], 'w+') as configfile:

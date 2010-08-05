@@ -5,155 +5,161 @@ Released for free under a Creative Commons Attribution 2.5 License
 */
 
 body {
-        margin: 0;
-        padding: 0;
-        background-color: #b2b2ff;
-        font-size: 13px;
-        font-family: "Trebuchet MS", Georgia, "Times New Roman", Times, serif;
-        text-align: justify;
-        color: #000000;
-        height: 100%;
-        width: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: #b2b2ff;
+    font-size: 13px;
+    font-family: "Trebuchet MS", Georgia, "Times New Roman", Times, serif;
+    text-align: justify;
+    color: #000000;
+    height: 100%;
+    width: 100%;
 }
 
 h1, h2, h3 {
-        margin: 0;
-        text-transform: lowercase;
-        font-weight: normal;
-        color: #FFFFFF;
+    margin: 0;
+    text-transform: lowercase;
+    font-weight: normal;
+    color: #FFFFFF;
 }
 
 h1 {
-        letter-spacing: -1px;
-        font-size: 32px;
+    letter-spacing: -1px;
+    font-size: 32px;
 }
 
 h2 {
-        font-size: 23px;
+    font-size: 23px;
 }
 
 p, ul, ol {
-        margin: 0 0 2em 0;
-        text-align: justify;
-        line-height: 26px;
+    margin: 0 0 2em 0;
+    text-align: justify;
+    line-height: 26px;
 }
 
 a:link {
-        color: #5A55DB;
+    color: #5A55DB;
 }
 
 a:hover, a:active {
-        text-decoration: none;
-        color: #8BD80E;
+    text-decoration: none;
+    color: #8BD80E;
 }
 
 a:visited {
-        color: #5A55DB;
+    color: #5A55DB;
 }
 
 #message {
-        text-align: middle;
-        margin-top: 2em;
-        margin-bottom: 2em;
-        margin-left: 20%;
-        margin-right: 20%;
-        padding: 2em;
-        border-color: #85A5FF;
-        -moz-border-radius: 1em 1em;
-        background-color: #85A5FF;
+    text-align: middle;
+    margin-top: 2em;
+    margin-bottom: 2em;
+    margin-left: 20%;
+    margin-right: 20%;
+    padding: 2em;
+    border-color: #85A5FF;
+    -moz-border-radius: 1em 1em;
+    background-color: #85A5FF;
 }
 
 img {
-        border: none;
+    border: none;
 }
 td {
-        vertical-align: top;
-        text-align: middle;
+    vertical-align: top;
+    text-align: middle;
 }
 
 td#logo {
-        height: 93px;
-        margin: 0;
-        padding: 0;
+    height: 93px;
+    margin: 0;
+    padding: 0;
 }
 
 td#logo a,
 td#logo img {
-        display: block;
+    display: block;
 }
 
 #title{
-        top: 0;
-        background-color: #d9b2ff;
-        height: 93px;
-        font-size: 3em;
-        text-align: center;
-        vertical-align: middle;
-        margin:0;
-        padding: 0;
+    top: 0;
+    background-color: #d9b2ff;
+    height: 93px;
+    font-size: 3em;
+    text-align: center;
+    vertical-align: middle;
+    margin:0;
+    padding: 0;
 }
 
 table#layout {
-        width: 100%;
-        height: 100%;
-        border: 0;
-        border-collapse: collapse;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    border-collapse: collapse;
 }
 
 table#layout > tr {
-        border-spacing: 0;
+    border-spacing: 0;
 }
 
 #demos_list {
-        margin-left: 20%;
-        margin-right: 20%;
-        text-align: middle;
-        margin: 1em;
-        padding: 1em;
-        -moz-border-radius: 1em 1em;
-        background-color: #BDCEFF;
+    margin-left: 20%;
+    margin-right: 20%;
+    text-align: middle;
+    margin: 1em;
+    padding: 1em;
+    -moz-border-radius: 1em 1em;
+    background-color: #BDCEFF;
 }
 
 #content {
-        top: 93px;
-        left: 200px;
+    top: 93px;
+    left: 200px;
 }
 
 #application_list {
-        top: 4em;
-        text-align: center;
+    top: 4em;
+    text-align: center;
 }
 
 /* Post */
 
 .post {
-        padding: 15px 0px;
-        margin-bottom: 20px;
+    padding: 15px 0px;
+    margin-bottom: 20px;
 }
 
 /* Sidebar */
 
 #sidebar {
-        width: 200px;
-        margin-left: 0;
-        padding: 0;
-        background-color: #FFC7B6;
+    width: 200px;
+    margin-left: 0;
+    padding: 0;
+    background-color: #FFC7B6;
 }
 
 #app_form {
-        top: 2em;
-        padding-top: 1em;
-        padding-left: 0.5em;
+    top: 2em;
+    padding-top: 1em;
+    padding-left: 0.5em;
 }
 
 #footer {
-        clear: both;
-        padding-top: 17px;
-        text-align: center;
-        color: #FFFFFF;
+    clear: both;
+    padding-top: 17px;
+    text-align: center;
+    color: #FFFFFF;
 }
 
 #legal a {
-        font-weight: normal;
-        color: #FFFFFF;
+    font-weight: normal;
+    color: #FFFFFF;
+}
+
+td.demo_title {
+    font-size: 120%;
+    padding: 0em 1em;
+    vertical-align: middle;
 }

@@ -109,7 +109,6 @@ def demos_list():
         demos.append(dict(
             name=name,
             port=APPS_CONF.get(name, 'port'),
-            autostart=APPS_CONF.has_option(name, 'autostart') and APPS_CONF.getboolean(name, 'autostart'),
             comment=get_demo_comment(name)
         ))
     return demos
