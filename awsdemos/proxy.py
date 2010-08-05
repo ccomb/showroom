@@ -34,7 +34,6 @@ class AppProxy(object):
             return response(environ, start_response)
         else:
             return self.app(environ, start_response)
-            return exc.HTTPFound(location='admin')
 
 def make_filter(global_conf, **local_conf):
     """factory for the [paste.filter_factory] entry-point

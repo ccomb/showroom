@@ -52,7 +52,7 @@ $('document').ready(function(){
                 </select>
                 <span id="app_form_dynamic"></span>
                 <img id="loading" style="display:none;"
-                src="admin/static/images/loading.gif" /><br />
+                src="static/images/loading.gif" /><br />
             </form>
         </td>
         <td id="content">
@@ -64,7 +64,8 @@ $('document').ready(function(){
             <table id="demos_list">
                 <tr tal:repeat="demo demos">
                   <td class="demo_title">
-                    <a tal:attributes="href python:'/'+demo['name']" tal:content="python: demo['name']">
+                    <a tal:attributes="href python: demo.get('proxied_url')"
+                       tal:content="python: demo.get('name')">
                         app name
                     </a>
                   </td>
@@ -72,10 +73,16 @@ $('document').ready(function(){
                     <button tal:attributes="
                       onclick python:'window.location.href=\''+request.application_url+'/daemon?NAME='+demo['name']+'&amp;COMMAND='+cmd+'\''"
                             tal:content="cmd">restart</button>
-                    </td>
-                  <td><button tal:attributes="
+                  </td>
+                  <td>
+                    <button tal:attributes="
                       onclick python:'window.location.href=\''+request.application_url+'/delete?NAME='+demo['name']+'\''
                       ">delete</button>
+                  </td>
+                  <td class="demo_title">
+                    <a tal:attributes="href python: demo.get('direct_url')">
+                        (direct link)
+                    </a>
                   </td>
                 </tr>
             </table>

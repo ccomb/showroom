@@ -66,8 +66,8 @@ def view_app_list(request):
     return render_template_to_response(
         "templates/master.pt",
         request=request,
-        apps=utils.load_app_list(),
-        demos=utils.demos_list(),
+        apps=utils.available_demos(),
+        demos=utils.installed_demos(request),
         logged_in=authenticated_userid(request),
         )
 
@@ -75,14 +75,14 @@ def json_app_list(request):
     """
     return a json view of all apps and their params/plugins
     """
-    return utils.load_app_list()
+    return utils.available_demos()
 
 def app_params(request):
     """ return the params of a given demo, in a json list.
     """
-    app_list = utils.load_app_list()
+    app_list = utils.available_demos()
     if 'app' in request.params and request.params['app'] in app_list:
-        return utils.load_app_list()[request.params['app']][0]
+        return utils.available_demos()[request.params['app']][0]
     else:
         return ("No application name given or unknown application.",)
 
@@ -91,9 +91,9 @@ def app_plugins(request):
     return the plugins of a given demo, in a json list.
 
     """
-    app_list = utils.load_app_list()
+    app_list = utils.available_demos()
     if 'app' in request.params and request.params['app'] in app_list:
-        return utils.load_app_list()[request.params['app']][1]
+        return utils.available_demos()[request.params['app']][1]
     else:
         return ("No application name given or unknown application.",)
 
@@ -141,7 +141,7 @@ def app_form(request):
     FIXME: seems not used
     """
     master = get_template('templates/master.pt')
-    app_list = utils.load_app_list()
+    app_list = utils.available_demos()
     if 'app' in request.params and request.params['app'] in app_list:
         return render_template_to_response(
             "templates/new_app.pt",
@@ -184,7 +184,7 @@ def action(request):
     params['NAME'] = params['NAME'].replace(' ', '_') # FIXME
     if 'app' not in params:
         raise NotFound
-    app_list = utils.load_app_list()
+    app_list = utils.available_demos()
     if params['app'] in app_list:
         # rebuild the name of the deployment script
         script = join(PATHS['scripts'], "demo_"+params['app']+".sh")
@@ -252,7 +252,7 @@ def action(request):
 
         _flash_message(request,
             u"application %s created at port %s" % (app_name, port))
-        return HTTPFound(location='/admin')
+        return HTTPFound(location='/')
     else:
         raise NotFound
 
@@ -269,12 +269,14 @@ def daemon(request):
         XMLRPC.supervisor.stopProcess(name)
         message = u'%s stopped!' % (name)
 
+    state = XMLRPC.supervisor.getProcessInfo(name)['statename']
+
     if state == 'STOPPED' and command in ('start', 'restart'):
         XMLRPC.supervisor.startProcess(name)
         message = u'%s started!' % (name)
 
     _flash_message(request, message)
-    return HTTPFound(location='/admin')
+    return HTTPFound(location='/')
 
 
 def delete_demo(request):
@@ -302,5 +304,5 @@ def delete_demo(request):
         LOG.error("directory not found for %s in demos." % name)
 
     _flash_message(request, '%s deleted!' % name)
-    return HTTPFound(location='/admin')
+    return HTTPFound(location='/')
 
