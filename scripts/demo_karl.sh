@@ -1,38 +1,36 @@
 #!/usr/bin/env sh
-set -e # explicit fail on errors
-# alterway solution
-# 24/02/2010 11:03:42 (UTC+0100)
-
 # PARAMS:NAME,COMMENT
+# START: start.sh
 
-# load vars and fonctions
-. $SCRIPTS/config.sh
+set -e # explicit fail on errors
 
-! [ -d $DEMOS/$NAME ] && svn co http://osi.agendaless.com/bfgsvn/karlsample/trunk/ $DEMOS/$NAME
-cd $DEMOS/$NAME
-rm -Rf etc && svn up
+# get the last version in svn (no release yet)
+svn co http://osi.agendaless.com/bfgsvn/karlsample/trunk/ karl
 
-bootstrap
+# create a sandbox and run the buildout
+virtualenv --no-site-packages --distribute sandbox
 
-$BIN/virtualenv --no-site-packages --distribute .
-bin/python bootstrap.py -d
-bin/buildout -N buildout:eggs-directory=$HOME/eggs
+cd karl
 
-perl -pe "s/8886/$PORT2/" -i etc/zeo.conf
-perl -pe "s/8886/$PORT2/" -i etc/karl.ini
-perl -pe "s/6543/$PORT/" -i etc/karl.ini
-perl -pe "s/9037/$SUPERVISOR_PORT/" -i etc/supervisord.conf
+../sandbox/bin/python bootstrap.py
+# remove the buildout-cache and download-cache params, then buildout
+sed -i '/^eggs-directory/d;/^download-cache/d' buildout.cfg
+bin/buildout -N
 
-perl -pe "s/pipeline:main/pipeline:karl_pipeline/" -i etc/karl.ini
-cat >> etc/karl.ini << EOF
+# change the listening port
+sed -i "s/6543/$PORT/" -i etc/karl.ini
+# change the ZEO port
+sed -i "s/8886/$(($PORT+1000))/" -i etc/zeo.conf
+sed -i "s/8886/$(($PORT+1000))/" -i etc/karl.ini
 
-[app:main]
-use = egg:Paste#urlmap
-/$NAME = karl_pipeline
+cd ..
 
+# create a unique startup script
+cat > start.sh <<EOF
+#!/bin/sh
+cd karl
+bin/runzeo -C etc/zeo.conf &
+bin/paster serve etc/karl.ini
 EOF
 
-echo $COMMENT > about.txt
-supervisor_daemon_sh
-
-cd -
+chmod +x start.sh

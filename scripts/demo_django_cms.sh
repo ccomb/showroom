@@ -3,75 +3,17 @@
 
 set -e # explicit fail on errors
 
-# load vars and fonctions
-. $SCRIPTS/config.sh
+virtualenv --no-site-packages --distribute sandbox
+sandbox/bin/pip install --download-cache=$HOME/eggs django-reversion south django PIL
 
-# set virtualenv (just in case)
-$BIN/virtualenv $DEMOS/$NAME --no-site-packages --distribute
-. $DEMOS/$NAME/bin/activate
+wget http://pypi.python.org/packages/source/d/django-cms/django-cms-2.1.0.beta3.tar.gz
+tar xzf django-cms-2.1.0.beta3.tar.gz
+cd django-cms-2.1.0.beta3
 
-cd $DEMOS/$NAME
-
-! [ -f bin/paster ] && bin/pip install django-reversion south django PIL
-
-
-! [ -d django-cms-2.0 ] && git clone git://github.com/digi604/django-cms-2.0.git
-cd django-cms-2.0 && python setup.py develop
 
 cd $DEMOS/$NAME
 rm -Rf example
 cp -R django-cms-2.0/example/ example
-
-cat > buildout.cfg << EOF
-[buildout]
-newest = false
-extensions = gp.vcsdevelop
-vcs-extend-develop =
-    git://github.com/digi604/django-cms-2.0.git#egg=django-cms
-parts = eggs supervisor
-
-[eggs]
-recipe = zc.recipe.egg
-eggs =
-    repoze.bfg
-    dj.paste
-    PasteScript
-    pysqlite
-initialization =
-    sys.path.append("\${buildout:directory}")
-    sys.path.append("\${buildout:directory}/example")
-
-[supervisor]
-recipe=collective.recipe.supervisor
-port=$SUPERVISOR_PORT
-serverurl=http://localhost:$SUPERVISOR_PORT
-programs=
-    10 app \${buildout:directory}/bin/paster [serve deploy.ini] \${buildout:directory}/example true
-
-EOF
-
-bootstrap
-bin/python bootstrap.py -d
-bin/buildout -N buildout:eggs-directory=$HOME/eggs
-
-cat > deploy.ini << EOF
-[DEFAULT]
-debug = true
-
-[app:main]
-use = egg:Paste#urlmap
-/$NAME = app
-
-[app:app]
-use=egg:dj.paste
-django_settings_module=example.settings
-
-[server:main]
-use = egg:Paste#http
-host = 127.0.0.1
-port = $PORT
-
-EOF
 
 cat > example/local_settings.py << EOF
 # -*- coding: utf-8 -*-
@@ -108,8 +50,4 @@ python manage.py syncdb --noinput
 python manage.py migrate
 cd ..
 cp example/cms.db cms.db
-
-echo $COMMENT > about.txt
-
-supervisor_daemon_sh
 

@@ -188,6 +188,18 @@ def action(request):
         # rebuild the name of the deployment script
         script = join(PATHS['scripts'], "demo_"+params['app']+".sh")
 
+        # *check the script* #FIXME move in a function
+        # our script should contain the command to start the demo
+        start_command = None
+        for line in open(script).readlines():
+            if line.strip().startswith('#') and 'START' in line:
+                start_command = line.split(':', 1)[1].strip()
+                break
+        if start_command is None:
+            message = u'The deployment script lacks a START command!'
+            _flash_message(request, message)
+            return HTTPFound(location='/')
+
         # add environment variables for the deployment script
         env = os.environ.copy()
         env.update(params)
@@ -209,8 +221,9 @@ def action(request):
         if not os.path.exists(demopath):
             os.mkdir(demopath)
         else:
-            print "this app already exists" # FIXME
-            raise NotFound
+            message = u"this app already exists"
+            _flash_message(request, message)
+            return HTTPFound(location='/')
 
         # run the deployment script
         LOG.debug(script)
@@ -218,17 +231,10 @@ def action(request):
 
         # add our new application in the apps config file
         APPS_CONF.add_section(app_name)
-
-        # our deployment should have created a democonfig.ini file
-        # we copy the configuration from this file to the apps conf
-        democonfig = SafeConfigParser()
-        democonfig.read(join(demopath, 'democonfig.ini'))
-        for name, value in democonfig.items('democonfig'):
-            APPS_CONF.set(app_name, name, value)
+        APPS_CONF.set(app_name, 'start', start_command)
         APPS_CONF.set(app_name, 'port', str(port))
         APPS_CONF.set(app_name, 'path', demopath)
         APPS_CONF.set(app_name, 'type', params['app'])
-        os.remove(join(demopath, 'democonfig.ini'))
 
         with open(PATHS['apps'], 'w+') as configfile:
             APPS_CONF.write(configfile)

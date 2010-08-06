@@ -2,7 +2,7 @@
     functions for repoz.bfg demo manager
 */
 
-function execute_command(url, app, params){
+function execute_command(url, app, params) {
     $('#loading_'+app).css("display", "block");
     $('#debug').text("loading...");
     $.get(url+'app='+app+'&params='+params, function(data){
@@ -11,13 +11,13 @@ function execute_command(url, app, params){
     });
 }
 
-function on_valid_form(button){
+function on_valid_form(button) {
     $('#app_form_submit').attr('disabled', 'disabled');
     $('#loading').css('display', 'block');
     return true;
 }
 
-function update_app_form(url, app){
+function update_app_form(url, app) {
     $("#app_form_dynamic").empty();
     if (app == ""){ return; }
     jQuery.getJSON(
@@ -32,7 +32,7 @@ function update_app_form(url, app){
     );
     jQuery.getJSON(
         url+"/app_plugins?app="+app,
-        function(data){
+        function(data) {
             if (data.length > 0){
                 $('#app_form_dynamic').append('PLUGINS'+
                     '<select id="app_form_dynamic_plugins" name="plugins" multiple="multiple" </select>'

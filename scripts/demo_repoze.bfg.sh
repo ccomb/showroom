@@ -1,10 +1,8 @@
 #!/usr/bin/env sh
-# gabriel pettier, for alterway solution
-# 24/02/2010 11:03:42 (UTC+0100)
-set -e
-pwd
-
 # PARAMS:NAME,COMMENT,TEST
+# START: sandbox/bin/paster serve bfg/bfg.ini
+
+set -e # explicit fail on errors
 
 # create a virtualenv
 virtualenv --no-site-packages --distribute sandbox
@@ -13,23 +11,12 @@ virtualenv --no-site-packages --distribute sandbox
 sandbox/bin/pip install -i http://dist.repoze.org/bfg/current/simple --download-cache=$HOME/eggs repoze.bfg==1.2.1
 
 # create a bfg project
-sandbox/bin/paster create -t bfg_starter "$NAME"
-cd "$NAME"
+sandbox/bin/paster create -t bfg_starter bfg
+cd bfg
 
 # change the port used by default
-sed -i "s/port = 6543/port = $PORT/" "$NAME.ini"
+sed -i "s/port = 6543/port = $PORT/" "bfg.ini"
 
-# install our new application
+# install our new application in the virtualenv
 ../sandbox/bin/python setup.py develop
-
-cd ..
-
-# write a file with required information
-cat > democonfig.ini <<EOF
-[democonfig]
-start= sandbox/bin/paster serve "$NAME/$NAME.ini"
-stop=
-status=
-comments = $COMMENT
-EOF
 

@@ -56,11 +56,15 @@ $('document').ready(function(){
             </form>
         </td>
         <td id="content">
-            <div id="message"
-                 tal:condition="python: 'message' in request.environ['beaker.session']"
-                 tal:content="python:request.environ['beaker.session']['message']">
-                    message placeholder
-            </div>
+
+          <tal:block define="session python:request.environ['beaker.session']"
+                     condition="session.has_key('message')">
+          <div id="message"
+               tal:define="message python:session.pop('message', None)"
+               tal:content="structure message" />
+          <div tal:replace="python:session.save() or ''" />
+          </tal:block>
+
             <table id="demos_list">
                 <tr tal:repeat="demo demos">
                   <td class="demo_title">
