@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from ConfigParser import SafeConfigParser
 from os.path import isdir, isfile, join, abspath
+from xmlrpclib import ServerProxy
 import logging
 import os
 import subprocess
@@ -28,6 +29,11 @@ if not isdir(PATHS['demos']):
 APPS_CONF = SafeConfigParser()
 APPS_CONF.read(PATHS['apps'])
 
+
+# start supervisor
+subprocess.Popen([join('bin', 'supervisord'), '-n', '-c', 'supervisord.cfg'])
+# connect to supervisor
+XMLRPC = ServerProxy('http://localhost:9001')
 
 def daemon(name, command='restart'):
     """function that start, stop or restart the demo.
@@ -96,26 +102,34 @@ def get_demo_comment(demo_name):
         return ''
 
 
-def installed_demos(request):
-    """ load the list of deployed applications
+def installed_demos(request, demo_name=None):
+    """ return a dict with infos of deployed demos,
+        or info of a single demo
     """
-    demos = []
-    for name in APPS_CONF.sections():
+    if demo_name is None:
+        demo_names = APPS_CONF.sections()
+    else:
+        demo_names = [demo_name]
+
+    demo_infos = []
+    for name in demo_names:
         port=APPS_CONF.get(name, 'port')
 
         direct_url = ':'.join(request.host_url.split(':')[:2]) + ':' + port + '/'
         proxied_url = request.host_url.split('//')
         proxied_url[1] = name + '.' + proxied_url[1]
         proxied_url = '//'.join(proxied_url)
+        state = XMLRPC.supervisor.getProcessInfo(name)['statename']
 
-        demos.append(dict(
+        demo_infos.append(dict(
             name=name,
             port=port,
             direct_url = direct_url,
             proxied_url = proxied_url,
+            state = state,
             comment=get_demo_comment(name)
         ))
-    return demos
+    return demo_infos
 
 
 def next_port():

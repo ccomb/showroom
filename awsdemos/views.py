@@ -8,7 +8,7 @@ from repoze.bfg.exceptions import NotFound
 from repoze.bfg.testing import DummyRequest
 from repoze.bfg.url import route_url
 from shutil import rmtree
-from utils import PATHS, APPS_CONF
+from utils import PATHS, APPS_CONF, XMLRPC
 from webob.exc import HTTPFound
 import logging
 import os
@@ -16,7 +16,6 @@ import subprocess
 import time
 import utils
 import webob
-from xmlrpclib import ServerProxy
 
 from repoze.bfg.security import (
     Allow,
@@ -29,11 +28,6 @@ from repoze.bfg.security import (
     )
 
 LOG = logging.getLogger(__name__)
-
-# start supervisor
-subprocess.Popen([join('bin', 'supervisord'), '-n', '-c', 'supervisord.cfg'])
-# connect to supervisor
-XMLRPC = ServerProxy('http://localhost:9001')
 
 
 
@@ -72,10 +66,15 @@ def view_app_list(request):
         )
 
 def json_app_list(request):
-    """
-    return a json view of all apps and their params/plugins
+    """return a json view of all apps and their params/plugins
     """
     return utils.available_demos()
+
+
+def json_installed_demos(request):
+    """ return a json view of all installed apps and their statuses
+    """
+    return utils.installed_demos()
 
 def app_params(request):
     """ return the params of a given demo, in a json list.
