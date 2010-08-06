@@ -4,16 +4,11 @@
 set -e # explicit fail on errors
 
 virtualenv --no-site-packages --distribute sandbox
-sandbox/bin/pip install --download-cache=$HOME/eggs django-reversion south django PIL
+sandbox/bin/pip install --download-cache=$HOME/eggs django-cms
 
-wget http://pypi.python.org/packages/source/d/django-cms/django-cms-2.1.0.beta3.tar.gz
-tar xzf django-cms-2.1.0.beta3.tar.gz
-cd django-cms-2.1.0.beta3
+sandbox/bin/django-admin.py startproject example
+cd example
 
-
-cd $DEMOS/$NAME
-rm -Rf example
-cp -R django-cms-2.0/example/ example
 
 cat > example/local_settings.py << EOF
 # -*- coding: utf-8 -*-

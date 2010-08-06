@@ -1,6 +1,5 @@
 #!/usr/bin/env sh
 # PARAMS:NAME,COMMENT
-# START: start.sh
 
 set -e # explicit fail on errors
 
@@ -27,10 +26,8 @@ cd ..
 
 # create a unique startup script
 cat > start.sh <<EOF
-#!/bin/sh
 cd karl
 bin/runzeo -C etc/zeo.conf &
 bin/paster serve etc/karl.ini
 EOF
 
-chmod +x start.sh

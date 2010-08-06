@@ -1,6 +1,5 @@
 #!/usr/bin/env sh
 # PARAMS:NAME,COMMENT,TEST
-# START: sandbox/bin/paster serve bfg/bfg.ini
 
 set -e # explicit fail on errors
 
@@ -19,4 +18,8 @@ sed -i "s/port = 6543/port = $PORT/" "bfg.ini"
 
 # install our new application in the virtualenv
 ../sandbox/bin/python setup.py develop
+
+cat > ../start.sh << EOF
+sandbox/bin/paster serve bfg/bfg.ini
+EOF
 
