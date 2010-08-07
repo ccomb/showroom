@@ -246,6 +246,8 @@ def action(request):
         supervisor_conf.add_section(section)
         supervisor_conf.set(section, 'command', start_script)
         supervisor_conf.set(section, 'directory', demopath)
+        supervisor_conf.set(section, 'autostart', 'false')
+        supervisor_conf.set(section, 'autorestart', 'false')
         with open(join(demopath, 'supervisor.cfg'), 'w') as supervisor_file:
             supervisor_conf.write(supervisor_file)
 
