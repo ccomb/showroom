@@ -22,6 +22,6 @@ sed -i "s/^port = .*/port = $PORT/" "deploy.ini"
 
 cat > ../start.sh << EOF
 cd bb
-bin/paster serve deploy.ini
+exec bin/paster serve deploy.ini
 EOF
 

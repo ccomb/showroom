@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 # PARAMS:NAME,COMMENT
 
 set -e # explicit fail on errors
@@ -18,5 +18,5 @@ cd project
 
 cat > ../start.sh << EOF
 #!/bin/sh
-sandbox/bin/python project/manage.py runserver $PORT
+exec sandbox/bin/python project/manage.py runserver --noreload $PORT
 EOF

@@ -20,6 +20,6 @@ sed -i "s/port = 6543/port = $PORT/" "bfg.ini"
 ../sandbox/bin/python setup.py develop
 
 cat > ../start.sh << EOF
-sandbox/bin/paster serve bfg/bfg.ini
+exec sandbox/bin/paster serve bfg/bfg.ini
 EOF
 

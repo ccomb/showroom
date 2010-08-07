@@ -2,8 +2,10 @@
 from ConfigParser import SafeConfigParser
 from os.path import isdir, isfile, join, abspath
 from xmlrpclib import ServerProxy
+import atexit
 import logging
 import os
+import socket
 import subprocess
 import sys
 
@@ -30,10 +32,21 @@ APPS_CONF = SafeConfigParser()
 APPS_CONF.read(PATHS['apps'])
 
 
-# start supervisor
-subprocess.Popen([join('bin', 'supervisord'), '-n', '-c', 'supervisord.cfg'])
 # connect to supervisor
 XMLRPC = ServerProxy('http://localhost:9001')
+# if not started, start supervisor in daemon mode
+try:
+    XMLRPC.supervisor.getPID()
+except socket.error:
+    subprocess.Popen([join('bin', 'supervisord'), '-c', 'supervisord.cfg']).wait()
+
+# try again
+XMLRPC.supervisor.getPID()
+
+#@atexit.register
+#def stop_supervisor():
+#    subprocess.call("bin/supervisorctl -c supervisord.cfg shutdown", shell=True)
+
 
 def daemon(name, command='restart'):
     """function that start, stop or restart the demo.

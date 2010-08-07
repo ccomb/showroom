@@ -26,6 +26,8 @@ cd ..
 
 # create a unique startup script
 cat > start.sh <<EOF
+#!/bin/bash
+trap "pkill -P $$" EXIT
 cd karl
 bin/runzeo -C etc/zeo.conf &
 bin/paster serve etc/karl.ini

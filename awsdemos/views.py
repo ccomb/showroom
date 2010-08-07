@@ -217,7 +217,7 @@ def action(request):
 
         # run the deployment script
         LOG.debug(script)
-        subprocess.call(script, shell=True, cwd=demopath, env=env)
+        subprocess.call('"'+script+'"', shell=True, cwd=demopath, env=env)
 
         # set the start script to executable
         start_script = join(demopath, 'start.sh')
@@ -226,7 +226,7 @@ def action(request):
         with open(start_script, 'r+') as s:
             content = s.read()
             if not content.startswith('#!'):
-                content = '#!/bin/sh\n' + content
+                content = '#!/bin/bash\n' + content
                 s.seek(0); s.write(content)
 
         # add our new application in the apps config file
