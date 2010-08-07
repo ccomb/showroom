@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from awsdemos.utils import APPS_CONF
-from restkit.ext.wsgi_proxy import Proxy
+from wsgiproxy.exactproxy import proxy_exact_request
 from webob import Request, exc
 import urllib
 from ConfigParser import ConfigParser
@@ -12,11 +12,9 @@ conf.read(join(dirname(dirname(__file__)), 'aws.demos.ini'))
 ADMIN_HOST = conf.get('DEFAULT', 'hostname')
 del conf
 
-class AppProxy(object):
+class Proxy(object):
     """ wsgi middleware that acts as a proxy, or directs to the admin
     """
-    proxy = Proxy(allowed_methods=['GET', 'HEAD', 'POST'])
-
     def __init__(self, app):
         self.app = app
 
@@ -28,7 +26,6 @@ class AppProxy(object):
         # we'll get the demo name from the url
         request = Request(environ)
         splitted_host = request.host.split(':')[0].split('.')
-        demo_name = None
         hostname = request.host.split(':')[0]
 
         if hostname == ADMIN_HOST:
@@ -54,7 +51,7 @@ class AppProxy(object):
         request.path_info = path_info
         request.environ['SERVER_NAME'] = 'localhost'
         request.environ['SERVER_PORT'] = port
-        response = request.get_response(self.proxy)
+        response = request.get_response(proxy_exact_request)
         return response(environ, start_response)
 
 
@@ -63,6 +60,6 @@ def make_filter(global_conf, **local_conf):
     (see setup.py)
     """
     def filter(app):
-        return AppProxy(app)
+        return Proxy(app)
     return filter
 
