@@ -14,7 +14,8 @@ LOG = logging.getLogger(__name__)
 CONFIG = SafeConfigParser()
 PATH = os.path.dirname(abspath(sys.argv[-1]))
 
-CONFIG.read(join(PATH, 'aws.demos.ini'))
+CONFIG.read(join(PATH, 'deploy.ini'))
+# XXX don't use this file for that
 PATHS = {
   'bin' : join(PATH, CONFIG.get('paths', 'bin')),
   'scripts' : join(PATH, CONFIG.get('paths', 'scripts')),

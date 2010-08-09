@@ -8,7 +8,8 @@ from os.path import join, dirname
 
 # get the admin hostname from the conf
 conf = ConfigParser()
-conf.read(join(dirname(dirname(__file__)), 'aws.demos.ini'))
+# XXX don't use this file for that
+conf.read(join(dirname(dirname(__file__)), 'deploy.ini'))
 ADMIN_HOST = conf.get('DEFAULT', 'hostname')
 del conf
 
