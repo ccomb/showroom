@@ -180,7 +180,7 @@ def action(request):
 
     """
     params = request.params.copy()
-    params['NAME'] = params['NAME'].replace(' ', '_') # FIXME
+    params['NAME'] = params['NAME'].replace(' ', '_').lower() # FIXME
     if 'app' not in params:
         raise NotFound
     app_list = utils.available_demos()
