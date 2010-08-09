@@ -42,6 +42,7 @@ $('document').ready(function(){
                 <div id="message" tal:content="message or ''"> </div>
             </tal:if>
             <div id='demos_list'>
+            Connectez-vous avec votre compte LDAP.<br/><br/>
             <form action="${request.application_url}/login" method="post">
                 <input type="hidden" name="came_from" value="${came_from}"/>
                 <input type="text" name="login" value="${login}"/><br/>
