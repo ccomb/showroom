@@ -252,7 +252,7 @@ def action(request):
             supervisor_conf.write(supervisor_file)
 
 
-        # reload the config and start the process
+        # reload the config
         XMLRPC.supervisor.reloadConfig()
         XMLRPC.supervisor.addProcessGroup(app_name)
 
@@ -293,7 +293,7 @@ def delete_demo(request):
     state = XMLRPC.supervisor.getProcessInfo(name)['statename']
     if state == 'RUNNING':
         XMLRPC.supervisor.stopProcess(name)
-        XMLRPC.supervisor.removeProcessGroup(name)
+    XMLRPC.supervisor.removeProcessGroup(name)
 
     LOG.warn("removing demo "+name)
 
