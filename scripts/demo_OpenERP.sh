@@ -37,7 +37,8 @@ sed -i "s/^port = '8070'/port = '$XMLRPC'/" openerp-web.cfg
 
 
 cat > start.sh << EOF
-trap "pkill -9 -P $$" EXIT
+#!/bin/bash
+trap "pkill -9 -P \$\$" EXIT
 #./sandbox/bin/openerp-server --port=$XMLRPC --net_port=$NETRPC &
 ./sandbox/bin/openerp-server --port=$XMLRPC --no-netrpc &
 ./sandbox/bin/openerp-web -c openerp-web.cfg
