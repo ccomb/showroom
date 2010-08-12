@@ -1,17 +1,11 @@
 # -*- coding: utf-8 -*-
-from awsdemos.utils import APPS_CONF
 from wsgiproxy.exactproxy import proxy_exact_request
 from webob import Request, exc
 import urllib
 from ConfigParser import ConfigParser
 from os.path import join, dirname
 
-# get the admin hostname from the conf
-conf = ConfigParser()
-# XXX don't use this file for that
-conf.read(join(dirname(dirname(__file__)), 'deploy.ini'))
-ADMIN_HOST = conf.get('DEFAULT', 'hostname')
-del conf
+from awsdemos.utils import APPS_CONF, ADMIN_HOST
 
 class Proxy(object):
     """ wsgi middleware that acts as a proxy, or directs to the admin

@@ -6,6 +6,7 @@ import atexit
 import logging
 import os
 import socket
+import string
 import subprocess
 import sys
 
@@ -22,7 +23,9 @@ PATHS = {
   'demos' : join(PATH, CONFIG.get('paths', 'demos')),
   'port' : join(PATH, CONFIG.get('paths', 'port')),
   'apps' : join(PATH, CONFIG.get('paths', 'apps')),
+  'var' : join(PATH, CONFIG.get('paths', 'var')),
 }
+ADMIN_HOST = CONFIG.get('DEFAULT', 'hostname')
 
 if not isdir(PATHS['demos']):
     os.makedirs(PATHS['demos'])
@@ -40,9 +43,9 @@ try:
     XMLRPC.supervisor.getPID()
 except socket.error:
     subprocess.Popen([join('bin', 'supervisord'), '-c', 'supervisord.cfg']).wait()
-
 # try again
 XMLRPC.supervisor.getPID()
+
 
 #@atexit.register
 #def stop_supervisor():
@@ -96,9 +99,9 @@ def available_demos():
         plugins = []
         for line in open('scripts'+os.sep+filename):
             if line.split(':')[0] == '# PARAMS':
-                params = line.split('\n')[0].split(':')[1].split(',')
+                params = map(string.strip, line.strip().split(':')[1].split(','))
             elif line.split(':')[0] == '# PLUGINS':
-                plugins = line.split('\n')[0].split(':')[1].split(',')
+                plugins = map(string.strip, line.strip().split(':')[1].split(','))
 
         demos[(filename[5:-3])] = (params, plugins)
     return demos
@@ -133,7 +136,12 @@ def installed_demos(request, demo_name=None):
         proxied_url = request.host_url.split('//')
         proxied_url[1] = name + '.' + proxied_url[1]
         proxied_url = '//'.join(proxied_url)
-        state = XMLRPC.supervisor.getProcessInfo(name)['statename']
+        state = 'STOPPED'
+        if 'supervisor.conf' in os.listdir(join(PATHS['demos'], name)):
+            state = XMLRPC.supervisor.getProcessInfo(name)['statename']
+        if 'apache2.conf' in os.listdir(join(PATHS['demos'], name)):
+            if name + '.conf' in os.listdir(join(PATHS['var'], 'apache2', 'demos')):
+                state = 'RUNNING'
 
         demo_infos.append(dict(
             name=name,

@@ -1,14 +1,14 @@
 # coding: utf-8
 from ConfigParser import SafeConfigParser, NoSectionError
 from awsdemos.security import ldaplogin
-from os.path import join, isfile, isdir
+from os.path import join
 from repoze.bfg.chameleon_zpt import get_template
 from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.exceptions import NotFound
 from repoze.bfg.testing import DummyRequest
 from repoze.bfg.url import route_url
 from shutil import rmtree
-from utils import PATHS, APPS_CONF, XMLRPC
+from utils import PATHS, APPS_CONF, XMLRPC, ADMIN_HOST
 from webob.exc import HTTPFound
 import logging
 import os
@@ -156,6 +156,51 @@ def app_form(request):
             ))
 
 
+def _reload_apache(demo):
+    """reload apache config, or shutdown if it is not needed anymore
+    """
+    apache_confs = [conf
+                    for conf in os.listdir(join(PATHS['var'], 'apache2', 'demos'))
+                    if conf.endswith('.conf')]
+    a2status = XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+
+    if len(apache_confs) == 0:
+        if a2status == 'RUNNING':
+            XMLRPC.supervisor.stopProcess('apache2')
+    else:
+        # reload the config or start Apache if needed (WITH supervisor!)
+        a2status = XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+        if a2status == 'RUNNING':
+            retcode = subprocess.call(
+                ["apache2ctl",  "-f", "apache2/apache2.conf", "-k", "graceful"])
+            # if the graceful command fails, we should disable the new config
+            # BUT we should let supervisor restart the app!!
+            if retcode != 0:
+                _a2dissite(demo)
+        else:
+            XMLRPC.supervisor.startProcess('apache2')
+
+
+
+
+
+def _a2ensite(demo):
+    """sandbox equivalent to the a2ensite command
+    """
+    config_file = join(PATHS['demos'], demo, 'apache2.conf')
+    config_link = join(PATHS['var'], 'apache2', 'demos', demo + '.conf')
+    if os.path.exists(config_file) and not os.path.exists(config_link):
+        os.link(config_file, config_link)
+
+
+def _a2dissite(demo):
+    """sandbox equivalent to the a2dissite command
+    """
+    config_link = join(PATHS['var'], 'apache2', 'demos', demo + '.conf')
+    if os.path.exists(config_link):
+        os.remove(config_link)
+
+
 def action(request):
     """
     Execute the action bound to the name passed and return when the action is
@@ -205,6 +250,7 @@ def action(request):
         env['PORT'] = str(port)
         # put the virtualenv path first
         env['PATH'] = os.path.abspath('bin') + ':' + env['PATH']
+        env['HOST'] = ADMIN_HOST
 
         # create the directory for the demo
         demopath = join(PATHS['demos'], app_name)
@@ -221,40 +267,43 @@ def action(request):
 
         # set the start script to executable
         start_script = join(demopath, 'start.sh')
-        os.chmod(start_script, 0744)
-        # add the shebang if forgotten
-        with open(start_script, 'r+') as s:
-            content = s.read()
-            if not content.startswith('#!'):
-                content = '#!/bin/bash\n' + content
-                s.seek(0); s.write(content)
+        if os.path.exists(start_script):
+            os.chmod(start_script, 0744)
+            # add the shebang if forgotten
+            with open(start_script, 'r+') as s:
+                content = s.read()
+                if not content.startswith('#!'):
+                    content = '#!/bin/bash\n' + content
+                    s.seek(0); s.write(content)
+
+            # add a supervisor include file for this program
+            supervisor_conf = SafeConfigParser()
+            section = 'program:%s' % app_name
+            supervisor_conf.add_section(section)
+            supervisor_conf.set(section, 'command', start_script)
+            supervisor_conf.set(section, 'directory', demopath)
+            supervisor_conf.set(section, 'autostart', 'false')
+            supervisor_conf.set(section, 'autorestart', 'false')
+            with open(join(demopath, 'supervisor.cfg'), 'w') as supervisor_file:
+                supervisor_conf.write(supervisor_file)
+
+            # reload the config
+            XMLRPC.supervisor.reloadConfig()
+            XMLRPC.supervisor.addProcessGroup(app_name)
+
+        # enable the apache conf (for apps running on apache)
+        _a2ensite(app_name)
+        _reload_apache(app_name)
 
         # add our new application in the apps config file
+        # TODO: move that in the demo directory
         APPS_CONF.add_section(app_name)
         APPS_CONF.set(app_name, 'port', str(port))
         APPS_CONF.set(app_name, 'path', demopath)
         APPS_CONF.set(app_name, 'type', params['app'])
-
         with open(PATHS['apps'], 'w+') as configfile:
             APPS_CONF.write(configfile)
-
         LOG.info('section %s added', app_name)
-
-        # add a supervisor include file for this program
-        supervisor_conf = SafeConfigParser()
-        section = 'program:%s' % app_name
-        supervisor_conf.add_section(section)
-        supervisor_conf.set(section, 'command', start_script)
-        supervisor_conf.set(section, 'directory', demopath)
-        supervisor_conf.set(section, 'autostart', 'false')
-        supervisor_conf.set(section, 'autorestart', 'false')
-        with open(join(demopath, 'supervisor.cfg'), 'w') as supervisor_file:
-            supervisor_conf.write(supervisor_file)
-
-
-        # reload the config
-        XMLRPC.supervisor.reloadConfig()
-        XMLRPC.supervisor.addProcessGroup(app_name)
 
         _flash_message(request,
             u"application %s created at port %s" % (app_name, port))
@@ -265,20 +314,51 @@ def action(request):
 
 def daemon(request):
     """ view that starts, stops or restarts the demo
+    TODO : move the startup and stop in a function
     """
     name = request.params.get('NAME', '_')
     command = request.params.get('COMMAND', 'restart').lower()
-    state = XMLRPC.supervisor.getProcessInfo(name)['statename']
+    start_script = join(PATHS['demos'], name, 'start.sh')
+    apache_config_link = join(PATHS['var'], 'apache2', 'demos', name + '.conf')
+    apache_config_file = join(PATHS['demos'], name, 'apache2.conf')
+
+    # get the state
+    has_startup_script = os.path.exists(start_script)
+    has_apache_conf = os.path.exists(apache_config_link)
+    has_apache_link = os.path.exists(apache_config_link)
+    state = 'STOPPED'
+    if has_apache_link:
+        state = 'RUNNING'
+    if has_startup_script:
+        state = XMLRPC.supervisor.getProcessInfo(name)['statename']
     message = u'Nothing changed'
 
+    # stop if asked
     if state == 'RUNNING' and command in ('stop', 'restart'):
-        XMLRPC.supervisor.stopProcess(name)
+        if has_startup_script:
+            XMLRPC.supervisor.stopProcess(name)
+        if has_apache_link:
+            _a2dissite(name)
+            _reload_apache(name)
         message = u'%s stopped!' % (name)
 
-    state = XMLRPC.supervisor.getProcessInfo(name)['statename']
+    # get the state again
+    has_startup_script = os.path.exists(start_script)
+    has_apache_conf = os.path.exists(apache_config_file)
+    has_apache_link = os.path.exists(apache_config_link)
+    state = 'STOPPED'
+    if has_apache_link:
+        state = 'RUNNING'
+    if has_startup_script:
+        state = XMLRPC.supervisor.getProcessInfo(name)['statename']
 
+    # start if asked
     if state == 'STOPPED' and command in ('start', 'restart'):
-        XMLRPC.supervisor.startProcess(name)
+        if has_startup_script:
+            XMLRPC.supervisor.startProcess(name)
+        if has_apache_conf:
+            _a2ensite(name)
+            _reload_apache(name)
         message = u'%s started!' % (name)
 
     _flash_message(request, message)
@@ -290,10 +370,12 @@ def delete_demo(request):
     """
     name=request.params['NAME']
 
-    state = XMLRPC.supervisor.getProcessInfo(name)['statename']
-    if state == 'RUNNING':
-        XMLRPC.supervisor.stopProcess(name)
-    XMLRPC.supervisor.removeProcessGroup(name)
+    start_script = join(PATHS['demos'], name, 'start.sh')
+    if os.path.exists(start_script):
+        state = XMLRPC.supervisor.getProcessInfo(name)['statename']
+        if state == 'RUNNING':
+            XMLRPC.supervisor.stopProcess(name)
+        XMLRPC.supervisor.removeProcessGroup(name)
 
     LOG.warn("removing demo "+name)
 
@@ -304,10 +386,13 @@ def delete_demo(request):
     conf = SafeConfigParser()
     conf.remove_section('program:'+name)
 
-    if isdir(join(PATHS['demos'], name)):
+    if os.path.isdir(join(PATHS['demos'], name)):
         rmtree(join(PATHS['demos'], name))
     else:
         LOG.error("directory not found for %s in demos." % name)
+
+    _a2dissite(name)
+    _reload_apache(name)
 
     _flash_message(request, '%s deleted!' % name)
     return HTTPFound(location='/')
