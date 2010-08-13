@@ -31,3 +31,23 @@ Admin usage:
     - (the user/password of the new instance?)
 
 
+TODO :
+
+• arreter automatiquement le supervisor si zero demo
+• pouvoir visualiser les scripts
+• afficher le nombre de lignes du script
+• calculer le temps de déploiement
+• (tracer des courbes avec tout ces valeurs)
+• mettre un bouton "ajouter la prise en charge d'une nouvelle démo" qui explique
+comment faire et donne le squelette du script 
+• si la démo n'est pas démarrée, intercepter les requetes dans le proxy et
+afficher une page disant que l'appli est pas démarrée.
+• lancer les déploiements en asynchrone, et afficher un gif animé pour montrer
+que ça tourne.
+• Eventuellement faire ça avec zc.async.
+• pouvoir sauvegarder un déploiement pour le reproduire (sauf le port)
+• si une nouvelle conf apache fait planter apache, la virer et redémarrer apache
+• stopper les demos si aucune requete n'est faite pendant 5min. proposer de
+redémarrer si on essaye d'y accéder quand-même.
+• ajouter un indicateur vert/rouge pour apache et les DB
+• ne pas démarrer apache automatiquement
