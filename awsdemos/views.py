@@ -189,7 +189,10 @@ def _a2ensite(demo):
     """
     config_file = join(PATHS['demos'], demo, 'apache2.conf')
     config_link = join(PATHS['var'], 'apache2', 'demos', demo + '.conf')
+    config_dir = join(PATHS['var'], 'apache2', 'demos')
     if os.path.exists(config_file) and not os.path.exists(config_link):
+        if not os.path.exists(config_dir):
+            os.mkdir(config_dir)
         os.link(config_file, config_link)
 
 
