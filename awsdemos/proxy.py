@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 from wsgiproxy.exactproxy import proxy_exact_request
-from webob import Request, exc
+from webob import Request, Response
+from webob.exc import HTTPFound
 import urllib
 from ConfigParser import ConfigParser
 from os.path import join, dirname
 
-from awsdemos.utils import APPS_CONF, ADMIN_HOST
+from awsdemos.utils import APPS_CONF, ADMIN_HOST, installed_demos
 
 class Proxy(object):
     """ wsgi middleware that acts as a proxy, or directs to the admin
@@ -27,7 +28,11 @@ class Proxy(object):
             # go to the admin interface
             return self.app(environ, start_response)
 
-        assert(ADMIN_HOST in hostname)
+        if ADMIN_HOST not in hostname:
+            # redirect to the configured hostname
+            url = request.url.replace(hostname, ADMIN_HOST)
+            response = HTTPFound(location=url)
+            return response(environ, start_response)
 
         demo_name = hostname[:-len(ADMIN_HOST)][:-1]
         # for a domain "a.b.c.com", first try "a.b.c", then "a.b" and "a" as a demo_name
@@ -37,6 +42,14 @@ class Proxy(object):
                 demo_name = try_this_name
 
 
+        # if the app is not running, tell it
+        if installed_demos(request, demo_name=demo_name)[0]['state'] != 'RUNNING':
+            admin_url = request.url.replace(demo_name+'.', '')
+            message = (u'<html><body>'
+                       u'This demo is not running. You can start it from the '
+                       u'<a href="%s">admin interface</a>'
+                       u'</body></html>') % admin_url
+            return Response(message)(environ, start_response)
         # otherwise, redirect to the demo with the correct port
         port = APPS_CONF.get(demo_name, 'port')
         request.script_name = None

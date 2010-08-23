@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from ConfigParser import SafeConfigParser
+from urlparse import urlsplit, urlunsplit
 from os.path import isdir, isfile, join, abspath
 from xmlrpclib import ServerProxy
 import atexit
@@ -41,7 +42,9 @@ XMLRPC = ServerProxy('http://localhost:9001')
 # if not started, start supervisor in daemon mode
 try:
     XMLRPC.supervisor.getPID()
+    LOG.info(u'OK, supervisor was already running.')
 except socket.error:
+    LOG.info(u'Starting supervisor...')
     subprocess.Popen([join('bin', 'supervisord'), '-c', 'supervisord.cfg']).wait()
 # try again
 XMLRPC.supervisor.getPID()
@@ -98,9 +101,9 @@ def available_demos():
         params = []
         plugins = []
         for line in open('scripts'+os.sep+filename):
-            if line.split(':')[0] == '# PARAMS':
+            if line.split(':')[0].strip() == '# PARAMS':
                 params = map(string.strip, line.strip().split(':')[1].split(','))
-            elif line.split(':')[0] == '# PLUGINS':
+            elif line.split(':')[0].strip() == '# PLUGINS':
                 plugins = map(string.strip, line.strip().split(':')[1].split(','))
 
         demos[(filename[5:-3])] = (params, plugins)
@@ -130,14 +133,14 @@ def installed_demos(request, demo_name=None):
 
     demo_infos = []
     for name in demo_names:
-        port=APPS_CONF.get(name, 'port')
-
-        direct_url = ':'.join(request.host_url.split(':')[:2]) + ':' + port + '/'
-        proxied_url = request.host_url.split('//')
-        proxied_url[1] = name + '.' + proxied_url[1]
-        proxied_url = '//'.join(proxied_url)
+        app_port=APPS_CONF.get(name, 'port')
+        current_host = urlsplit(request.host_url)
+        direct_url = urlunsplit(
+            (current_host.scheme, ADMIN_HOST + ':' + app_port, '/', '', ''))
+        proxied_url = urlunsplit(
+            (current_host.scheme, name + '.' + ADMIN_HOST + ':' + str(current_host.port), '/', '', ''))
         state = 'STOPPED'
-        if 'supervisor.conf' in os.listdir(join(PATHS['demos'], name)):
+        if 'supervisor.cfg' in os.listdir(join(PATHS['demos'], name)):
             state = XMLRPC.supervisor.getProcessInfo(name)['statename']
         if 'apache2.conf' in os.listdir(join(PATHS['demos'], name)):
             if name + '.conf' in os.listdir(join(PATHS['var'], 'apache2', 'demos')):
@@ -145,7 +148,7 @@ def installed_demos(request, demo_name=None):
 
         demo_infos.append(dict(
             name=name,
-            port=port,
+            port=app_port,
             direct_url = direct_url,
             proxied_url = proxied_url,
             state = state,

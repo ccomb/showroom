@@ -172,7 +172,7 @@ def _reload_apache(demo):
         a2status = XMLRPC.supervisor.getProcessInfo('apache2')['statename']
         if a2status == 'RUNNING':
             retcode = subprocess.call(
-                ["apache2ctl",  "-f", "apache2/apache2.conf", "-k", "graceful"])
+                ["apache2ctl",  "-f", "etc/apache2/apache2.conf", "-k", "graceful"])
             # if the graceful command fails, we should disable the new config
             # BUT we should let supervisor restart the app!!
             if retcode != 0:
@@ -294,10 +294,6 @@ def action(request):
             XMLRPC.supervisor.reloadConfig()
             XMLRPC.supervisor.addProcessGroup(app_name)
 
-        # enable the apache conf (for apps running on apache)
-        _a2ensite(app_name)
-        _reload_apache(app_name)
-
         # add our new application in the apps config file
         # TODO: move that in the demo directory
         APPS_CONF.add_section(app_name)
@@ -327,7 +323,7 @@ def daemon(request):
 
     # get the state
     has_startup_script = os.path.exists(start_script)
-    has_apache_conf = os.path.exists(apache_config_link)
+    has_apache_conf = os.path.exists(apache_config_file)
     has_apache_link = os.path.exists(apache_config_link)
     state = 'STOPPED'
     if has_apache_link:
