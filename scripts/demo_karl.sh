@@ -1,7 +1,6 @@
 #!/usr/bin/env sh
 # PARAMS:NAME,COMMENT
 
-set -e # explicit fail on errors
 
 # get the last version in svn (no release yet)
 svn co http://osi.agendaless.com/bfgsvn/karlsample/trunk/ karl

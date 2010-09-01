@@ -1,7 +1,6 @@
 #!/usr/bin/env sh
 # PARAMS:NAME,COMMENT
 
-set -e # explicit fail on errors
 
 virtualenv --no-site-packages --distribute sandbox
 sandbox/bin/pip install --download-cache=$HOME/eggs django-cms

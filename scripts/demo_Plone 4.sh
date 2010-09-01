@@ -2,7 +2,6 @@
 # PARAMS:NAME,COMMENT,LOGIN,PASSWORD
 # PLUGINS:aws.minisite,Products.collage,collective.plonefinder,Products.FCKeditor
 
-set -e # explicit fail on errors
 
 # create a virtualenv
 virtualenv --no-site-packages --distribute sandbox

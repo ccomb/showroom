@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # PARAMS:NAME,COMMENT
 
-set -e # explicit fail on errors
 
 # create a virtualenv
 virtualenv --no-site-packages --distribute sandbox

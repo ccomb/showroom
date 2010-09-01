@@ -3,8 +3,6 @@
 # sudo aptitude install php5-cli apache2
 # sudo pear install Console_Table
 
-set -e # explicit shell errors
-
 # download drupal
 drupal_version=6.19
 wget http://ftp.drupal.org/files/projects/drupal-$drupal_version.tar.gz
@@ -32,6 +30,29 @@ EOF
 # initialize MySQL
 mkdir mysql
 mysql_install_db --no-defaults --datadir=$PWD/mysql/
+
+# start mysql temporarily
+mysqld --no-defaults --socket=$PWD/mysql/mysqld.sock --datadir=$PWD/mysql/ --log-error=$PWD/mysql/mysql-error.log --port=$((PORT+1000)) &
+
+# wait for mysql to be started
+echo "Waiting for mysql to start..."
+mysqladmin --socket=$PWD/mysql/mysqld.sock --user=root status
+while [ $? -ne 0 ]; do
+    sleep 0.5; echo "Waiting for mysql to start..."
+    mysqladmin --socket=$PWD/mysql/mysqld.sock --user=root status
+done
+
+# create a database
+mysqladmin --socket=$PWD/mysql/mysqld.sock --user=root create drupal
+
+# create a user with all privileges on the database
+echo "CREATE USER 'drupal'@'localhost';" > mysql.tmp
+echo "GRANT ALL ON drupal TO 'drupal'@'localhost';" >> mysql.tmp
+mysql --socket=$PWD/mysql/mysqld.sock --user=root mysql < mysql.tmp
+rm mysql.tmp
+
+# stop mysql
+mysqladmin --socket=$PWD/mysql/mysqld.sock --user=root shutdown
 
 # create a startup script
 cat > start.sh << EOF

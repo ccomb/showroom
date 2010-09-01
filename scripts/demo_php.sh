@@ -1,7 +1,6 @@
 #!/bin/bash
 # PARAMS: NAME 
 
-set -e # explicit shell errors
 
 # create a PHP hello world
 mkdir htdocs
