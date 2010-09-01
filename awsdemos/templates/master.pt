@@ -57,7 +57,7 @@ $('document').ready(function(){
         </td>
         <td id="content">
 
-          <tal:block define="session python:request.environ['beaker.session']"
+          <tal:block define="session python:request.environ.get('beaker.session', {})"
                      condition="session.has_key('message')">
           <div id="message"
                tal:define="message python:session.pop('message', None)"

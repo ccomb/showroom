@@ -11,23 +11,25 @@ class ViewTests(unittest.TestCase):
     def tearDown(self):
         self.config.end()
 
-    def test_app_list(self):
-        from awsdemos.views import app_list
+    def test_view_app_list(self):
+        """check that the app list don't fail
+        """
+        from awsdemos.views import view_app_list
         request = testing.DummyRequest()
-        info = app_list(request)
+        info = view_app_list(request)
         self.assertEqual(info.status, '200 OK')
 
     def test_action(self):
+        """an action without argument should return NotFound
+        """
         from awsdemos.views import action
         request = testing.DummyRequest()
-        # action without argument should raise NotFound
         self.assertRaises(NotFound, action, request)
 
     def test_new_app(self):
-        from awsdemos.views import demo_form, action
-        request = testing.DummyRequest(
-            params=(('app','not_existing'),), path='/new'
-            )
+        from awsdemos.views import action
+        request = testing.DummyRequest(params={'app':'not_existing'},
+                                       path='/new')
         self.assertRaises(NotFound, action, request)
 
 

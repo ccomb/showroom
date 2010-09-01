@@ -228,9 +228,9 @@ def action(request):
 
     """
     params = request.params.copy()
-    params['NAME'] = params['NAME'].replace(' ', '_').lower() # FIXME
-    if 'app' not in params:
+    if 'app' not in params or 'NAME' not in params:
         raise NotFound
+    params['NAME'] = params['NAME'].replace(' ', '_').lower() # FIXME
     app_list = utils.available_demos()
     if params['app'] in app_list:
         # rebuild the name of the deployment script

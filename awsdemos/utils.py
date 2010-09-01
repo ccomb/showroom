@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from ConfigParser import SafeConfigParser
 from urlparse import urlsplit, urlunsplit
-from os.path import isdir, isfile, join, abspath
+from os.path import isdir, isfile, join, abspath, dirname
 from xmlrpclib import ServerProxy
 import atexit
 import logging
@@ -14,7 +14,7 @@ import sys
 LOG = logging.getLogger(__name__)
 
 CONFIG = SafeConfigParser()
-PATH = os.path.dirname(abspath(sys.argv[-1]))
+PATH = dirname(dirname(__file__))
 
 CONFIG.read(join(PATH, 'deploy.ini'))
 # XXX don't use this file for that
@@ -95,12 +95,12 @@ def available_demos():
     ['NAME', 'COMMENT']
     """
     demos = {}
-    for filename in [ filename for filename in os.listdir('scripts')
+    for filename in [ filename for filename in os.listdir(PATHS['scripts'])
                       if filename.startswith('demo_')
                       and filename.endswith('.sh')]:
         params = []
         plugins = []
-        for line in open('scripts'+os.sep+filename):
+        for line in open(join(PATHS['scripts'], filename)):
             if line.split(':')[0].strip() == '# PARAMS':
                 params = map(string.strip, line.strip().split(':')[1].split(','))
             elif line.split(':')[0].strip() == '# PLUGINS':
