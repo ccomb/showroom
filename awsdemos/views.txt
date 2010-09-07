@@ -1,4 +1,17 @@
+>>> from repoze.bfg.testing import DummyRequest
+>>> from awsdemos.views import action
 
+>>> action(DummyRequest())
+Traceback (most recent call last):
+...
+NotFound
+>>> action(DummyRequest({'app':'toto'}))
+Traceback (most recent call last):
+...
+NotFound
 
->>> 2+2
-3
+#>>> action(DummyRequest({'app':'repoze.BFG',
+#...                      'NAME':'foobar',
+#...                      'COMMENT': 'commentaire'})) #doctest: +ELLIPSIS
+#<Response at ... 200 OK>
+

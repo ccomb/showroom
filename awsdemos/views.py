@@ -5,7 +5,6 @@ from os.path import join
 from repoze.bfg.chameleon_zpt import get_template
 from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.exceptions import NotFound
-from repoze.bfg.testing import DummyRequest
 from repoze.bfg.url import route_url
 from shutil import rmtree
 from utils import PATHS, APPS_CONF, XMLRPC, ADMIN_HOST
@@ -211,21 +210,6 @@ def action(request):
     FIXME: should verify if the user has access to the command.
 
     If we don't specify an app, or we specify a non existing app, we get a 404:
-
-    >>> action(DummyRequest())
-    Traceback (most recent call last):
-    ...
-    NotFound
-    >>> action(DummyRequest({'app':'toto'}))
-    Traceback (most recent call last):
-    ...
-    NotFound
-
-    >>> action(DummyRequest({'app':'repoze.bfg',
-    ...                      'NAME':'foobar',
-    ...                      'COMMENT': 'commentaire'})) #doctest: +ELLIPSIS
-    <Response at ... 200 OK>
-
     """
     params = request.params.copy()
     if 'app' not in params or 'NAME' not in params:

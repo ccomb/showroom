@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
 from ConfigParser import SafeConfigParser
 from urlparse import urlsplit, urlunsplit
-from os.path import isdir, isfile, join, abspath, dirname
+from os.path import isdir, isfile, join, dirname
 from xmlrpclib import ServerProxy
-import atexit
 import logging
 import os
 import socket
 import string
 import subprocess
-import sys
 
 LOG = logging.getLogger(__name__)
 
@@ -91,8 +89,10 @@ def available_demos():
     """ return a dict containing all available demos
     and their respective commands defined in config file.
 
-    >>> available_demos()['repoze.bfg']
-    ['NAME', 'COMMENT']
+    >>> available_demos()['repoze.BFG']['params']
+    ['NAME', 'COMMENT', 'TEST']
+    >>> available_demos()['repoze.BFG']['plugins']
+    []
     """
     demos = {}
     for filename in [ filename for filename in os.listdir(PATHS['scripts'])
@@ -106,7 +106,7 @@ def available_demos():
             elif line.split(':')[0].strip() == '# PLUGINS':
                 plugins = map(string.strip, line.strip().split(':')[1].split(','))
 
-        demos[(filename[5:-3])] = (params, plugins)
+        demos[(filename[5:-3])] = {'params':params, 'plugins':plugins}
     return demos
 
 

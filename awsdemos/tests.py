@@ -35,11 +35,13 @@ class ViewTests(unittest.TestCase):
 
 
 def test_suite():
+    optionflags = doctest.NORMALIZE_WHITESPACE+doctest.ELLIPSIS
     suite = unittest.TestSuite([
         unittest.makeSuite(ViewTests),
-        doctest.DocFileSuite('views.txt'),
-        doctest.DocFileSuite('utils.txt'),
-        doctest.DocTestSuite(awsdemos.views, optionflags=doctest.ELLIPSIS)
+        doctest.DocFileSuite('views.txt', optionflags=optionflags),
+        doctest.DocFileSuite('utils.txt', optionflags=optionflags),
+        doctest.DocTestSuite(awsdemos.views, optionflags=optionflags),
+        doctest.DocTestSuite(awsdemos.utils, optionflags=optionflags),
     ])
     return suite
 

@@ -1,4 +1,30 @@
+AWS Demos comes with several predefined deployment scripts for the demos.
+
+We can get the list of available demos as a dict:
+
+>>> from awsdemos.utils import available_demos
+
+>>> available_demos = available_demos()
+>>> available_demos
+{'...
+
+Each demo definition itself is a dict.
+
+>>> all(map(lambda x: type(x) is dict, available_demos.values()))
+True
+
+All demo definition dict should have at least a 'params' list:
+
+>>> all(map(lambda x: 'params' in x, available_demos.values()))
+True
+
+All demo definition dict should also have an plugins list:
+
+>>> all(map(lambda x: 'plugins' in x, available_demos.values()))
+True
 
 
->>> 2+2
-3
+
+
+
+
