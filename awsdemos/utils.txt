@@ -1,12 +1,14 @@
 AWS Demos comes with several predefined deployment scripts for the demos.
 
+Available Demos
+---------------
+
 We can get the list of available demos as a dict:
 
->>> from awsdemos.utils import available_demos
-
->>> available_demos = available_demos()
+>>> from awsdemos import utils
+>>> available_demos = utils.available_demos()
 >>> available_demos
-{'...
+{'test1': {'params': ['NAME', 'COMMENT'], 'plugins': []}}
 
 Each demo definition itself is a dict.
 
@@ -23,8 +25,88 @@ All demo definition dict should also have an plugins list:
 >>> all(map(lambda x: 'plugins' in x, available_demos.values()))
 True
 
+We shouldn't have any installed demos:
+
+>>> utils.installed_demos()
+[]
 
 
+Deploying a demo
+----------------
 
+We try de deploy the 'test1' demo:
+
+>>> utils.deploy('test1', 'demotest1')
+
+Ok, we check that the files are there:
+
+>>> import os
+>>> os.listdir(utils.PATHS['demos'])
+['demotest1']
+
+>>> os.listdir(os.path.join(utils.PATHS['demos'], 'demotest1'))
+['demo.conf', 'start.sh', 'foobar', 'supervisor.cfg']
+
+We try to deploy with the same name, we get an error:
+
+>>> utils.deploy('test1', 'demotest1')
+Traceback (most recent call last):
+...
+DeploymentError: this demo already exists
+
+We try to deploy a non existent demo:
+
+>>> utils.deploy('foo', 'bar')
+Traceback (most recent call last):
+...
+DeploymentError: this demo does not exist
+
+
+Now we can get the list of installed demos:
+
+>>> from pprint import pprint
+>>> pprint(utils.installed_demos(), width=1)
+[{'comment': '', 'name': 'demotest1', 'port': '9000', 'state': 'STOPPED'}]
+
+We can deploy again as another name:
+
+>>> utils.deploy('test1', 'demotest2')
+
+>>> pprint(utils.installed_demos(), width=1)
+[{'comment': '', 'name': 'demotest1', 'port': '9000', 'state': 'STOPPED'},
+ {'comment': '', 'name': 'demotest2', 'port': '9001', 'state': 'STOPPED'}]
+
+
+Removing a demo
+---------------
+
+Then we can remove a demo:
+
+>>> utils.destroy('demotest1')
+>>> pprint(utils.installed_demos(), width=1)
+[{'comment': '', 'name': 'demotest2', 'port': '9001', 'state': 'STOPPED'}]
+
+If we redeploy, the port is reassigned to 9000:
+
+>>> utils.deploy('test1', 'demotest1')
+>>> pprint(utils.installed_demos(), width=1)
+[{'comment': '', 'name': 'demotest1', 'port': '9000', 'state': 'STOPPED'},
+ {'comment': '', 'name': 'demotest2', 'port': '9001', 'state': 'STOPPED'}]
+
+
+We try to destroy a non existent demo:
+
+>>> utils.destroy('foobar')
+Traceback (most recent call last):
+...
+DestructionError: this demo does not exist
+
+
+We destroy both:
+
+>>> utils.destroy('demotest1')
+>>> utils.destroy('demotest2')
+>>> utils.installed_demos()
+[]
 
 

@@ -7,7 +7,8 @@ from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.exceptions import NotFound
 from repoze.bfg.url import route_url
 from shutil import rmtree
-from utils import PATHS, APPS_CONF, XMLRPC, ADMIN_HOST
+from urlparse import urlsplit, urlunsplit
+from utils import PATHS, XMLRPC, ADMIN_HOST
 from webob.exc import HTTPFound
 import logging
 import os
@@ -51,6 +52,18 @@ def _flash_message(request, message):
     request.environ['beaker.session']['message'] = message
     request.environ['beaker.session'].save()
 
+
+def proxied_url(demo, request):
+    current_host = urlsplit(request.host_url)
+    return urlunsplit(
+        (current_host.scheme, ADMIN_HOST + ':' + port, '/', '', ''))
+
+
+def direct_url(demo, request):
+    current_host = urlsplit(request.host_url)
+    return urlunsplit(
+        (current_host.scheme, name + '.' + ADMIN_HOST + ':' + str(current_host.port), '/', '', ''))
+
 def view_app_list(request):
     """ return the main page, with applications list, and actions.
     """
@@ -60,7 +73,9 @@ def view_app_list(request):
         "templates/master.pt",
         request=request,
         apps=utils.available_demos(),
-        demos=utils.installed_demos(request),
+        proxied_url=proxied_url,
+        direct_url=direct_url,
+        demos=utils.installed_demos(),
         logged_in=authenticated_userid(request),
         )
 
@@ -78,8 +93,8 @@ def json_installed_demos(request):
 def app_params(request):
     """ return the params of a given demo, in a json list.
     """
-    app_list = utils.available_demos()
-    if 'app' in request.params and request.params['app'] in app_list:
+    available_demos = utils.available_demos()
+    if 'app' in request.params and request.params['app'] in available_demos:
         return utils.available_demos()[request.params['app']][0]
     else:
         return ("No application name given or unknown application.",)
@@ -89,8 +104,8 @@ def app_plugins(request):
     return the plugins of a given demo, in a json list.
 
     """
-    app_list = utils.available_demos()
-    if 'app' in request.params and request.params['app'] in app_list:
+    available_demos = utils.available_demos()
+    if 'app' in request.params and request.params['app'] in available_demos:
         return utils.available_demos()[request.params['app']][1]
     else:
         return ("No application name given or unknown application.",)
@@ -139,12 +154,12 @@ def app_form(request):
     FIXME: seems not used
     """
     master = get_template('templates/master.pt')
-    app_list = utils.available_demos()
-    if 'app' in request.params and request.params['app'] in app_list:
+    available_demos = utils.available_demos()
+    if 'app' in request.params and request.params['app'] in available_demos:
         return render_template_to_response(
             "templates/new_app.pt",
             request=request,
-            paramlist=app_list[request.params['app']],
+            paramlist=available_demos[request.params['app']],
             logged_in=authenticated_userid(request),
             demo=request.params['app'],
             master=master
@@ -203,6 +218,7 @@ def _a2dissite(demo):
         os.remove(config_link)
 
 
+
 def action(request):
     """
     Execute the action bound to the name passed and return when the action is
@@ -215,84 +231,16 @@ def action(request):
     if 'app' not in params or 'NAME' not in params:
         raise NotFound
     params['NAME'] = params['NAME'].replace(' ', '_').lower() # FIXME
-    app_list = utils.available_demos()
-    if params['app'] in app_list:
-        # rebuild the name of the deployment script
-        script = join(PATHS['scripts'], "demo_"+params['app']+".sh")
-
-        # *check the script* #FIXME move in a function
-
-        # add environment variables for the deployment script
-        env = os.environ.copy()
-        env.update(params)
-        app_name = params['NAME']
-        try:
-            port = APPS_CONF.get(app_name, 'port')
-        except NoSectionError:
-            port = utils.next_port()
-        else:
-            LOG.warn('demo %s already exist. reusing port' % app_name)
-            XMLRPC.supervisor.stopProcess(app_name)
-            port = utils.next_port()
-        env['PORT'] = str(port)
-        # put the virtualenv path first
-        env['PATH'] = os.path.abspath('bin') + ':' + env['PATH']
-        env['HOST'] = ADMIN_HOST
-
-        # create the directory for the demo
-        demopath = join(PATHS['demos'], app_name)
-        if not os.path.exists(demopath):
-            os.mkdir(demopath)
-        else:
-            message = u"this app already exists"
-            _flash_message(request, message)
-            return HTTPFound(location='/')
-
-        # run the deployment script
-        LOG.debug(script)
-        subprocess.call('"'+script+'"', shell=True, cwd=demopath, env=env)
-
-        # set the start script to executable
-        start_script = join(demopath, 'start.sh')
-        if os.path.exists(start_script):
-            os.chmod(start_script, 0744)
-            # add the shebang if forgotten
-            with open(start_script, 'r+') as s:
-                content = s.read()
-                if not content.startswith('#!'):
-                    content = '#!/bin/bash\n' + content
-                    s.seek(0); s.write(content)
-
-            # add a supervisor include file for this program
-            supervisor_conf = SafeConfigParser()
-            section = 'program:%s' % app_name
-            supervisor_conf.add_section(section)
-            supervisor_conf.set(section, 'command', start_script)
-            supervisor_conf.set(section, 'directory', demopath)
-            supervisor_conf.set(section, 'autostart', 'false')
-            supervisor_conf.set(section, 'autorestart', 'false')
-            with open(join(demopath, 'supervisor.cfg'), 'w') as supervisor_file:
-                supervisor_conf.write(supervisor_file)
-
-            # reload the config
-            XMLRPC.supervisor.reloadConfig()
-            XMLRPC.supervisor.addProcessGroup(app_name)
-
-        # add our new application in the apps config file
-        # TODO: move that in the demo directory
-        APPS_CONF.add_section(app_name)
-        APPS_CONF.set(app_name, 'port', str(port))
-        APPS_CONF.set(app_name, 'path', demopath)
-        APPS_CONF.set(app_name, 'type', params['app'])
-        with open(PATHS['apps'], 'w+') as configfile:
-            APPS_CONF.write(configfile)
-        LOG.info('section %s added', app_name)
-
+    try:
+        utils.deploy(params['app'], params['NAME'])
+    except utils.DeploymentError, e:
         _flash_message(request,
-            u"application %s created at port %s" % (app_name, port))
+            u"Error : %s" % e.message)
         return HTTPFound(location='/')
-    else:
-        raise NotFound
+
+    _flash_message(request,
+        u"application %s created at port %s" % (app_name, port))
+    return HTTPFound(location='/')
 
 
 def daemon(request):
@@ -352,31 +300,16 @@ def delete_demo(request):
     """ If an application of the name NAME is deployed, we delete it
     """
     name=request.params['NAME']
+    try:
+        destroy(name)
+    except utils.DestructionError, e:
+        message = 'Error: %s' % e.message
+        _flash_message(request, message)
+        return HTTPFound(location='/')
 
-    start_script = join(PATHS['demos'], name, 'start.sh')
-    if os.path.exists(start_script):
-        state = XMLRPC.supervisor.getProcessInfo(name)['statename']
-        if state == 'RUNNING':
-            XMLRPC.supervisor.stopProcess(name)
-        XMLRPC.supervisor.removeProcessGroup(name)
-
-    LOG.warn("removing demo "+name)
-
-    APPS_CONF.remove_section(name)
-    with open(PATHS['apps'], 'w') as configfile:
-        APPS_CONF.write(configfile)
-
-    conf = SafeConfigParser()
-    conf.remove_section('program:'+name)
-
-    if os.path.isdir(join(PATHS['demos'], name)):
-        rmtree(join(PATHS['demos'], name))
-    else:
-        LOG.error("directory not found for %s in demos." % name)
-
-    _a2dissite(name)
+    utils._a2dissite(name)
     _reload_apache(name)
 
-    _flash_message(request, '%s deleted!' % name)
+    _flash_message(request, '%s demo successfully deleted!' % name)
     return HTTPFound(location='/')
 

@@ -68,7 +68,7 @@ $('document').ready(function(){
             <table id="demos_list">
                 <tr tal:repeat="demo demos">
                   <td class="demo_title">
-                    <a tal:attributes="href python: demo.get('proxied_url')"
+                    <a tal:attributes="href python: proxied_url(demo, request)"
                        tal:content="python: demo.get('name')">
                         app name
                     </a>
@@ -89,7 +89,7 @@ $('document').ready(function(){
                    </div>
                   </td>
                   <td class="demo_title">
-                    <a tal:attributes="href python: demo.get('direct_url')">
+                    <a tal:attributes="href python: direct_url(demo, request)">
                         (direct link)
                     </a>
                   </td>
