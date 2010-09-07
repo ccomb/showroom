@@ -1,6 +1,7 @@
 from repoze.bfg import testing
 from repoze.bfg.configuration import Configurator
 from repoze.bfg.exceptions import NotFound
+import awsdemos.views
 import unittest, doctest
 
 class ViewTests(unittest.TestCase):
@@ -33,16 +34,12 @@ class ViewTests(unittest.TestCase):
         self.assertRaises(NotFound, action, request)
 
 
-
-
-
-def additional_tests():
-    """Setuptools/Distribute looks for this additional function when searching
-    tests through the 'test_suite' argument of setup()
-
-    This is used to add doctests to the test suite
-    """
-    import awsdemos
-    return doctest.DocTestSuite(awsdemos.views,
-                                optionflags=doctest.ELLIPSIS)
+def test_suite():
+    suite = unittest.TestSuite([
+        unittest.makeSuite(ViewTests),
+        doctest.DocFileSuite('views.txt'),
+        doctest.DocFileSuite('utils.txt'),
+        doctest.DocTestSuite(awsdemos.views, optionflags=doctest.ELLIPSIS)
+    ])
+    return suite
 
