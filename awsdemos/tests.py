@@ -20,8 +20,8 @@ def setUp(self):
     base_dir = dirname(dirname(abspath(__file__)))
     self.tempdir = tempfile.mkdtemp(dir=getcwd())
     # copy etc
-    etc = join(dirname(dirname(abspath(__file__))), 'etc')
-    shutil.copytree(etc, join(self.tempdir, 'etc'))
+    etc = join(self.tempdir, 'etc')
+    shutil.copytree(join(dirname(dirname(abspath(__file__))), 'etc'), etc)
     # create empty var
     var = join(self.tempdir, 'var')
     mkdir(var)
@@ -43,6 +43,14 @@ def setUp(self):
         content = s.read()
         content = content.replace('8001', '8002')
         content = content.replace('../demos', 'demos')
+        content = content.replace('etc/apache2', join(etc, 'apache2'))
+        s.seek(0); s.truncate(); s.write(content)
+
+    # we modify the original apache file
+    self.apache = join(etc, 'apache2', 'apache2.conf')
+    with open(self.apache, 'r+') as s:
+        content = s.read()
+        content = content.replace('../../var', var)
         s.seek(0); s.truncate(); s.write(content)
 
     # update the PATHS
@@ -63,6 +71,8 @@ def tearDown(self):
     # we restore the scripts path
     PATHS['scripts'] = self.scripts
     # we stop our custom supervisor
+    subprocess.call(PATHS['bin'] + "/supervisorctl -c %s stop all" % self.supervisor,
+                    shell=True)
     subprocess.call(PATHS['bin'] + "/supervisorctl -c %s shutdown" % self.supervisor,
                     shell=True)
     shutil.rmtree(self.tempdir)

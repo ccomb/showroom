@@ -7,9 +7,13 @@ We can get the list of available demos as a dict:
 
 >>> from awsdemos import utils
 >>> available_demos = utils.available_demos()
->>> available_demos
-{'test1': {'params': ['NAME', 'COMMENT'], 'plugins': []},
- 'error': {'params': ['NAME', 'COMMENT'], 'plugins': []}}
+>>> from pprint import pprint
+>>> pprint(available_demos, width=1)
+{'error':           {'params': ['NAME', 'COMMENT'], 'plugins': []},
+ 'test1':           {'params': ['NAME', 'COMMENT'], 'plugins': []},
+ 'testapache':      {'params': ['NAME', 'COMMENT'], 'plugins': []},
+ 'testapache3':     {'params': ['NAME', 'COMMENT'], 'plugins': []},
+ 'testapachebad':   {'params': ['NAME', 'COMMENT'], 'plugins': []}}
 
 Each demo definition itself is a dict.
 
@@ -64,17 +68,16 @@ DeploymentError: this demo does not exist
 
 Now we can get the list of installed demos:
 
->>> from pprint import pprint
 >>> pprint(utils.installed_demos(), width=1)
-[{'comment': '', 'name': 'demotest1', 'port': '9000', 'status': 'STOPPED'}]
+[{'comment': '', 'name': 'demotest1', 'port': '20000', 'status': 'STOPPED'}]
 
 We can deploy again as another name:
 
 >>> utils.deploy('test1', 'demotest2')
 
 >>> pprint(utils.installed_demos(), width=1)
-[{'comment': '', 'name': 'demotest1', 'port': '9000', 'status': 'STOPPED'},
- {'comment': '', 'name': 'demotest2', 'port': '9001', 'status': 'STOPPED'}]
+[{'comment': '', 'name': 'demotest1', 'port': '20000', 'status': 'STOPPED'},
+ {'comment': '', 'name': 'demotest2', 'port': '20001', 'status': 'STOPPED'}]
 
 We try to deploy a demo which has an error:
 
@@ -103,14 +106,14 @@ Then we can remove a demo:
 
 >>> utils.InstalledDemo('demotest1').destroy()
 >>> pprint(utils.installed_demos(), width=1)
-[{'comment': '', 'name': 'demotest2', 'port': '9001', 'status': 'STOPPED'}]
+[{'comment': '', 'name': 'demotest2', 'port': '20001', 'status': 'STOPPED'}]
 
-If we redeploy, the port is reassigned to 9000:
+If we redeploy, the port is reassigned to 20000:
 
 >>> utils.deploy('test1', 'demotest1')
 >>> pprint(utils.installed_demos(), width=1)
-[{'comment': '', 'name': 'demotest1', 'port': '9000', 'status': 'STOPPED'},
- {'comment': '', 'name': 'demotest2', 'port': '9001', 'status': 'STOPPED'}]
+[{'comment': '', 'name': 'demotest1', 'port': '20000', 'status': 'STOPPED'},
+ {'comment': '', 'name': 'demotest2', 'port': '20001', 'status': 'STOPPED'}]
 
 
 We try to destroy a non existent demo:
@@ -166,6 +169,85 @@ We stop it:
 >>> demo.get_status()
 'STOPPED'
 
+Apache support
+--------------
+
+If the deployment script creates an apache2.conf file, this file is aggregated
+to the global apache config through a link. This link is used to determine the
+status.
+
+>>> utils.deploy('testapache', 'test')
+>>> demo = utils.InstalledDemo('test')
+>>> demo.get_status()
+'STOPPED'
+>>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+'STOPPED'
+>>> demo.start()
+>>> demo.get_status()
+'RUNNING'
+>>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+'RUNNING'
+>>> demo.stop()
+>>> demo.get_status()
+'STOPPED'
+>>> demo.destroy()
+>>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+'STOPPED'
+
+If the provided apache config is erroneous, we don't start the app.
+
+>>> utils.deploy('testapachebad', 'test')
+>>> demo = utils.InstalledDemo('test')
+>>> demo.get_status()
+'STOPPED'
+>>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+'STOPPED'
+>>> demo.start()
+>>> demo.get_status()
+'STOPPED'
+>>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+'STOPPED'
+>>> demo.stop()
+>>> demo.get_status()
+'STOPPED'
+>>> demo.destroy()
+>>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+'STOPPED'
+
+The same with 2 corrects, and 1 bad :
+
+>>> utils.deploy('testapache', 'test')
+>>> utils.deploy('testapache', 'test2')
+>>> utils.InstalledDemo('test').start()
+>>> utils.InstalledDemo('test2').start()
+>>> utils.InstalledDemo('test').get_status()
+'RUNNING'
+>>> utils.InstalledDemo('test2').get_status()
+'RUNNING'
+>>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+'RUNNING'
+>>> utils.deploy('testapachebad', 'apache3')
+>>> utils.InstalledDemo('apache3').get_status()
+'STOPPED'
+>>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+'RUNNING'
+>>> utils.InstalledDemo('test').get_status()
+'RUNNING'
+>>> utils.InstalledDemo('test2').get_status()
+'RUNNING'
+>>> utils.InstalledDemo('test').destroy()
+>>> utils.InstalledDemo('test').get_status()
+'DESTROYED'
+>>> utils.InstalledDemo('test2').get_status()
+'RUNNING'
+>>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+'RUNNING'
+>>> utils.InstalledDemo('test2').destroy()
+>>> utils.InstalledDemo('test2').get_status()
+'DESTROYED'
+>>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+'STOPPED'
+>>> utils.InstalledDemo('apache3').destroy()
 
 
 

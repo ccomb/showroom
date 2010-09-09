@@ -184,7 +184,8 @@ class InstalledDemo(object):
         apache_links = os.listdir(join(PATHS['var'], 'apache2', 'demos'))
 
         if 'apache2.conf' in democontent:
-            if self.name + '.conf' in apache_links:
+            a2status = XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+            if self.name + '.conf' in apache_links and a2status == 'RUNNING':
                 status = 'RUNNING'
         return status
 
@@ -194,14 +195,7 @@ class InstalledDemo(object):
         if self.has_startup_script:
             XMLRPC.supervisor.startProcess(self.name)
         if self.has_apache_conf:
-            self._a2ensite(self.name)
-            retcode = _reload_apache()
-            # if apache doesn't restart because of us,
-            # we should disable the new config
-            # BUT we should let supervisor restart the app!!
-            if retcode != 0:
-                self._a2dissite()
-                self.stop()
+            self._a2ensite()
 
     def stop(self):
         """stop the demo
@@ -210,7 +204,34 @@ class InstalledDemo(object):
             XMLRPC.supervisor.stopProcess(self.name)
         if self.has_apache_link:
             self._a2dissite()
-            _reload_apache()
+
+    def _reload_apache(self):
+        """reload apache config, or shutdown if it is not needed anymore
+        """
+        apache_confs = [conf
+                        for conf in os.listdir(join(PATHS['var'], 'apache2', 'demos'))
+                        if conf.endswith('.conf')]
+        a2status = XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+
+        if len(apache_confs) == 0:
+            try:
+                retcode = XMLRPC.supervisor.stopProcess('apache2')
+            except:
+                return 0
+        else:
+            # reload the config or start Apache if needed (WITH supervisor!)
+            a2status = XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+            if a2status == 'RUNNING':
+                retcode = subprocess.call(
+                    ["apache2ctl",  "-f", PATHS['etc']+"/apache2/apache2.conf", "-k", "graceful"])
+                return retcode
+            else:
+                try:
+                    XMLRPC.supervisor.startProcess('apache2')
+                except:
+                    return 1
+                return 0
+
 
     def _a2ensite(self):
         """sandbox equivalent to the a2ensite command
@@ -222,6 +243,13 @@ class InstalledDemo(object):
             if not os.path.exists(config_dir):
                 os.mkdir(config_dir)
             os.link(config_file, config_link)
+            # if apache doesn't restart because of us,
+            # we should disable the new config and stop the app.
+            # Supervisor should immediately try to restart apache
+            retcode = self._reload_apache()
+            if retcode != 0:
+                self._a2dissite()
+                self.stop()
 
 
     def _a2dissite(self):
@@ -230,51 +258,20 @@ class InstalledDemo(object):
         config_link = join(PATHS['var'], 'apache2', 'demos', self.name + '.conf')
         if os.path.exists(config_link):
             os.remove(config_link)
+            self._reload_apache()
 
     def destroy(self):
-        if self.name not in [d['name'] for d in installed_demos()]:
+        if not os.path.exists(self.path):
             raise DestructionError('this demo does not exist')
-        start_script = join(PATHS['demos'], self.name, 'start.sh')
-        if os.path.exists(start_script):
-            try:
-                status = XMLRPC.supervisor.getProcessInfo(self.name)['statename']
-            except:
-                status = 'STOPPED'
-            if status == 'RUNNING':
-                XMLRPC.supervisor.stopProcess(self.name)
-            XMLRPC.supervisor.removeProcessGroup(self.name)
-
+        if self.get_status() == 'RUNNING':
+            self.stop()
         LOG.warn("removing demo %s" % self.name)
-
+        had_startup_script = self.has_startup_script
         if os.path.isdir(self.path):
             shutil.rmtree(self.path)
-        self._a2dissite()
-        _reload_apache()
-
-
-def _reload_apache():
-    """reload apache config, or shutdown if it is not needed anymore
-    """
-    apache_confs = [conf
-                    for conf in os.listdir(join(PATHS['var'], 'apache2', 'demos'))
-                    if conf.endswith('.conf')]
-    a2status = XMLRPC.supervisor.getProcessInfo('apache2')['statename']
-
-    if len(apache_confs) == 0:
-        if a2status == 'RUNNING':
-            XMLRPC.supervisor.stopProcess('apache2')
-    else:
-        # reload the config or start Apache if needed (WITH supervisor!)
-        a2status = XMLRPC.supervisor.getProcessInfo('apache2')['statename']
-        if a2status == 'RUNNING':
-            retcode = subprocess.call(
-                ["apache2ctl",  "-f", "etc/apache2/apache2.conf", "-k", "graceful"])
-            return retcode
-        else:
-            XMLRPC.supervisor.startProcess('apache2')
-
-
-
+        if had_startup_script:
+            XMLRPC.supervisor.removeProcessGroup(self.name)
+            XMLRPC.supervisor.reloadConfig()
 
 
 def get_available_port():
@@ -282,7 +279,7 @@ def get_available_port():
     """
     demos = installed_demos()
     ports = [int(demo['port']) for demo in demos]
-    port = 9000
+    port = 20000
     while port in ports:
         port += 1
     return port
