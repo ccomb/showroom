@@ -8,7 +8,8 @@ We can get the list of available demos as a dict:
 >>> from awsdemos import utils
 >>> available_demos = utils.available_demos()
 >>> available_demos
-{'test1': {'params': ['NAME', 'COMMENT'], 'plugins': []}}
+{'test1': {'params': ['NAME', 'COMMENT'], 'plugins': []},
+ 'error': {'params': ['NAME', 'COMMENT'], 'plugins': []}}
 
 Each demo definition itself is a dict.
 
@@ -43,9 +44,8 @@ Ok, we check that the files are there:
 >>> import os
 >>> os.listdir(utils.PATHS['demos'])
 ['demotest1']
-
->>> os.listdir(os.path.join(utils.PATHS['demos'], 'demotest1'))
-['demo.conf', 'start.sh', 'foobar', 'supervisor.cfg']
+>>> sorted(os.listdir(os.path.join(utils.PATHS['demos'], 'demotest1')))
+['demo.conf', 'foobar', 'start.sh', 'supervisor.cfg']
 
 We try to deploy with the same name, we get an error:
 
@@ -76,6 +76,17 @@ We can deploy again as another name:
 [{'comment': '', 'name': 'demotest1', 'port': '9000', 'state': 'STOPPED'},
  {'comment': '', 'name': 'demotest2', 'port': '9001', 'state': 'STOPPED'}]
 
+We try to deploy a demo which has an error:
+
+>>> utils.deploy('error', 'demoerror')
+Traceback (most recent call last):
+...
+DeploymentError: installation ended with an error
+
+We shouldn't have any remaining folder:
+
+>>> os.listdir(utils.PATHS['demos'])
+['demotest1', 'demotest2']
 
 Removing a demo
 ---------------
@@ -108,5 +119,9 @@ We destroy both:
 >>> utils.destroy('demotest2')
 >>> utils.installed_demos()
 []
+
+>>> os.listdir(utils.PATHS['demos'])
+[]
+
 
 

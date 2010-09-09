@@ -206,12 +206,14 @@ def deploy(app_type, app_name):
     if not os.path.exists(demopath):
         os.mkdir(demopath)
     else:
-        raise DeploymentError('This app already exists')
-
+        raise DeploymentError('this app already exists')
 
     # run the deployment script
     LOG.debug(script)
-    subprocess.call('"'+script+'"', shell=True, cwd=demopath, env=env)
+    retcode = subprocess.call('"'+script+'"', shell=True, cwd=demopath, env=env)
+    if retcode != 0:
+        shutil.rmtree(demopath)
+        raise DeploymentError('installation ended with an error')
 
     # set the start script to executable
     start_script = join(demopath, 'start.sh')

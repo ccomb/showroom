@@ -2,7 +2,7 @@
 import awsdemos
 awsdemos.currently_testing = True
 ###
-from os import mkdir, chdir
+from os import mkdir, chdir, getcwd
 from os.path import abspath, dirname, join
 from repoze.bfg import testing
 from repoze.bfg.configuration import Configurator
@@ -18,7 +18,7 @@ PATHS = awsdemos.utils.PATHS
 def setUp(self):
     # For the tests, we change the location of the demos
     base_dir = dirname(dirname(abspath(__file__)))
-    self.tempdir = tempfile.mkdtemp()
+    self.tempdir = tempfile.mkdtemp(dir=getcwd())
     # copy etc
     etc = join(dirname(dirname(abspath(__file__))), 'etc')
     shutil.copytree(etc, join(self.tempdir, 'etc'))
