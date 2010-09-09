@@ -136,26 +136,145 @@ def installed_demos():
     demo_infos = []
     demo_names = os.listdir(PATHS['demos'])
     for name in demo_names:
-        conf = SafeConfigParser()
-        conf.read(join(PATHS['demos'], name, 'demo.conf'))
-        port=conf.get(name, 'port')
-        state = 'STOPPED'
-        if 'supervisor.cfg' in os.listdir(join(PATHS['demos'], name)):
-            try:
-                state = XMLRPC.supervisor.getProcessInfo(name)['statename']
-            except:
-                state = 'STOPPED'
-        if 'apache2.conf' in os.listdir(join(PATHS['demos'], name)):
-            if name + '.conf' in os.listdir(join(PATHS['var'], 'apache2', 'demos')):
-                state = 'RUNNING'
-
+        demo = InstalledDemo(name)
         demo_infos.append(dict(
-            name=name,
-            port=port,
-            state = state,
-            comment=get_demo_comment(name)
+            name=demo.name,
+            port=demo.get_port(),
+            status = demo.get_status(),
+            comment='',
+            #comment=demo.get_comment()
         ))
     return demo_infos
+
+
+class InstalledDemo(object):
+    """object representing an installed demo
+    """
+    def __init__(self, name):
+        self.name = name
+        if self.name == '':
+            raise ValueError('empty demo name')
+        self.path = join(PATHS['demos'], self.name)
+        self.start_script = join(PATHS['demos'], name, 'start.sh')
+        self.apache_config_file = join(PATHS['demos'], name, 'apache2.conf')
+        self.apache_config_link = join(PATHS['var'], 'apache2', 'demos', name + '.conf')
+
+    has_startup_script = property(lambda self: os.path.exists(self.start_script))
+    has_apache_link = property(lambda self: os.path.exists(self.apache_config_link))
+    has_apache_conf = property(lambda self: os.path.exists(self.apache_config_file))
+
+    def get_port(self):
+        conf = SafeConfigParser()
+        conf.read(join(PATHS['demos'], self.name, 'demo.conf'))
+        return conf.get(self.name, 'port')
+
+    def get_status(self):
+        """return the status of the demo
+        We use the same status as supervisor
+        """
+        status = 'STOPPED'
+        if not os.path.exists(self.path):
+            return 'DESTROYED'
+        democontent = os.listdir(self.path)
+        if 'supervisor.cfg' in democontent:
+            try:
+                status = XMLRPC.supervisor.getProcessInfo(self.name)['statename']
+            except:
+                status = 'STOPPED'
+        apache_links = os.listdir(join(PATHS['var'], 'apache2', 'demos'))
+
+        if 'apache2.conf' in democontent:
+            if self.name + '.conf' in apache_links:
+                status = 'RUNNING'
+        return status
+
+    def start(self):
+        """start the demo
+        """
+        if self.has_startup_script:
+            XMLRPC.supervisor.startProcess(self.name)
+        if self.has_apache_conf:
+            self._a2ensite(self.name)
+            retcode = _reload_apache()
+            # if apache doesn't restart because of us,
+            # we should disable the new config
+            # BUT we should let supervisor restart the app!!
+            if retcode != 0:
+                self._a2dissite()
+                self.stop()
+
+    def stop(self):
+        """stop the demo
+        """
+        if self.has_startup_script:
+            XMLRPC.supervisor.stopProcess(self.name)
+        if self.has_apache_link:
+            self._a2dissite()
+            _reload_apache()
+
+    def _a2ensite(self):
+        """sandbox equivalent to the a2ensite command
+        """
+        config_file = join(PATHS['demos'], self.name, 'apache2.conf')
+        config_link = join(PATHS['var'], 'apache2', 'demos', self.name + '.conf')
+        config_dir = join(PATHS['var'], 'apache2', 'demos')
+        if os.path.exists(config_file) and not os.path.exists(config_link):
+            if not os.path.exists(config_dir):
+                os.mkdir(config_dir)
+            os.link(config_file, config_link)
+
+
+    def _a2dissite(self):
+        """sandbox equivalent to the a2dissite command
+        """
+        config_link = join(PATHS['var'], 'apache2', 'demos', self.name + '.conf')
+        if os.path.exists(config_link):
+            os.remove(config_link)
+
+    def destroy(self):
+        if self.name not in [d['name'] for d in installed_demos()]:
+            raise DestructionError('this demo does not exist')
+        start_script = join(PATHS['demos'], self.name, 'start.sh')
+        if os.path.exists(start_script):
+            try:
+                status = XMLRPC.supervisor.getProcessInfo(self.name)['statename']
+            except:
+                status = 'STOPPED'
+            if status == 'RUNNING':
+                XMLRPC.supervisor.stopProcess(self.name)
+            XMLRPC.supervisor.removeProcessGroup(self.name)
+
+        LOG.warn("removing demo %s" % self.name)
+
+        if os.path.isdir(self.path):
+            shutil.rmtree(self.path)
+        self._a2dissite()
+        _reload_apache()
+
+
+def _reload_apache():
+    """reload apache config, or shutdown if it is not needed anymore
+    """
+    apache_confs = [conf
+                    for conf in os.listdir(join(PATHS['var'], 'apache2', 'demos'))
+                    if conf.endswith('.conf')]
+    a2status = XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+
+    if len(apache_confs) == 0:
+        if a2status == 'RUNNING':
+            XMLRPC.supervisor.stopProcess('apache2')
+    else:
+        # reload the config or start Apache if needed (WITH supervisor!)
+        a2status = XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+        if a2status == 'RUNNING':
+            retcode = subprocess.call(
+                ["apache2ctl",  "-f", "etc/apache2/apache2.conf", "-k", "graceful"])
+            return retcode
+        else:
+            XMLRPC.supervisor.startProcess('apache2')
+
+
+
 
 
 def get_available_port():
@@ -250,23 +369,6 @@ def deploy(app_type, app_name):
     LOG.info('section %s added', app_name)
 
 
-def destroy(name):
-    if name not in [d['name'] for d in installed_demos()]:
-        raise DestructionError('this demo does not exist')
-    start_script = join(PATHS['demos'], name, 'start.sh')
-    if os.path.exists(start_script):
-        try:
-            state = XMLRPC.supervisor.getProcessInfo(name)['statename']
-        except:
-            state = 'STOPPED'
-        if state == 'RUNNING':
-            XMLRPC.supervisor.stopProcess(name)
-        XMLRPC.supervisor.removeProcessGroup(name)
 
-    LOG.warn("removing demo %s" % name)
-
-    demopath = join(PATHS['demos'], name)
-    if os.path.isdir(demopath):
-        shutil.rmtree(demopath)
 
 

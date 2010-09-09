@@ -66,15 +66,15 @@ Now we can get the list of installed demos:
 
 >>> from pprint import pprint
 >>> pprint(utils.installed_demos(), width=1)
-[{'comment': '', 'name': 'demotest1', 'port': '9000', 'state': 'STOPPED'}]
+[{'comment': '', 'name': 'demotest1', 'port': '9000', 'status': 'STOPPED'}]
 
 We can deploy again as another name:
 
 >>> utils.deploy('test1', 'demotest2')
 
 >>> pprint(utils.installed_demos(), width=1)
-[{'comment': '', 'name': 'demotest1', 'port': '9000', 'state': 'STOPPED'},
- {'comment': '', 'name': 'demotest2', 'port': '9001', 'state': 'STOPPED'}]
+[{'comment': '', 'name': 'demotest1', 'port': '9000', 'status': 'STOPPED'},
+ {'comment': '', 'name': 'demotest2', 'port': '9001', 'status': 'STOPPED'}]
 
 We try to deploy a demo which has an error:
 
@@ -88,26 +88,34 @@ We shouldn't have any remaining folder:
 >>> os.listdir(utils.PATHS['demos'])
 ['demotest1', 'demotest2']
 
+Installed Demo object
+---------------------
+
+we can instantiate an object representing a demo (even if it does not exist)
+
+>>> demo = utils.InstalledDemo('nonexisting')
+
+
 Removing a demo
 ---------------
 
 Then we can remove a demo:
 
->>> utils.destroy('demotest1')
+>>> utils.InstalledDemo('demotest1').destroy()
 >>> pprint(utils.installed_demos(), width=1)
-[{'comment': '', 'name': 'demotest2', 'port': '9001', 'state': 'STOPPED'}]
+[{'comment': '', 'name': 'demotest2', 'port': '9001', 'status': 'STOPPED'}]
 
 If we redeploy, the port is reassigned to 9000:
 
 >>> utils.deploy('test1', 'demotest1')
 >>> pprint(utils.installed_demos(), width=1)
-[{'comment': '', 'name': 'demotest1', 'port': '9000', 'state': 'STOPPED'},
- {'comment': '', 'name': 'demotest2', 'port': '9001', 'state': 'STOPPED'}]
+[{'comment': '', 'name': 'demotest1', 'port': '9000', 'status': 'STOPPED'},
+ {'comment': '', 'name': 'demotest2', 'port': '9001', 'status': 'STOPPED'}]
 
 
 We try to destroy a non existent demo:
 
->>> utils.destroy('foobar')
+>>> utils.InstalledDemo('foobar').destroy()
 Traceback (most recent call last):
 ...
 DestructionError: this demo does not exist
@@ -115,13 +123,50 @@ DestructionError: this demo does not exist
 
 We destroy both:
 
->>> utils.destroy('demotest1')
->>> utils.destroy('demotest2')
+>>> utils.InstalledDemo('demotest1').destroy()
+>>> utils.InstalledDemo('demotest2').destroy()
 >>> utils.installed_demos()
 []
 
 >>> os.listdir(utils.PATHS['demos'])
 []
+
+
+Start, stop, status
+-------------------
+
+We deploy a simple demo
+
+>>> utils.deploy('test1', 'demotest1')
+
+We can build an object representing this demo:
+
+>>> demo = utils.InstalledDemo('demotest1')
+>>> demo.get_status()
+'STOPPED'
+
+The same with a non existing demo returns a specific status:
+
+>>> utils.InstalledDemo('nonexisting').get_status()
+'DESTROYED'
+>>> utils.InstalledDemo('').get_status()
+Traceback (most recent call last):
+...
+ValueError: empty demo name
+
+We start it:
+
+>>> demo.start()
+>>> demo.get_status()
+'RUNNING'
+
+We stop it:
+
+>>> demo.stop()
+>>> demo.get_status()
+'STOPPED'
+
+
 
 
 

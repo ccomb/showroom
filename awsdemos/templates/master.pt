@@ -85,7 +85,7 @@ $('document').ready(function(){
                   </td>
                   <td>
                     <div class="STOPPED"
-                         tal:attributes="class python:'state ' + demo.get('state'); title python:demo.get('state')">
+                         tal:attributes="class python:'status ' + demo.get('status'); title python:demo.get('status')">
                    </div>
                   </td>
                   <td class="demo_title">

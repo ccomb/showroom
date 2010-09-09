@@ -53,6 +53,7 @@ def setUp(self):
     PATHS['supervisor'] = self.supervisor
 
     # we start supervisor again with the new config
+    self.cwd = getcwd()
     chdir(base_dir)
     subprocess.call(PATHS['bin'] + "/supervisord -c " + self.supervisor, shell=True)
     awsdemos.utils.connect_supervisor()
@@ -65,6 +66,7 @@ def tearDown(self):
     subprocess.call(PATHS['bin'] + "/supervisorctl -c %s shutdown" % self.supervisor,
                     shell=True)
     shutil.rmtree(self.tempdir)
+    chdir(self.cwd)
 
 
 class ViewTests(unittest.TestCase):

@@ -1,31 +1,16 @@
 # coding: utf-8
-from ConfigParser import SafeConfigParser, NoSectionError
 from awsdemos.security import ldaplogin
-from os.path import join
 from repoze.bfg.chameleon_zpt import get_template
 from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.exceptions import NotFound
+from repoze.bfg.security import authenticated_userid, forget, remember
 from repoze.bfg.url import route_url
-from shutil import rmtree
 from urlparse import urlsplit, urlunsplit
-from utils import PATHS, XMLRPC, ADMIN_HOST
+from utils import ADMIN_HOST
 from webob.exc import HTTPFound
 import logging
-import os
-import subprocess
-import time
 import utils
 import webob
-
-from repoze.bfg.security import (
-    Allow,
-    Everyone,
-    Authenticated,
-    authenticated_userid,
-    has_permission,
-    forget,
-    remember,
-    )
 
 LOG = logging.getLogger(__name__)
 
@@ -56,19 +41,17 @@ def _flash_message(request, message):
 def proxied_url(demo, request):
     current_host = urlsplit(request.host_url)
     return urlunsplit(
-        (current_host.scheme, ADMIN_HOST + ':' + port, '/', '', ''))
+        (current_host.scheme, ADMIN_HOST + ':' + demo.get_port(), '/', '', ''))
 
 
 def direct_url(demo, request):
     current_host = urlsplit(request.host_url)
     return urlunsplit(
-        (current_host.scheme, name + '.' + ADMIN_HOST + ':' + str(current_host.port), '/', '', ''))
+        (current_host.scheme, demo.name + '.' + ADMIN_HOST + ':' + str(current_host.port), '/', '', ''))
 
 def view_app_list(request):
     """ return the main page, with applications list, and actions.
     """
-    logged_in = authenticated_userid(request)
-    master = get_template('templates/master.pt')
     return render_template_to_response(
         "templates/master.pt",
         request=request,
@@ -170,55 +153,6 @@ def app_form(request):
             ))
 
 
-def _reload_apache(demo):
-    """reload apache config, or shutdown if it is not needed anymore
-    """
-    apache_confs = [conf
-                    for conf in os.listdir(join(PATHS['var'], 'apache2', 'demos'))
-                    if conf.endswith('.conf')]
-    a2status = XMLRPC.supervisor.getProcessInfo('apache2')['statename']
-
-    if len(apache_confs) == 0:
-        if a2status == 'RUNNING':
-            XMLRPC.supervisor.stopProcess('apache2')
-    else:
-        # reload the config or start Apache if needed (WITH supervisor!)
-        a2status = XMLRPC.supervisor.getProcessInfo('apache2')['statename']
-        if a2status == 'RUNNING':
-            retcode = subprocess.call(
-                ["apache2ctl",  "-f", "etc/apache2/apache2.conf", "-k", "graceful"])
-            # if the graceful command fails, we should disable the new config
-            # BUT we should let supervisor restart the app!!
-            if retcode != 0:
-                _a2dissite(demo)
-        else:
-            XMLRPC.supervisor.startProcess('apache2')
-
-
-
-
-
-def _a2ensite(demo):
-    """sandbox equivalent to the a2ensite command
-    """
-    config_file = join(PATHS['demos'], demo, 'apache2.conf')
-    config_link = join(PATHS['var'], 'apache2', 'demos', demo + '.conf')
-    config_dir = join(PATHS['var'], 'apache2', 'demos')
-    if os.path.exists(config_file) and not os.path.exists(config_link):
-        if not os.path.exists(config_dir):
-            os.mkdir(config_dir)
-        os.link(config_file, config_link)
-
-
-def _a2dissite(demo):
-    """sandbox equivalent to the a2dissite command
-    """
-    config_link = join(PATHS['var'], 'apache2', 'demos', demo + '.conf')
-    if os.path.exists(config_link):
-        os.remove(config_link)
-
-
-
 def action(request):
     """
     Execute the action bound to the name passed and return when the action is
@@ -230,16 +164,17 @@ def action(request):
     params = request.params.copy()
     if 'app' not in params or 'NAME' not in params:
         raise NotFound
-    params['NAME'] = params['NAME'].replace(' ', '_').lower() # FIXME
+    name = params['NAME'].replace(' ', '_').lower() # FIXME
     try:
-        utils.deploy(params['app'], params['NAME'])
+        utils.deploy(params['app'], name)
     except utils.DeploymentError, e:
         _flash_message(request,
             u"Error : %s" % e.message)
         return HTTPFound(location='/')
 
+    demo = utils.InstalledDemo(name)
     _flash_message(request,
-        u"application %s created at port %s" % (app_name, port))
+        u"application %s created at port %s" % (demo.name, demo.port))
     return HTTPFound(location='/')
 
 
@@ -249,47 +184,23 @@ def daemon(request):
     """
     name = request.params.get('NAME', '_')
     command = request.params.get('COMMAND', 'restart').lower()
-    start_script = join(PATHS['demos'], name, 'start.sh')
-    apache_config_link = join(PATHS['var'], 'apache2', 'demos', name + '.conf')
-    apache_config_file = join(PATHS['demos'], name, 'apache2.conf')
+    demo = utils.InstalledDemo(name)
 
     # get the state
-    has_startup_script = os.path.exists(start_script)
-    has_apache_conf = os.path.exists(apache_config_file)
-    has_apache_link = os.path.exists(apache_config_link)
-    state = 'STOPPED'
-    if has_apache_link:
-        state = 'RUNNING'
-    if has_startup_script:
-        state = XMLRPC.supervisor.getProcessInfo(name)['statename']
+    state = demo.get_state()
     message = u'Nothing changed'
 
     # stop if asked
     if state == 'RUNNING' and command in ('stop', 'restart'):
-        if has_startup_script:
-            XMLRPC.supervisor.stopProcess(name)
-        if has_apache_link:
-            _a2dissite(name)
-            _reload_apache(name)
+        demo.stop()
         message = u'%s stopped!' % (name)
 
     # get the state again
-    has_startup_script = os.path.exists(start_script)
-    has_apache_conf = os.path.exists(apache_config_file)
-    has_apache_link = os.path.exists(apache_config_link)
-    state = 'STOPPED'
-    if has_apache_link:
-        state = 'RUNNING'
-    if has_startup_script:
-        state = XMLRPC.supervisor.getProcessInfo(name)['statename']
+    state = demo.get_state()
 
     # start if asked
     if state == 'STOPPED' and command in ('start', 'restart'):
-        if has_startup_script:
-            XMLRPC.supervisor.startProcess(name)
-        if has_apache_conf:
-            _a2ensite(name)
-            _reload_apache(name)
+        demo.start()
         message = u'%s started!' % (name)
 
     _flash_message(request, message)
@@ -301,14 +212,11 @@ def delete_demo(request):
     """
     name=request.params['NAME']
     try:
-        destroy(name)
+        utils.InstalledDemo(name).destroy()
     except utils.DestructionError, e:
         message = 'Error: %s' % e.message
         _flash_message(request, message)
         return HTTPFound(location='/')
-
-    utils._a2dissite(name)
-    _reload_apache(name)
 
     _flash_message(request, '%s demo successfully deleted!' % name)
     return HTTPFound(location='/')
