@@ -198,6 +198,7 @@ class InstalledDemo(object):
             XMLRPC.supervisor.stopProcess(self.name)
         if self.has_apache_link:
             self._a2dissite()
+        assert(self.get_status() != 'RUNNING')
 
     def _reload_apache(self):
         """reload apache config, or shutdown if it is not needed anymore
@@ -257,7 +258,7 @@ class InstalledDemo(object):
     def destroy(self):
         if not os.path.exists(self.path):
             raise DestructionError('this demo does not exist')
-        if self.get_status() == 'RUNNING':
+        if self.get_status() in ('RUNNING', 'STARTING'):
             self.stop()
         LOG.warn("removing demo %s" % self.name)
         had_startup_script = self.has_startup_script

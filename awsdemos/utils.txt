@@ -10,9 +10,12 @@ We can get the list of available demos as a dict:
 >>> from pprint import pprint
 >>> pprint(available_demos, width=1)
 {'error':           {'params': ['name', 'comment'], 'plugins': []},
+ 'error2':           {'params': ['name', 'comment'], 'plugins': []},
+ 'error3':           {'params': ['name', 'comment'], 'plugins': []},
+ 'error4':           {'params': ['name', 'comment'], 'plugins': []},
  'test1':           {'params': ['name', 'comment'], 'plugins': []},
+ 'test2':           {'params': ['name', 'comment'], 'plugins': []},
  'testapache':      {'params': ['name', 'comment'], 'plugins': []},
- 'testapache3':     {'params': ['name', 'comment'], 'plugins': []},
  'testapachebad':   {'params': ['name', 'comment'], 'plugins': []}}
 
 Each demo definition itself is a dict.
@@ -41,19 +44,19 @@ Deploying a demo
 
 We try de deploy the 'test1' demo:
 
->>> utils.deploy('test1', 'demotest1')
+>>> utils.deploy('test1', 'test1')
 
 Ok, we check that the files are there:
 
 >>> import os
 >>> os.listdir(utils.PATHS['demos'])
-['demotest1']
->>> sorted(os.listdir(os.path.join(utils.PATHS['demos'], 'demotest1')))
+['test1']
+>>> sorted(os.listdir(os.path.join(utils.PATHS['demos'], 'test1')))
 ['demo.conf', 'foobar', 'start.sh', 'supervisor.cfg']
 
 We try to deploy with the same name, we get an error:
 
->>> utils.deploy('test1', 'demotest1')
+>>> utils.deploy('test1', 'test1')
 Traceback (most recent call last):
 ...
 DeploymentError: this demo already exists
@@ -69,15 +72,15 @@ DeploymentError: this demo does not exist
 Now we can get the list of installed demos:
 
 >>> pprint(utils.installed_demos(), width=1)
-[{'comment': '', 'name': 'demotest1', 'port': '20000', 'status': 'STOPPED'}]
+[{'comment': '', 'name': 'test1', 'port': '20000', 'status': 'STOPPED'}]
 
 We can deploy again as another name:
 
->>> utils.deploy('test1', 'demotest2')
+>>> utils.deploy('test1', 'test1bis')
 
 >>> pprint(utils.installed_demos(), width=1)
-[{'comment': '', 'name': 'demotest1', 'port': '20000', 'status': 'STOPPED'},
- {'comment': '', 'name': 'demotest2', 'port': '20001', 'status': 'STOPPED'}]
+[{'comment': '', 'name': 'test1', 'port': '20000', 'status': 'STOPPED'},
+ {'comment': '', 'name': 'test1bis', 'port': '20001', 'status': 'STOPPED'}]
 
 We try to deploy a demo which has an error:
 
@@ -89,7 +92,7 @@ DeploymentError: installation ended with an error
 We shouldn't have any remaining folder:
 
 >>> os.listdir(utils.PATHS['demos'])
-['demotest1', 'demotest2']
+['test1', 'test1bis']
 
 Installed Demo object
 ---------------------
@@ -104,16 +107,16 @@ Removing a demo
 
 Then we can remove a demo:
 
->>> utils.InstalledDemo('demotest1').destroy()
+>>> utils.InstalledDemo('test1').destroy()
 >>> pprint(utils.installed_demos(), width=1)
-[{'comment': '', 'name': 'demotest2', 'port': '20001', 'status': 'STOPPED'}]
+[{'comment': '', 'name': 'test1bis', 'port': '20001', 'status': 'STOPPED'}]
 
 If we redeploy, the port is reassigned to 20000:
 
->>> utils.deploy('test1', 'demotest1')
+>>> utils.deploy('test1', 'test1')
 >>> pprint(utils.installed_demos(), width=1)
-[{'comment': '', 'name': 'demotest1', 'port': '20000', 'status': 'STOPPED'},
- {'comment': '', 'name': 'demotest2', 'port': '20001', 'status': 'STOPPED'}]
+[{'comment': '', 'name': 'test1', 'port': '20000', 'status': 'STOPPED'},
+ {'comment': '', 'name': 'test1bis', 'port': '20001', 'status': 'STOPPED'}]
 
 
 We try to destroy a non existent demo:
@@ -126,8 +129,8 @@ DestructionError: this demo does not exist
 
 We destroy both:
 
->>> utils.InstalledDemo('demotest1').destroy()
->>> utils.InstalledDemo('demotest2').destroy()
+>>> utils.InstalledDemo('test1').destroy()
+>>> utils.InstalledDemo('test1bis').destroy()
 >>> utils.installed_demos()
 []
 
@@ -140,11 +143,11 @@ Start, stop, status
 
 We deploy a simple demo
 
->>> utils.deploy('test1', 'demotest1')
+>>> utils.deploy('test1', 'test1')
 
 We can build an object representing this demo:
 
->>> demo = utils.InstalledDemo('demotest1')
+>>> demo = utils.InstalledDemo('test1')
 >>> demo.get_status()
 'STOPPED'
 
@@ -168,6 +171,28 @@ We stop it:
 >>> demo.stop()
 >>> demo.get_status()
 'STOPPED'
+>>> utils.XMLRPC.supervisor.getProcessInfo('test1')['statename']
+'STOPPED'
+>>> demo.destroy()
+
+We deploy a demo whose startup script fails
+
+>>> utils.deploy('error2', 'error2')
+>>> utils.InstalledDemo('error2').start()
+Traceback (most recent call last):
+...
+Fault: <Fault 40: 'ABNORMAL_TERMINATION: error2'>
+>>> utils.InstalledDemo('error2').get_status() in ('BACKOFF', 'STARTING')
+True
+>>> import time
+>>> while utils.InstalledDemo('error2').get_status() in ('BACKOFF', 'STARTING'):
+...     time.sleep(0.2)
+>>> utils.InstalledDemo('error2').get_status()
+'FATAL'
+>>> utils.XMLRPC.supervisor.getProcessInfo('error2')['statename']
+'FATAL'
+>>> utils.InstalledDemo('error2').destroy()
+
 
 Apache support
 --------------
@@ -214,6 +239,12 @@ If the provided apache config is erroneous, we don't start the app.
 >>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
 'STOPPED'
 
+Check that the process is stopped
+
+>>> import commands
+>>> commands.getoutput('ps -ef|grep sleep\ 99999999|grep -v grep')
+''
+
 The same with 2 corrects, and 1 bad :
 
 >>> utils.deploy('testapache', 'test')
@@ -226,8 +257,8 @@ The same with 2 corrects, and 1 bad :
 'RUNNING'
 >>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
 'RUNNING'
->>> utils.deploy('testapachebad', 'apache3')
->>> utils.InstalledDemo('apache3').get_status()
+>>> utils.deploy('testapachebad', 'test3')
+>>> utils.InstalledDemo('test3').get_status()
 'STOPPED'
 >>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
 'RUNNING'
@@ -247,8 +278,92 @@ The same with 2 corrects, and 1 bad :
 'DESTROYED'
 >>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
 'STOPPED'
->>> utils.InstalledDemo('apache3').destroy()
+>>> utils.InstalledDemo('test3').destroy()
 
 
+Apache + a process
+------------------
 
+We deploy a demo which contains both an apache config and a startup script:
+
+>>> utils.deploy('test2', 'test2')
+>>> utils.InstalledDemo('test2').start()
+>>> utils.InstalledDemo('test2').get_status()
+'RUNNING'
+>>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+'RUNNING'
+>>> utils.InstalledDemo('test2').stop()
+>>> utils.InstalledDemo('test2').get_status()
+'STOPPED'
+>>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+'STOPPED'
+>>> utils.InstalledDemo('test2').destroy()
+
+The same with 2 demos:
+
+>>> utils.deploy('test2', 'test2')
+>>> utils.deploy('test2', 'test2bis')
+>>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+'STOPPED'
+>>> utils.InstalledDemo('test2').start()
+>>> utils.InstalledDemo('test2bis').start()
+>>> utils.InstalledDemo('test2').get_status()
+'RUNNING'
+>>> utils.InstalledDemo('test2bis').get_status()
+'RUNNING'
+>>> while utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']=='STARTING':
+...     time.sleep(0.2)
+>>> utils.InstalledDemo('test2').stop()
+>>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+'RUNNING'
+>>> utils.InstalledDemo('test2bis').stop()
+>>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+'STOPPED'
+>>> utils.InstalledDemo('test2').get_status()
+'STOPPED'
+>>> utils.InstalledDemo('test2bis').get_status()
+'STOPPED'
+>>> utils.InstalledDemo('test2').destroy()
+>>> utils.InstalledDemo('test2bis').destroy()
+
+A script with a bad apache conf and a good startup script:
+
+>>> utils.deploy('error3', 'error3')
+>>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+'STOPPED'
+>>> utils.InstalledDemo('error3').start()
+>>> utils.InstalledDemo('error3').get_status()
+'STOPPED'
+>>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+'STOPPED'
+>>> utils.XMLRPC.supervisor.getProcessInfo('error3')['statename']
+'STOPPED'
+>>> utils.InstalledDemo('error3').destroy()
+
+Apache should restart
+
+A script with a good apache conf and a bad startup script:
+
+>>> utils.deploy('error4', 'error4')
+>>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+'STOPPED'
+>>> utils.InstalledDemo('error4').start()
+Traceback (most recent call last):
+...
+Fault: <Fault 40: 'ABNORMAL_TERMINATION: error4'>
+>>> utils.InstalledDemo('error4').get_status() in ('STARTING', 'BACKOFF')
+True
+>>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+'STOPPED'
+>>> utils.XMLRPC.supervisor.getProcessInfo('error4')['statename'] in ('STARTING', 'BACKOFF')
+True
+>>> while utils.XMLRPC.supervisor.getProcessInfo('error4')['statename'] in ('STARTING', 'BACKOFF'):
+...     time.sleep(0.2)
+>>> utils.XMLRPC.supervisor.getProcessInfo('error4')['statename']
+'FATAL'
+>>> utils.InstalledDemo('error4').destroy()
+
+
+>>> commands.getoutput('ps -ef|grep sleep\ 99999999|grep -v grep')
+''
 
