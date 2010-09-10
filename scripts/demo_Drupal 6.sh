@@ -1,5 +1,5 @@
 #!/bin/bash
-# PARAMS: NAME 
+# PARAMS: name 
 # sudo aptitude install php5-cli apache2
 # sudo pear install Console_Table
 

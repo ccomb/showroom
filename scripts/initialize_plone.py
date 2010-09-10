@@ -9,8 +9,8 @@ newSecurityManager(None, user)
 app=makerequest(app)
 
 print 'Adding plone site'
-app.manage_addProduct['CMFPlone'].addPloneSite(os.environ['NAME'])
-site = app[os.environ['NAME']]
+app.manage_addProduct['CMFPlone'].addPloneSite(os.environ['name'])
+site = app[os.environ['name']]
 
 print 'Adding user'
 site.acl_users.source_users.doAddUser('admin', 'admin')

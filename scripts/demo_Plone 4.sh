@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# PARAMS:NAME,COMMENT,LOGIN,PASSWORD
+# PARAMS:name,comment,LOGIN,PASSWORD
 # PLUGINS:aws.minisite,Products.collage,collective.plonefinder,Products.FCKeditor
 
 
@@ -37,8 +37,8 @@ EOF
 #newSecurityManager(None, user)
 #
 #print 'Adding plone site'
-#app.manage_addProduct['CMFPlone'].addPloneSite(os.environ['NAME'])
-#site = app[os.environ['NAME']]
+#app.manage_addProduct['CMFPlone'].addPloneSite(os.environ['name'])
+#site = app[os.environ['name']]
 #
 ##print 'Adding user. Dont work for now'
 #site.portal_registration.addMember('$LOGIN', '$PASSWORD', ['Manager'])

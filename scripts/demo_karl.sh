@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# PARAMS:NAME,COMMENT
+# PARAMS:name,comment
 
 
 # get the last version in svn (no release yet)

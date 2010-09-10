@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# PARAMS:NAME,COMMENT
+# PARAMS:name,comment
 
 
 virtualenv --no-site-packages --distribute sandbox
@@ -13,10 +13,10 @@ cat > example/local_settings.py << EOF
 # -*- coding: utf-8 -*-
 import os
 
-CMS_MEDIA_ROOT = "$DEMO/$NAME/django-cms-2.0/cms/media/cms/"
+CMS_MEDIA_ROOT = "$DEMO/$name/django-cms-2.0/cms/media/cms/"
 
 DATABASE_ENGINE = 'sqlite3'
-DATABASE_NAME = 'cms.db'
+DATABASE_name = 'cms.db'
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.auth",

@@ -23,23 +23,20 @@ function update_app_form(url, app) {
     jQuery.getJSON(
         url+"/app_params?app="+app,
         function(data){
-            for (param in data){
+            params = data['params']
+            for (param in params) {
                 $("#app_form_dynamic").append(
-                    '<br/>'+data[param]+':<input '+(data[param].toLowerCase()=='password' && 'type="password"' || '')+'name="'+data[param]+'"></input>'
+                    '<br/>'+params[param]+':<input '+(params[param].toLowerCase()=='password' && 'type="password"' || '')+'name="'+params[param]+'"></input>'
                 );
             }
-        }
-    );
-    jQuery.getJSON(
-        url+"/app_plugins?app="+app,
-        function(data) {
-            if (data.length > 0){
+            plugins = data['plugins'];
+            if (plugins.length > 0) {
                 $('#app_form_dynamic').append('PLUGINS'+
                     '<select id="app_form_dynamic_plugins" name="plugins" multiple="multiple" </select>'
                     )
-                for (plugin in data){
+                for (plugin in plugins) {
                     $("#app_form_dynamic_plugins").append(
-                        '<option>'+data[plugin]+'</option>'
+                        '<option>'+plugins[plugin]+'</option>'
                     );
                 }
             }

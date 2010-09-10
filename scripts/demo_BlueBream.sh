@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# PARAMS:NAME,COMMENT,TEST
+# PARAMS:name,comment,test
 
 
 # create a virtualenv

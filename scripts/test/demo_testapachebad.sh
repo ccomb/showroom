@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PARAMS:NAME,COMMENT
+# PARAMS:name,comment
 
 # create a file
 mkdir htdocs

@@ -1,5 +1,5 @@
 #!/bin/bash
-# PARAMS: NAME 
+# PARAMS: name 
 
 
 # create a PHP hello world

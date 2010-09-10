@@ -97,7 +97,7 @@ def available_demos():
     and their respective commands defined in config file.
 
     >>> available_demos()['repoze.BFG']['params']
-    ['NAME', 'COMMENT', 'TEST']
+    ['name', 'comment', 'test']
     >>> available_demos()['repoze.BFG']['plugins']
     []
     """
@@ -115,18 +115,6 @@ def available_demos():
 
         demos[(filename[5:-3])] = {'params':params, 'plugins':plugins}
     return demos
-
-
-def get_demo_comment(demo_name):
-    """ return the content of "about.txt" in the directory of the application,
-    if it exists.
-    """
-    if 'about.txt' in os.listdir(join(PATHS['demos'], demo_name)):
-        return open(
-            join(PATHS['demos'], demo_name, 'about.txt')
-            ).read()
-    else:
-        return ''
 
 
 def installed_demos():
@@ -150,6 +138,7 @@ def installed_demos():
 class InstalledDemo(object):
     """object representing an installed demo
     """
+    broken = False
     def __init__(self, name):
         self.name = name
         if self.name == '':
@@ -165,8 +154,13 @@ class InstalledDemo(object):
 
     def get_port(self):
         conf = SafeConfigParser()
-        conf.read(join(PATHS['demos'], self.name, 'demo.conf'))
-        return conf.get(self.name, 'port')
+        conf_path = join(PATHS['demos'], self.name, 'demo.conf')
+        try:
+            conf.read(conf_path)
+            return conf.get(self.name, 'port')
+        except:
+            self.broken = True; return ''
+
 
     def get_status(self):
         """return the status of the demo
@@ -309,7 +303,7 @@ def deploy(app_type, app_name):
 
     # add environment variables for the deployment script
     env = os.environ.copy()
-    env['NAME'] = app_name
+    env['name'] = app_name
 
     port = get_available_port()
     env['PORT'] = str(port)

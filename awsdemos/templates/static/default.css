@@ -197,4 +197,17 @@ div.FATAL {
     width: 0.8em;
     height: 0.8em;
 }
+a.start, a.stop, a.destroy {
+    color: black;
+    display: inline-block;
+    background: #eee;
+    text-decoration: none;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    padding: 0.5em;
+}
+a.destroy {
+    color: red;
+}
+
 

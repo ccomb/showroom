@@ -9,11 +9,11 @@ We can get the list of available demos as a dict:
 >>> available_demos = utils.available_demos()
 >>> from pprint import pprint
 >>> pprint(available_demos, width=1)
-{'error':           {'params': ['NAME', 'COMMENT'], 'plugins': []},
- 'test1':           {'params': ['NAME', 'COMMENT'], 'plugins': []},
- 'testapache':      {'params': ['NAME', 'COMMENT'], 'plugins': []},
- 'testapache3':     {'params': ['NAME', 'COMMENT'], 'plugins': []},
- 'testapachebad':   {'params': ['NAME', 'COMMENT'], 'plugins': []}}
+{'error':           {'params': ['name', 'comment'], 'plugins': []},
+ 'test1':           {'params': ['name', 'comment'], 'plugins': []},
+ 'testapache':      {'params': ['name', 'comment'], 'plugins': []},
+ 'testapache3':     {'params': ['name', 'comment'], 'plugins': []},
+ 'testapachebad':   {'params': ['name', 'comment'], 'plugins': []}}
 
 Each demo definition itself is a dict.
 

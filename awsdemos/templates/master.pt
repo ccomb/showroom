@@ -32,7 +32,7 @@ $('document').ready(function(){
             <a href="${request.application_url}"><img src="${request.application_url}/static/images/Alter_Way_SOLUTIONS.png"/></a>
         </td>
         <td id="title">
-            Applications de démonstration.
+            Applications web en démonstration.
         </td>
     </tr>
     <tr>
@@ -43,10 +43,10 @@ $('document').ready(function(){
         </div>
 
             <form id="app_form" method="POST"
-            action="${request.application_url}/action">
+            action="${request.application_url}/deploy">
                 <div>créer une démo</div>
                 <select name="app"
-                onchange="update_app_form('${request.application_url}', this.value)">
+                        onchange="update_app_form('${request.application_url}', this.value)">
                 <option></option>
                 <option tal:repeat="app apps" tal:content="python:app">placeholder</option>
                 </select>
@@ -66,34 +66,45 @@ $('document').ready(function(){
           </tal:block>
 
             <table id="demos_list">
-                <tr tal:repeat="demo demos">
-                  <td class="demo_title">
-                    <a tal:attributes="href python: proxied_url(demo, request)"
-                       tal:content="python: demo.get('name')">
-                        app name
-                    </a>
-                  </td>
-                  <td class="demo_button" tal:repeat="cmd python: ['start', 'stop', 'restart']">
-                    <button tal:attributes="
-                      onclick python:'window.location.href=\''+request.application_url+'/daemon?NAME='+demo['name']+'&amp;COMMAND='+cmd+'\''"
-                            tal:content="cmd">restart</button>
-                  </td>
-                  <td>
-                    <button tal:attributes="
-                      onclick python:'window.location.href=\''+request.application_url+'/delete?NAME='+demo['name']+'\''
-                      ">delete</button>
-                  </td>
-                  <td>
-                    <div class="STOPPED"
-                         tal:attributes="class python:'status ' + demo.get('status'); title python:demo.get('status')">
-                   </div>
-                  </td>
-                  <td class="demo_title">
-                    <a tal:attributes="href python: direct_url(demo, request)">
-                        (direct link)
-                    </a>
-                  </td>
-                </tr>
+              <tr tal:repeat="demo demos">
+                <td>
+                  <div class="STOPPED"
+                       tal:attributes="class python:'status ' + demo.get('status'); title python:demo.get('status')">
+                 </div>
+                </td>
+                <td class="demo_title">
+                  <a tal:attributes="href python: proxied_url(demo, request)"
+                     tal:content="python: demo.get('name')">
+                      app name
+                  </a>
+                </td>
+                <td class="demo_title">
+                  <a tal:attributes="href python: direct_url(demo, request)">
+                      (direct link)
+                  </a>
+                </td>
+                <td class="demo_button">
+                  <a href="#" class="start"
+                     tal:condition="python: demo['status'] == 'STOPPED'"
+                     tal:attributes="href string:/start?name=${demo['name']}">
+                    start
+                  </a>
+                </td>
+                <td class="demo_button">
+                  <a href="#" class="stop"
+                     tal:condition="python: demo['status'] == 'RUNNING'"
+                     tal:attributes="href string:/stop?name=${demo['name']}">
+                    stop
+                  </a>
+                </td>
+                <td class="demo_button">
+                  <a href="#" class="destroy"
+                     tal:condition="python: demo['status'] == 'STOPPED'"
+                     tal:attributes="href string:/destroy?name=${demo['name']}">
+                    destroy
+                  </a>
+                </td>
+              </tr>
             </table>
         </td>
     </tr>

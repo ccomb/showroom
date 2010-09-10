@@ -15,22 +15,6 @@ import webob
 LOG = logging.getLogger(__name__)
 
 
-
-def admin(view):
-    """ decorator used to limit views to logged user (admin).
-    """
-    def decorated(request):
-        if authenticated_userid(request):
-            return view(request)
-        else:
-            return render_template_to_response(
-                'templates/login.pt',
-                request=request,
-                message="Veuillez vous identifier pour accéder à cette page"
-                )
-    return decorated
-
-
 def _flash_message(request, message):
     """send a message through the session to the next url
     """
@@ -39,17 +23,21 @@ def _flash_message(request, message):
 
 
 def proxied_url(demo, request):
+    """Give the url of the proxied demo
+    """
     current_host = urlsplit(request.host_url)
     return urlunsplit(
-        (current_host.scheme, ADMIN_HOST + ':' + demo.get_port(), '/', '', ''))
+        (current_host.scheme, demo['name'] + '.' + ADMIN_HOST + ':' + str(current_host.port), '/', '', ''))
 
 
 def direct_url(demo, request):
+    """Give the direct url of the demo
+    """
     current_host = urlsplit(request.host_url)
     return urlunsplit(
-        (current_host.scheme, demo.name + '.' + ADMIN_HOST + ':' + str(current_host.port), '/', '', ''))
+        (current_host.scheme, ADMIN_HOST + ':' + demo['port'], '/', '', ''))
 
-def view_app_list(request):
+def installed_demos(request):
     """ return the main page, with applications list, and actions.
     """
     return render_template_to_response(
@@ -62,7 +50,8 @@ def view_app_list(request):
         logged_in=authenticated_userid(request),
         )
 
-def json_app_list(request):
+
+def json_available_demos(request):
     """return a json view of all apps and their params/plugins
     """
     return utils.available_demos()
@@ -73,30 +62,9 @@ def json_installed_demos(request):
     """
     return utils.installed_demos()
 
-def app_params(request):
-    """ return the params of a given demo, in a json list.
-    """
-    available_demos = utils.available_demos()
-    if 'app' in request.params and request.params['app'] in available_demos:
-        return utils.available_demos()[request.params['app']][0]
-    else:
-        return ("No application name given or unknown application.",)
-
-def app_plugins(request):
-    """
-    return the plugins of a given demo, in a json list.
-
-    """
-    available_demos = utils.available_demos()
-    if 'app' in request.params and request.params['app'] in available_demos:
-        return utils.available_demos()[request.params['app']][1]
-    else:
-        return ("No application name given or unknown application.",)
 
 def login(request):
-    """
-    allow to login to the application to do admin tasks.
-
+    """ authenticate to do admin tasks.
     """
     login_url = route_url('login', request)
     referrer = request.url
@@ -125,46 +93,20 @@ def login(request):
 
 
 def logout(request):
-    """ Logout of the application.
+    """ Get out of the application.
     """
     headers = forget(request)
     return HTTPFound(location = route_url('view_wiki', request),
                      headers = headers)
 
 
-def app_form(request):
-    """ return the form to create a demo
-    FIXME: seems not used
-    """
-    master = get_template('templates/master.pt')
-    available_demos = utils.available_demos()
-    if 'app' in request.params and request.params['app'] in available_demos:
-        return render_template_to_response(
-            "templates/new_app.pt",
-            request=request,
-            paramlist=available_demos[request.params['app']],
-            logged_in=authenticated_userid(request),
-            demo=request.params['app'],
-            master=master
-        )
-    else:
-        return webob.Response(str(
-            "No application name given or unknown application."
-            ))
-
-
-def action(request):
-    """
-    Execute the action bound to the name passed and return when the action is
-    finished.
-    FIXME: should verify if the user has access to the command.
-
-    If we don't specify an app, or we specify a non existing app, we get a 404:
+def deploy(request):
+    """ deploy a demo
     """
     params = request.params.copy()
-    if 'app' not in params or 'NAME' not in params:
+    if 'app' not in params or 'name' not in params:
         raise NotFound
-    name = params['NAME'].replace(' ', '_').lower() # FIXME
+    name = params['name'].replace(' ', '_').lower() # FIXME
     try:
         utils.deploy(params['app'], name)
     except utils.DeploymentError, e:
@@ -174,43 +116,56 @@ def action(request):
 
     demo = utils.InstalledDemo(name)
     _flash_message(request,
-        u"application %s created at port %s" % (demo.name, demo.port))
+        u"application %s created at port %s" % (demo.name, demo.get_port()))
     return HTTPFound(location='/')
 
 
-def daemon(request):
-    """ view that starts, stops or restarts the demo
-    TODO : move the startup and stop in a function
+def start(request):
+    """ view that starts the demo
     """
-    name = request.params.get('NAME', '_')
-    command = request.params.get('COMMAND', 'restart').lower()
+    name = request.params.get('name', '_')
     demo = utils.InstalledDemo(name)
 
-    # get the state
-    state = demo.get_state()
+    old_status = demo.get_status()
     message = u'Nothing changed'
-
-    # stop if asked
-    if state == 'RUNNING' and command in ('stop', 'restart'):
-        demo.stop()
-        message = u'%s stopped!' % (name)
-
-    # get the state again
-    state = demo.get_state()
-
-    # start if asked
-    if state == 'STOPPED' and command in ('start', 'restart'):
+    try:
         demo.start()
-        message = u'%s started!' % (name)
-
+    except Exception, e:
+        message = u'Error: %s' % e.message
+        _flash_message(request, message)
+        return HTTPFound(location='/')
+    new_status = demo.get_status()
+    if new_status == 'RUNNING' and new_status != old_status:
+        message = u'Demo "%s" succesfully started' % demo.name
     _flash_message(request, message)
     return HTTPFound(location='/')
 
 
-def delete_demo(request):
-    """ If an application of the name NAME is deployed, we delete it
+def stop(request):
+    """ view that stops a demo
     """
-    name=request.params['NAME']
+    name = request.params.get('name', '_')
+    demo = utils.InstalledDemo(name)
+
+    old_status = demo.get_status()
+    message = u'Nothing changed'
+    try:
+        demo.stop()
+    except Exception, e:
+        message = u'Error: %s' % e.message
+        _flash_message(request, message)
+        return HTTPFound(location='/')
+    new_status = demo.get_status()
+    if new_status == 'STOPPED' and new_status != old_status:
+        message = u'Demo "%s" succesfully stopped' % demo.name
+    _flash_message(request, message)
+    return HTTPFound(location='/')
+
+
+def destroy(request):
+    """ Destroy a demo
+    """
+    name=request.params['name']
     try:
         utils.InstalledDemo(name).destroy()
     except utils.DestructionError, e:
@@ -220,4 +175,15 @@ def delete_demo(request):
 
     _flash_message(request, '%s demo successfully deleted!' % name)
     return HTTPFound(location='/')
+
+
+def app_params(request):
+    """ return the params of a given demo, in a json list.
+    This is used in the app creation form
+    """
+    available_demos = utils.available_demos()
+    if 'app' in request.params and request.params['app'] in available_demos:
+        return utils.available_demos()[request.params['app']]
+    else:
+        return ("No application name given or unknown application.",)
 

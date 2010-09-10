@@ -7,6 +7,6 @@ if [ $# -ne 4 ]
 then
     echo "OK"
 else
-    echo "TEST FAILED"
+    echo "test FAILED"
 if
 

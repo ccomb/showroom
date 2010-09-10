@@ -1,17 +1,17 @@
 #!/usr/bin/env sh
-# PARAMS:NAME,COMMENT
+# PARAMS:name,comment
 
 
 # load vars and fonctions
 . $SCRIPTS/config.sh
 
-! [ -d $DEMOS/$NAME ] && hg clone https://gawel@bitbucket.org/diefenbach/lfc-buildout-development/ $DEMOS/$NAME
+! [ -d $DEMOS/$name ] && hg clone https://gawel@bitbucket.org/diefenbach/lfc-buildout-development/ $DEMOS/$name
 
 # set virtualenv (just in case)
-$BIN/virtualenv $DEMOS/$NAME --no-site-packages --distribute
-. $DEMOS/$NAME/bin/activate
+$BIN/virtualenv $DEMOS/$name --no-site-packages --distribute
+. $DEMOS/$name/bin/activate
 
-cd $DEMOS/$NAME
+cd $DEMOS/$name
 
 bin/pip install PIL
 
@@ -69,7 +69,7 @@ debug = true
 
 [app:main]
 use = egg:Paste#urlmap
-/$NAME = app
+/$name = app
 
 [app:app]
 use=egg:SaladeDeFruits#rewrite
@@ -82,6 +82,6 @@ port = $PORT
 
 EOF
 
-echo $COMMENT > about.txt
+echo $comment > about.txt
 supervisor_daemon_sh
 
