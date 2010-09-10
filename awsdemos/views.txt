@@ -1,16 +1,22 @@
->>> from repoze.bfg.testing import DummyRequest
->>> from awsdemos import views
+Test some views
 
->>> views.action(DummyRequest())
-Traceback (most recent call last):
-...
-NotFound
->>> action(DummyRequest({'app':'toto'}))
-Traceback (most recent call last):
-...
-NotFound
-
-#>>> action(DummyRequest({'app':'repoze.BFG',
+#>>> from repoze.bfg import configuration
+#>>> from repoze.bfg.testing import DummyRequest
+#>>> from awsdemos import views
+#>>> import awsdemos
+#
+#>>> conf = configuration.Configurator(package=awsdemos)
+#>>> conf.testing_add_renderer('templates/master.pt')
+#>>> views.installed_demos(DummyRequest())
+#Traceback (most recent call last):
+#...
+#NotFound
+#>>> views.installed_demos(DummyRequest({'app':'toto'}))
+#Traceback (most recent call last):
+#...
+#NotFound
+#
+#>>> views.installed_demos(DummyRequest({'app':'repoze.BFG',
 #...                      'name':'foobar',
 #...                      'comment': 'commentaire'})) #doctest: +ELLIPSIS
 #<Response at ... 200 OK>

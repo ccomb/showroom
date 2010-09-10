@@ -6,6 +6,7 @@ from repoze.bfg.exceptions import NotFound
 from repoze.bfg.security import authenticated_userid, forget, remember
 from repoze.bfg.url import route_url
 from urlparse import urlsplit, urlunsplit
+from os.path import join, abspath, dirname
 from utils import ADMIN_HOST
 from webob.exc import HTTPFound
 import logging
@@ -41,7 +42,7 @@ def installed_demos(request):
     """ return the main page, with applications list, and actions.
     """
     return render_template_to_response(
-        "templates/master.pt",
+        join(abspath(dirname(__file__)), 'templates', 'master.pt'),
         request=request,
         apps=utils.available_demos(),
         proxied_url=proxied_url,

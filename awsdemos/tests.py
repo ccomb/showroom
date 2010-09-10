@@ -93,23 +93,23 @@ class ViewTests(unittest.TestCase):
     def test_view_app_list(self):
         """check that the app list don't fail
         """
-        from awsdemos.views import view_app_list
+        from awsdemos.views import installed_demos
         request = testing.DummyRequest()
-        info = view_app_list(request)
+        info = installed_demos(request)
         self.assertEqual(info.status, '200 OK')
 
-    def test_action(self):
-        """an action without argument should return NotFound
+    def test_deploy(self):
+        """a deploy without argument should return NotFound
         """
-        from awsdemos.views import action
+        from awsdemos.views import deploy
         request = testing.DummyRequest()
-        self.assertRaises(NotFound, action, request)
+        self.assertRaises(NotFound, deploy, request)
 
     def test_new_app(self):
-        from awsdemos.views import action
+        from awsdemos.views import deploy
         request = testing.DummyRequest(params={'app':'not_existing'},
                                        path='/new')
-        self.assertRaises(NotFound, action, request)
+        self.assertRaises(NotFound, deploy, request)
 
 
 def test_suite():

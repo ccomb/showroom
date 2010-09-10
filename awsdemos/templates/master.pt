@@ -89,8 +89,6 @@ $('document').ready(function(){
                      tal:attributes="href string:/start?name=${demo['name']}">
                     start
                   </a>
-                </td>
-                <td class="demo_button">
                   <a href="#" class="stop"
                      tal:condition="python: demo['status'] == 'RUNNING'"
                      tal:attributes="href string:/stop?name=${demo['name']}">
@@ -112,7 +110,7 @@ $('document').ready(function(){
         <!-- end content -->
         <!-- start footer -->
         <td colspan="2" id="footer">
-            Application propulsée par <a href="http://repoze.org">Repoze.BFG</a>
+            Application propulsée par <a href="http://bfg.repoze.org">Repoze.BFG</a>
         </td>
     </tr>
 </table>
