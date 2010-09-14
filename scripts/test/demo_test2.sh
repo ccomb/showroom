@@ -17,5 +17,6 @@ EOF
 
 cat > start.sh << EOF
 #!/bin/sh
+# we forgot the exec, a trap should be added during deployment
 sleep 99999999
 EOF

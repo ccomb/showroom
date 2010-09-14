@@ -13,6 +13,7 @@ requires = [
     'afpy.ldap',
     'python-ldap',
     'Beaker',
+    'interlude',
 ]
 
 setup(name='aws.demos',

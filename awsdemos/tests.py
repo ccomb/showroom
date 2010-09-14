@@ -51,6 +51,7 @@ def setUp(self):
     with open(self.apache, 'r+') as s:
         content = s.read()
         content = content.replace('../../var', var)
+        content = content.replace('etc', etc)
         s.seek(0); s.truncate(); s.write(content)
 
     # update the PATHS

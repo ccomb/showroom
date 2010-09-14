@@ -12,5 +12,5 @@ EOF
 cat > start.sh << EOF
 #!/bin/sh
 # good script
-sleep 99999999
+exec sleep 99999999
 EOF

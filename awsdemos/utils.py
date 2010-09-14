@@ -330,12 +330,14 @@ def deploy(app_type, app_name):
     start_script = join(demopath, 'start.sh')
     if os.path.exists(start_script):
         os.chmod(start_script, 0744)
-        # add the shebang if forgotten
+        # add and shebang and trap if forgotten
         with open(start_script, 'r+') as s:
+            start = ''
             content = s.read()
-            if not content.startswith('#!'):
-                content = '#!/bin/bash\n' + content
-                s.seek(0); s.truncate(); s.write(content)
+            if not content.startswith('#!') or all([not line.startswith('trap') for line in content.splitlines()[:5]]):
+                start = '#!/bin/bash\ntrap "pkill -P \$\$" EXIT\n'
+            content = start + content
+            s.seek(0); s.truncate(); s.write(content)
 
         # add a supervisor include file for this program
         supervisor_conf = SafeConfigParser()

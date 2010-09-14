@@ -29,6 +29,6 @@ cat > start.sh <<EOF
 trap "pkill -P \$\$" EXIT
 cd karl
 bin/runzeo -C etc/zeo.conf &
-bin/paster serve etc/karl.ini
+exec bin/paster serve etc/karl.ini
 EOF
 
