@@ -289,9 +289,10 @@ class DestructionError(Exception):
     pass
 
 
-def deploy(app_type, app_name):
+def deploy(params, app_name):
     """deploy a demo of 'app_type' in the 'app_name' directory
     """
+    app_type = params.pop('app')
     if app_type not in available_demos():
         raise DeploymentError('this demo does not exist')
 
@@ -312,6 +313,7 @@ def deploy(app_type, app_name):
     # put the virtualenv path first
     env['PATH'] = os.path.abspath('bin') + ':' + env['PATH']
     env['HOST'] = ADMIN_HOST
+    env.update(params)
 
     # create the directory for the demo
     demopath = join(PATHS['demos'], app_name)

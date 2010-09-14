@@ -114,7 +114,7 @@ def deploy(request):
         raise NotFound
     name = params['name'].replace(' ', '_').lower() # FIXME
     try:
-        utils.deploy(params['app'], name)
+        utils.deploy(params, name)
     except utils.DeploymentError, e:
         _flash_message(request,
             u"Error : %s" % e.message)
