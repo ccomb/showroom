@@ -28,10 +28,10 @@ def proxied_url(demo, request):
     """
     current_host = urlsplit(request.host_url)
     port = current_host.port
-    if port == 'None':
-        host = ADMIN_HOST + ':' + str(current_host.port)
-    else:
+    if port is None:
         host = ADMIN_HOST
+    else:
+        host = ADMIN_HOST + ':' + str(current_host.port)
     return urlunsplit(
         (current_host.scheme, demo['name'] + '.' + host, '/', '', ''))
 

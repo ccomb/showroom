@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PARAMS:name,comment,LOGIN,PASSWORD
+# PARAMS:name,LOGIN,PASSWORD
 # PLUGINS:aws.minisite,Products.collage,collective.plonefinder,Products.FCKeditor
 set -e
 
@@ -11,7 +11,7 @@ virtualenv --no-site-packages --distribute sandbox
 sandbox/bin/pip install --download-cache=$HOME/eggs ZopeSkel==2.17 PIL==1.1.7
 
 # create a project
-sandbox/bin/paster create --no-interactive -t plone3_buildout plone4 plone_version=4.0rc1 zope_user=$LOGIN zope_password=$PASSWORD http_port=$PORT
+sandbox/bin/paster create --no-interactive -t plone3_buildout plone4 plone_version=4.0 zope_user=$LOGIN zope_password=$PASSWORD http_port=$PORT
 cd plone4
 
 # build the application
