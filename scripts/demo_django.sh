@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PARAMS:name,comment
+# PARAMS:name
 set -e
 
 
