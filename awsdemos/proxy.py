@@ -37,8 +37,8 @@ class Proxy(object):
         demo_name = hostname[:-len(ADMIN_HOST)][:-1]
 
         # for a domain "a.b.c.com", first try "a.b.c", then "a.b" and "a" as a demo_name
-        for i in range(len(splitted_host), 1, -1):
-            try_this_name = '.'.join(splitted_host[1:i])
+        for i in range(1, len(splitted_host)):
+            try_this_name = '.'.join(splitted_host[:-i])
             if try_this_name in PATHS['demos']:
                 demo_name = try_this_name
                 break

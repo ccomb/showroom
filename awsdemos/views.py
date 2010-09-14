@@ -27,8 +27,13 @@ def proxied_url(demo, request):
     """Give the url of the proxied demo
     """
     current_host = urlsplit(request.host_url)
+    port = current_host.port
+    if port == 'None':
+        host = ADMIN_HOST + ':' + str(current_host.port)
+    else:
+        host = ADMIN_HOST
     return urlunsplit(
-        (current_host.scheme, demo['name'] + '.' + ADMIN_HOST + ':' + str(current_host.port), '/', '', ''))
+        (current_host.scheme, demo['name'] + '.' + host, '/', '', ''))
 
 
 def direct_url(demo, request):
