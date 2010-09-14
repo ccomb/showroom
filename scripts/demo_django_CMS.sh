@@ -1,5 +1,6 @@
-#!/usr/bin/env sh
-# PARAMS:name,comment
+#!/usr/bin/env bash
+#  PARAMS:name,comment
+set -e
 
 
 virtualenv --no-site-packages --distribute sandbox

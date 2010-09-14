@@ -1,6 +1,7 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 # PARAMS:name,comment,LOGIN,PASSWORD
 # PLUGINS:aws.minisite,Products.collage,collective.plonefinder,Products.FCKeditor
+set -e
 
 
 # create a virtualenv

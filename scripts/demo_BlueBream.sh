@@ -1,12 +1,13 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 # PARAMS:name,comment,test
+set -e
 
 
 # create a virtualenv
 virtualenv --no-site-packages --distribute sandbox
 
 # install the required packages
-sandbox/bin/pip install --download-cache=$HOME/eggs bluebream==1.0b2
+sandbox/bin/pip install --download-cache=$HOME/eggs bluebream==1.0b4
 
 # create a bfg project
 sandbox/bin/paster create --no-interactive -t bluebream bb

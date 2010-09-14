@@ -1,5 +1,6 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 # PARAMS:name,comment
+set -e
 
 
 # load vars and fonctions

@@ -263,6 +263,7 @@ class InstalledDemo(object):
         LOG.warn("removing demo %s" % self.name)
         had_startup_script = self.has_startup_script
         if os.path.isdir(self.path):
+            subprocess.call(['chmod', '-R', '777', self.path])
             shutil.rmtree(self.path)
         if had_startup_script:
             XMLRPC.supervisor.removeProcessGroup(self.name)
@@ -334,7 +335,9 @@ def deploy(app_type, app_name):
         with open(start_script, 'r+') as s:
             start = ''
             content = s.read()
-            if not content.startswith('#!') or all([not line.startswith('trap') for line in content.splitlines()[:5]]):
+            if (not content.startswith('#!')
+                or all([not line.startswith('trap') for line in content.splitlines()[:5]])
+                or all([not line.startswith('set -e') for line in content.splitlines()[:5]])):
                 start = '#!/bin/bash\ntrap "pkill -P \$\$" EXIT\n'
             content = start + content
             s.seek(0); s.truncate(); s.write(content)
@@ -347,6 +350,7 @@ def deploy(app_type, app_name):
         supervisor_conf.set(section, 'directory', demopath)
         supervisor_conf.set(section, 'autostart', 'false')
         supervisor_conf.set(section, 'autorestart', 'false')
+        supervisor_conf.set(section, 'startsecs', '2')
         with open(join(demopath, 'supervisor.cfg'), 'w') as supervisor_file:
             supervisor_conf.write(supervisor_file)
 

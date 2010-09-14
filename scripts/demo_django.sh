@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # PARAMS:name,comment
+set -e
 
 
 # create a virtualenv
