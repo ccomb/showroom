@@ -10,9 +10,9 @@ virtualenv --no-site-packages --distribute sandbox
 # egenix distribution setup is just a pain
 sandbox/bin/easy_install http://downloads.egenix.com/python/egenix-mx-base-3.1.2.tar.gz
 sandbox/bin/pip install http://download.gna.org/pychart/PyChart-1.39.tar.gz
-sandbox/bin/pip install --download-cache=$HOME/eggs psycopg2==2.2.2 reportlab==2.4 pydot==1.0.2 lxml==2.2.7 pytz==2010k
+sandbox/bin/pip install --download-cache=$HOME/eggs psycopg2==2.2.2 reportlab==2.4 pydot==1.0.2 lxml==2.2.8 pytz==2010k PIL=1.1.7
 
-version=5.0.12
+version=5.0.14
 
 # download and install the server
 wget http://openerp.com/download/stable/source/openerp-server-$version.tar.gz
@@ -29,18 +29,24 @@ cd openerp-web-$version
 cd ..
 
 # copy and change the default config
-XMLRPC=$(($PORT+1000))
-#NETRPC=$(($PORT+2000))
+NETRPC=$(($PORT+1000))
 cp ./sandbox/lib/python2.6/site-packages/openerp_web-$version-py2.6.egg/config/openerp-web.cfg .
 sed -i "s/^server.socket_port =.*/server.socket_port = $PORT/" openerp-web.cfg
-sed -i "s/^port = '8070'/port = '$XMLRPC'/" openerp-web.cfg
+sed -i "s/^port = '8070'/port = '$NETRPC'/" openerp-web.cfg
 
+# initialise and create the database
+/usr/lib/postgresql/8.4/bin/initdb postgresql
+echo "data_directory = '$PWD/postgresql'" >> postgresql/postgresql.conf
+echo "hba_file = '$PWD/postgresql/pg_hba.conf'" >> postgresql/postgresql.conf
+echo "ident_file = '$PWD/postgresql/pg_ident.conf'" >> postgresql/postgresql.conf
+echo "unix_socket_directory='$PWD'" >> postgresql/postgresql.conf
+echo "port = $((PORT+2000))" >> postgresql/postgresql.conf
 
 cat > start.sh << EOF
 #!/bin/bash
-trap "pkill -9 -P \$\$" EXIT
-#./sandbox/bin/openerp-server --port=$XMLRPC --net_port=$NETRPC &
-./sandbox/bin/openerp-server --port=$XMLRPC --no-netrpc &
+trap "pkill -1 -P \$\$" EXIT
+/usr/lib/postgresql/8.4/bin/postgres -D $PWD/postgresql &
+./sandbox/bin/openerp-server --net_port=$NETRPC --db_host=localhost --db_port=$((PORT+2000)) &
 ./sandbox/bin/openerp-web -c openerp-web.cfg
 EOF
 
