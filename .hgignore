@@ -16,4 +16,4 @@ docs/modules/
 *.pyo
 *.log
 *.vim
-
+paster.pid
