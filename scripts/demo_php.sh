@@ -1,5 +1,5 @@
 #!/bin/bash
-# PARAMS: name 
+# PARAMS: name, plugins
 set -e
 
 

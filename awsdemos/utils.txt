@@ -9,14 +9,14 @@ We can get the list of available demos as a dict:
 >>> available_demos = utils.available_demos()
 >>> from pprint import pprint
 >>> pprint(available_demos, width=1)
-{'error':           {'params': ['name', 'comment'], 'plugins': []},
- 'error2':           {'params': ['name', 'comment'], 'plugins': []},
- 'error3':           {'params': ['name', 'comment'], 'plugins': []},
- 'error4':           {'params': ['name', 'comment'], 'plugins': []},
- 'test1':           {'params': ['name', 'comment'], 'plugins': []},
- 'test2':           {'params': ['name', 'comment'], 'plugins': []},
- 'testapache':      {'params': ['name', 'comment'], 'plugins': []},
- 'testapachebad':   {'params': ['name', 'comment'], 'plugins': []}}
+{'error':           {'params': ['name', 'comment']},
+ 'error2':           {'params': ['name', 'comment']},
+ 'error3':           {'params': ['name', 'comment']},
+ 'error4':           {'params': ['name', 'comment']},
+ 'test1':           {'params': ['name', 'comment']},
+ 'test2':           {'params': ['name', 'comment']},
+ 'testapache':      {'params': ['name', 'comment']},
+ 'testapachebad':   {'params': ['name', 'comment']}}
 
 Each demo definition itself is a dict.
 
@@ -26,11 +26,6 @@ True
 All demo definition dict should have at least a 'params' list:
 
 >>> all(map(lambda x: 'params' in x, available_demos.values()))
-True
-
-All demo definition dict should also have an plugins list:
-
->>> all(map(lambda x: 'plugins' in x, available_demos.values()))
 True
 
 We shouldn't have any installed demos:
@@ -44,7 +39,7 @@ Deploying a demo
 
 We try de deploy the 'test1' demo:
 
->>> utils.deploy('test1', 'test1')
+>>> utils.deploy({'app':'test1'}, 'test1')
 
 Ok, we check that the files are there:
 
@@ -56,14 +51,14 @@ Ok, we check that the files are there:
 
 We try to deploy with the same name, we get an error:
 
->>> utils.deploy('test1', 'test1')
+>>> utils.deploy({'app':'test1'}, 'test1')
 Traceback (most recent call last):
 ...
 DeploymentError: this demo already exists
 
 We try to deploy a non existent demo:
 
->>> utils.deploy('foo', 'bar')
+>>> utils.deploy({'app':'foo'}, 'bar')
 Traceback (most recent call last):
 ...
 DeploymentError: this demo does not exist
@@ -76,7 +71,7 @@ Now we can get the list of installed demos:
 
 We can deploy again as another name:
 
->>> utils.deploy('test1', 'test1bis')
+>>> utils.deploy({'app':'test1'}, 'test1bis')
 
 >>> pprint(utils.installed_demos(), width=1)
 [{'comment': '', 'name': 'test1', 'port': '20000', 'status': 'STOPPED'},
@@ -84,7 +79,7 @@ We can deploy again as another name:
 
 We try to deploy a demo which has an error:
 
->>> utils.deploy('error', 'demoerror')
+>>> utils.deploy({'app':'error'}, 'demoerror')
 Traceback (most recent call last):
 ...
 DeploymentError: installation ended with an error
@@ -113,7 +108,7 @@ Then we can remove a demo:
 
 If we redeploy, the port is reassigned to 20000:
 
->>> utils.deploy('test1', 'test1')
+>>> utils.deploy({'app':'test1'}, 'test1')
 >>> pprint(utils.installed_demos(), width=1)
 [{'comment': '', 'name': 'test1', 'port': '20000', 'status': 'STOPPED'},
  {'comment': '', 'name': 'test1bis', 'port': '20001', 'status': 'STOPPED'}]
@@ -143,7 +138,7 @@ Start, stop, status
 
 We deploy a simple demo
 
->>> utils.deploy('test1', 'test1')
+>>> utils.deploy({'app':'test1'}, 'test1')
 
 We can build an object representing this demo:
 
@@ -177,7 +172,7 @@ We stop it:
 
 We deploy a demo whose startup script fails
 
->>> utils.deploy('error2', 'error2')
+>>> utils.deploy({'app':'error2'}, 'error2')
 >>> utils.InstalledDemo('error2').start()
 Traceback (most recent call last):
 ...
@@ -201,7 +196,7 @@ If the deployment script creates an apache2.conf file, this file is aggregated
 to the global apache config through a link. This link is used to determine the
 status.
 
->>> utils.deploy('testapache', 'test')
+>>> utils.deploy({'app':'testapache'}, 'test')
 >>> demo = utils.InstalledDemo('test')
 >>> demo.get_status()
 'STOPPED'
@@ -221,7 +216,7 @@ status.
 
 If the provided apache config is erroneous, we don't start the app.
 
->>> utils.deploy('testapachebad', 'test')
+>>> utils.deploy({'app':'testapachebad'}, 'test')
 >>> demo = utils.InstalledDemo('test')
 >>> demo.get_status()
 'STOPPED'
@@ -247,8 +242,8 @@ Check that the process is stopped
 
 The same with 2 corrects, and 1 bad :
 
->>> utils.deploy('testapache', 'test')
->>> utils.deploy('testapache', 'test2')
+>>> utils.deploy({'app':'testapache'}, 'test')
+>>> utils.deploy({'app':'testapache'}, 'test2')
 >>> utils.InstalledDemo('test').start()
 >>> utils.InstalledDemo('test2').start()
 >>> utils.InstalledDemo('test').get_status()
@@ -257,7 +252,7 @@ The same with 2 corrects, and 1 bad :
 'RUNNING'
 >>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
 'RUNNING'
->>> utils.deploy('testapachebad', 'test3')
+>>> utils.deploy({'app':'testapachebad'}, 'test3')
 >>> utils.InstalledDemo('test3').get_status()
 'STOPPED'
 >>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
@@ -286,7 +281,7 @@ Apache + a process
 
 We deploy a demo which contains both an apache config and a startup script:
 
->>> utils.deploy('test2', 'test2')
+>>> utils.deploy({'app':'test2'}, 'test2')
 >>> utils.InstalledDemo('test2').start()
 >>> utils.InstalledDemo('test2').get_status()
 'RUNNING'
@@ -301,8 +296,8 @@ We deploy a demo which contains both an apache config and a startup script:
 
 The same with 2 demos:
 
->>> utils.deploy('test2', 'test2')
->>> utils.deploy('test2', 'test2bis')
+>>> utils.deploy({'app':'test2'}, 'test2')
+>>> utils.deploy({'app':'test2'}, 'test2bis')
 >>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
 'STOPPED'
 >>> utils.InstalledDemo('test2').start()
@@ -328,7 +323,7 @@ The same with 2 demos:
 
 A script with a bad apache conf and a good startup script:
 
->>> utils.deploy('error3', 'error3')
+>>> utils.deploy({'app':'error3'}, 'error3')
 >>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
 'STOPPED'
 >>> utils.InstalledDemo('error3').start()
@@ -344,7 +339,7 @@ Apache should restart
 
 A script with a good apache conf and a bad startup script:
 
->>> utils.deploy('error4', 'error4')
+>>> utils.deploy({'app':'error4'}, 'error4')
 >>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
 'STOPPED'
 >>> utils.InstalledDemo('error4').start()

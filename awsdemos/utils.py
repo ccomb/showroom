@@ -97,23 +97,18 @@ def available_demos():
     and their respective commands defined in config file.
 
     >>> available_demos()['repoze.BFG']['params']
-    ['name', 'comment', 'test']
-    >>> available_demos()['repoze.BFG']['plugins']
-    []
+    ['name']
     """
     demos = {}
     for filename in [ filename for filename in os.listdir(PATHS['scripts'])
                       if filename.startswith('demo_')
                       and filename.endswith('.sh')]:
         params = []
-        plugins = []
         for line in open(join(PATHS['scripts'], filename)):
             if line.split(':')[0].strip() == '# PARAMS':
                 params = map(string.strip, line.strip().split(':')[1].split(','))
-            elif line.split(':')[0].strip() == '# PLUGINS':
-                plugins = map(string.strip, line.strip().split(':')[1].split(','))
 
-        demos[(filename[5:-3])] = {'params':params, 'plugins':plugins}
+        demos[(filename[5:-3])] = {'params':params}
     return demos
 
 

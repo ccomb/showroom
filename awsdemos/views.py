@@ -113,6 +113,8 @@ def deploy(request):
     if 'app' not in params or 'name' not in params:
         raise NotFound
     name = params['name'].replace(' ', '_').lower() # FIXME
+    if 'plugins' in params:
+        params['plugins'] = ' '.join(params['plugins'].split())
     try:
         utils.deploy(params, name)
     except utils.DeploymentError, e:

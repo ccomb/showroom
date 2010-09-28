@@ -25,19 +25,14 @@ function update_app_form(url, app) {
         function(data){
             params = data['params']
             for (param in params) {
-                $("#app_form_dynamic").append(
-                    '<br/>'+params[param]+':<input '+(params[param].toLowerCase()=='password' && 'type="password"' || '')+'name="'+params[param]+'"></input>'
-                );
-            }
-            plugins = data['plugins'];
-            if (plugins.length > 0) {
-                $('#app_form_dynamic').append('PLUGINS'+
-                    '<select id="app_form_dynamic_plugins" name="plugins" multiple="multiple" </select>'
-                    )
-                for (plugin in plugins) {
-                    $("#app_form_dynamic_plugins").append(
-                        '<option>'+plugins[plugin]+'</option>'
+                if (params[param]=='plugins') {
+                    $("#app_form_dynamic").append(
+                        '<br/>'+params[param]+':<textarea name="plugins"></textarea>'
                     );
+                } else {
+                  $("#app_form_dynamic").append(
+                    '<br/>'+params[param]+':<input '+(params[param].toLowerCase()=='password' && 'type="password"' || '')+'name="'+params[param]+'"></input>'
+                  );
                 }
             }
         }
