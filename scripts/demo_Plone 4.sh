@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PARAMS: name, login, password, plugins
+# PARAMS: name=plone4, login=admin, password, version=4.0.2, plugins
 set -e
 
 # create a virtualenv
@@ -9,7 +9,7 @@ virtualenv --no-site-packages --distribute sandbox
 sandbox/bin/pip install --download-cache=$HOME/eggs ZopeSkel==2.17 PIL==1.1.7
 
 # create a project
-sandbox/bin/paster create --no-interactive -t plone3_buildout plone4 plone_version=4.0 zope_user=$login zope_password=$password http_port=$PORT
+sandbox/bin/paster create --no-interactive -t plone3_buildout plone4 plone_version=$version zope_user=$login zope_password=$password http_port=$PORT
 cd plone4
 
 # add plugins
@@ -18,7 +18,7 @@ for package in $plugins; do
 done
 
 # build the application
-../sandbox/bin/python bootstrap.py
+../sandbox/bin/python bootstrap.py --version 1.4.4
 ./bin/buildout
 
 # create the startup script
@@ -26,28 +26,4 @@ cat > ../start.sh << EOF
 #!/usr/bin/env sh
 exec plone4/bin/instance console
 EOF
-
-# create site
-#cat > bin/initialize.py << EOF
-## -*- coding: utf-8 -*-
-#import os
-#import transaction
-#from AccessControl.SecurityManagement import newSecurityManager
-#from Testing.makerequest import makerequest
-#app=makerequest(app)
-#
-#user = app.acl_users.getUserById('admin')
-#user = user.__of__(app.acl_users)
-#newSecurityManager(None, user)
-#
-#print 'Adding plone site'
-#app.manage_addProduct['CMFPlone'].addPloneSite(os.environ['name'])
-#site = app[os.environ['name']]
-#
-##print 'Adding user. Dont work for now'
-#site.portal_registration.addMember('$LOGIN', '$PASSWORD', ['Manager'])
-#transaction.commit()
-#EOF
-#
-#bin/instance run bin/initialize.py
 

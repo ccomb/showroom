@@ -49,7 +49,7 @@ trap "pkill -1 -P \$\$" EXIT
 postgres_pid=\$!
 ./sandbox/bin/openerp-server --netrpc-interface=localhost --netrpc-port=$NETRPC --no-xmlrpc --no-xmlrpcs --db_host=localhost --db_port=$((PORT+2000)) &
 openerp_pid=\$!
-./sandbox/bin/openerp-web -c openerp-web.cfg
+./sandbox/bin/openerp-web -c openerp-web.cfg &
 web_pid=\$!
 trap "kill \$web_pid; kill \$openerp_pid; kill \$postgres_pid" EXIT
 cat

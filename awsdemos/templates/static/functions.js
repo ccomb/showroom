@@ -31,7 +31,7 @@ function update_app_form(url, app) {
                     );
                 } else {
                   $("#app_form_dynamic").append(
-                    '<br/>'+params[param]+':<input '+(params[param].toLowerCase()=='password' && 'type="password"' || '')+'name="'+params[param]+'"></input>'
+                    '<br/>'+params[param].split('=')[0]+':<input '+(params[param].toLowerCase()=='password' && 'type="password"' || '')+'name="'+params[param].split('=')[0]+'" value="' + (params[param].split('=')[1] || '') + '"></input>'
                   );
                 }
             }
