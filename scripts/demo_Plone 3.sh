@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 # PARAMS:name=plone3, login=admin, password, version=3.3.5, plugins
-# PLUGINS:aws.minisite,Products.collage,collective.plonefinder,Products.FCKeditor
 set -e
 
 
@@ -12,7 +11,7 @@ sandbox/bin/pip install --download-cache=$HOME/eggs ZopeSkel==2.17
 sandbox/bin/pip install --download-cache=$HOME/eggs -f http://dist.plone.org/thirdparty/ PILwoTk==1.1.6.4
 
 # create a project
-sandbox/bin/paster create --no-interactive -t plone3_buildout plone3 plone_version=$versions zope_user=$login zope_password=$password http_port=$PORT
+sandbox/bin/paster create --no-interactive -t plone3_buildout plone3 plone_version=$version zope_user=$login zope_password=$password http_port=$PORT
 cd plone3
 
 # add plugins
@@ -21,8 +20,7 @@ for package in $plugins; do
 done
 
 # build the application
-../sandbox/bin/python bootstrap.py --version 1.4.3
-cat buildout.cfg
+../sandbox/bin/python bootstrap.py -d -v 1.4.3
 ./bin/buildout
 
 # create the startup script

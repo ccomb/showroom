@@ -18,7 +18,7 @@ for package in $plugins; do
 done
 
 # build the application
-../sandbox/bin/python bootstrap.py --version 1.4.4
+../sandbox/bin/python bootstrap.py -d -v 1.4.4
 ./bin/buildout
 
 # create the startup script
