@@ -269,7 +269,7 @@ def get_available_port():
     """ return the first available port
     """
     demos = installed_demos()
-    ports = [int(demo['port']) for demo in demos]
+    ports = [int(demo['port']) for demo in demos if demo['port'].isdigit()]
     port = 20000
     while port in ports:
         port += 1
