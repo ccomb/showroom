@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PARAMS:name=openerp5
+# PARAMS:name
 set -e
 
 

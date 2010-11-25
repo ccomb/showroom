@@ -4,12 +4,13 @@
 # sudo pear install Console_Table
 
 # download drupal
-drupal_version=7.0-alpha7
+drupal_version=7.0-beta3
 db_name=drupal
 db_user=drupal
 db_pass=drupal
 db_host=127.0.0.1
 db_port=$((PORT+1000))
+echo $db_port
 
 wget http://ftp.drupal.org/files/projects/drupal-$drupal_version.tar.gz
 tar xzf drupal-$drupal_version.tar.gz

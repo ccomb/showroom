@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PARAMS: name=plone4, login=admin, password, version=4.0.2, plugins
+# PARAMS: name, login=admin, password, version=4.0.2, plugins
 set -e
 
 # create a virtualenv

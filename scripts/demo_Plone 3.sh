@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PARAMS:name=plone3, login=admin, password, version=3.3.5, plugins
+# PARAMS:name, login=admin, password, version=3.3.5, plugins
 set -e
 
 
