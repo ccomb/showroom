@@ -17,7 +17,7 @@ cd bb
 sed -i "s/^port = .*/port = $PORT/" "deploy.ini"
 
 # bootstrap and buildout
-../sandbox/bin/python bootstrap.py
+../sandbox/bin/python bootstrap.py --version 1.4.3
 ./bin/buildout
 
 cat > ../start.sh << EOF

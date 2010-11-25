@@ -11,7 +11,7 @@ virtualenv --no-site-packages --distribute sandbox
 
 cd karl
 
-../sandbox/bin/python bootstrap.py
+../sandbox/bin/python bootstrap.py --version 1.4.3
 # remove the buildout-cache and download-cache params, then buildout
 sed -i '/^eggs-directory/d;/^download-cache/d' buildout.cfg
 bin/buildout -N
