@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PARAMS:name
+# PARAMS:name=openerp6
 set -e
 
 
@@ -15,14 +15,14 @@ sandbox/bin/pip install --download-cache=$HOME/eggs psycopg2==2.2.2 reportlab==2
 version=6.0.0-rc1
 
 # download and install the server
-wget http://openerp.com/download/stable/source/openerp-server-$version.tar.gz
+wget http://openerp.com/download/unstable/source/openerp-server-$version.tar.gz
 tar xzf openerp-server-$version.tar.gz
 cd openerp-server-$version
 ../sandbox/bin/python setup.py install
 cd ..
 
 # download and install the web interface
-wget http://openerp.com/download/stable/source/openerp-web-$version.tar.gz
+wget http://openerp.com/download/unstable/source/openerp-web-$version.tar.gz
 tar xzf openerp-web-$version.tar.gz
 cd openerp-web-$version
 ../sandbox/bin/python setup.py install
@@ -30,7 +30,7 @@ cd ..
 
 # copy and change the default config
 NETRPC=$(($PORT+1000))
-cp ./sandbox/lib/python2.6/site-packages/openerp_web-$version-py2.6.egg/config/openerp-web.cfg .
+cp ./sandbox/lib/python2.6/site-packages/openerp_web-*-py2.6.egg/openerp-web/doc/openerp-web.cfg .
 sed -i "s/^server.socket_port =.*/server.socket_port = $PORT/" openerp-web.cfg
 sed -i "s/^port = '8070'/port = '$NETRPC'/" openerp-web.cfg
 
@@ -46,7 +46,12 @@ cat > start.sh << EOF
 #!/bin/bash
 trap "pkill -1 -P \$\$" EXIT
 /usr/lib/postgresql/8.4/bin/postgres -D $PWD/postgresql &
+postgres_pid=\$!
 ./sandbox/bin/openerp-server --netrpc-interface=localhost --netrpc-port=$NETRPC --no-xmlrpc --no-xmlrpcs --db_host=localhost --db_port=$((PORT+2000)) &
+openerp_pid=\$!
 ./sandbox/bin/openerp-web -c openerp-web.cfg
+web_pid=\$!
+trap "kill \$web_pid; kill \$openerp_pid; kill \$postgres_pid" EXIT
+cat
 EOF
 
