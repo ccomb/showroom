@@ -119,6 +119,8 @@ def installed_demos():
     demo_infos = []
     demo_names = os.listdir(PATHS['demos'])
     for name in demo_names:
+        if not os.path.isdir(join(PATHS['demos'], name)):
+            continue
         demo = InstalledDemo(name)
         demo_infos.append(dict(
             name=demo.name,
