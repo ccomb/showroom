@@ -2,7 +2,6 @@
 # PARAMS:name, login=admin, password, version=3.3.5, plugins
 set -e
 
-
 # create a virtualenv
 virtualenv -p python2.4 --no-site-packages --distribute sandbox
 
@@ -17,6 +16,7 @@ cd plone3
 # add plugins
 for package in $plugins; do
     sed -i "1,30s/^eggs =/eggs =\n    $package/" buildout.cfg
+    sed -i "s/^zcml =/zcml =\n    $package/" buildout.cfg
 done
 
 # build the application
