@@ -73,3 +73,4 @@ TODO :
 * stopper les demos si aucune requete n'est faite pendant 5min. proposer de
   redémarrer si on essaye d'y accéder quand-même.
 * ajouter un indicateur vert/rouge pour apache et supervisor
+* ajouter un proxy de téléchargement pour accélérer les déploiements
