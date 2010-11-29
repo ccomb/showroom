@@ -38,7 +38,8 @@ Then you can install the development trunk of Showroom with::
 
   $ hg clone https://bitbucket.org/alterway/aws.demos
   $ cd aws.demos
-  $ python bootstrap.py
+  $ virtualenv --no-site-packages --distribute sandbox
+  $ sandbox/bin/python bootstrap.py
   $ ./bin/buildout
 
 Starting
