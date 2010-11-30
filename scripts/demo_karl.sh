@@ -2,16 +2,15 @@
 # PARAMS:name
 set -e
 
-
 # get the last version in svn (no release yet)
 svn co http://osi.agendaless.com/bfgsvn/karlsample/trunk/ karl
 
 # create a sandbox and run the buildout
-virtualenv --no-site-packages --distribute sandbox
+virtualenv --no-site-packages --distribute -p python2.5 sandbox
 
 cd karl
 
-../sandbox/bin/python bootstrap.py --version 1.4.3
+../sandbox/bin/python bootstrap.py
 # remove the buildout-cache and download-cache params, then buildout
 sed -i '/^eggs-directory/d;/^download-cache/d' buildout.cfg
 bin/buildout -N
