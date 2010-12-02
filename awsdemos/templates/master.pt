@@ -22,98 +22,99 @@ $('document').ready(function(){
 </head>
 
 <body>
-<!-- start header -->
-<!--div tal:content="demos">debug</div-->
-<!--div id="debug"></div-->
 
-<table id="layout" cellspacing="0" cellpadding="0">
-    <tr>
-        <td id="logo">
-            <a href="${request.application_url}"><img src="${request.application_url}/static/images/Alter_Way_SOLUTIONS.png"/></a>
-        </td>
-        <td id="title">
-            Applications web en démonstration.
-        </td>
+<!-- header -->
+<div id="header">
+  <!-- logo -->
+  <div id="logo">
+      <a href="${request.application_url}"><img src="${request.application_url}/static/images/logo.png"/></a>
+  </div>
+
+  <!-- user -->
+  <div id="user_ID">
+      ${logged_in}
+      <a href='${request.application_url}/logout'> disconnect</a>
+  </div>
+</div>
+
+<!-- form to create a demo -->
+<form id="app_form" method="POST"
+action="${request.application_url}/deploy">
+    <div>create a demo
+    <select name="app"
+            onchange="update_app_form('${request.application_url}', this.value)">
+    <option></option>
+    <option tal:repeat="app apps" tal:content="python:app">placeholder</option>
+    </select>
+    </div>
+    <span id="app_form_dynamic"></span>
+    <img id="loading" style="display:none;"
+    src="static/images/loading.gif" /><br />
+</form>
+
+<!-- content -->
+<div id="content">
+
+  <!-- message -->
+  <tal:block define="session python:request.environ.get('beaker.session', {})"
+             condition="session.has_key('message')">
+  <div id="message"
+       tal:define="message python:session.pop('message', None)"
+       tal:content="structure message" />
+  <div tal:replace="python:session.save() or ''" />
+  </tal:block>
+
+  <!-- demo list -->
+  <div id="demos_list">
+  <table>
+    <tr tal:repeat="demo demos">
+      <td>
+        <div class="STOPPED"
+             tal:attributes="class python:'status ' + demo.get('status'); title python:demo.get('status')"
+             tal:content="python:demo.get('status')">
+       </div>
+      </td>
+      <td class="demo_title">
+        <a tal:attributes="href python: proxied_url(demo, request)"
+           tal:content="python: demo.get('name')">
+            app name
+        </a>
+      </td>
+      <td class="demo_title">
+        <a tal:attributes="href python: direct_url(demo, request)">
+            (direct link)
+        </a>
+      </td>
+      <td class="demo_button">
+        <a href="#" class="start"
+           tal:condition="python: demo['status'] == 'STOPPED'"
+           tal:attributes="href string:/start?name=${demo['name']}">
+          start
+        </a>
+        <a href="#" class="stop"
+           tal:condition="python: demo['status'] == 'RUNNING'"
+           tal:attributes="href string:/stop?name=${demo['name']}">
+          stop
+        </a>
+      </td>
+      <td class="demo_button">
+        <a href="#" class="destroy"
+           tal:condition="python: demo['status'] == 'STOPPED'"
+           tal:attributes="href string:/destroy?name=${demo['name']}">
+          destroy
+        </a>
+      </td>
     </tr>
-    <tr>
-        <td id="sidebar">
-        <div id="user_ID">
-            connecté en tant que: ${logged_in}<br/> <a
-            href='${request.application_url}/logout'> se déconnecter</a>
-        </div>
+  </table>
+  </div>
+</div>
 
-            <form id="app_form" method="POST"
-            action="${request.application_url}/deploy">
-                <div>créer une démo</div>
-                <select name="app"
-                        onchange="update_app_form('${request.application_url}', this.value)">
-                <option></option>
-                <option tal:repeat="app apps" tal:content="python:app">placeholder</option>
-                </select>
-                <span id="app_form_dynamic"></span>
-                <img id="loading" style="display:none;"
-                src="static/images/loading.gif" /><br />
-            </form>
-        </td>
-        <td id="content">
 
-          <tal:block define="session python:request.environ.get('beaker.session', {})"
-                     condition="session.has_key('message')">
-          <div id="message"
-               tal:define="message python:session.pop('message', None)"
-               tal:content="structure message" />
-          <div tal:replace="python:session.save() or ''" />
-          </tal:block>
+<!-- start footer -->
+<div colspan="2" id="footer">
+    Powered by <a href="http://bfg.repoze.org">Repoze.BFG</a>
+    - <a href="https://bitbucket.org/alterway/showroom">Source code</a>
+</div>
 
-            <table id="demos_list">
-              <tr tal:repeat="demo demos">
-                <td>
-                  <div class="STOPPED"
-                       tal:attributes="class python:'status ' + demo.get('status'); title python:demo.get('status')">
-                 </div>
-                </td>
-                <td class="demo_title">
-                  <a tal:attributes="href python: proxied_url(demo, request)"
-                     tal:content="python: demo.get('name')">
-                      app name
-                  </a>
-                </td>
-                <td class="demo_title">
-                  <a tal:attributes="href python: direct_url(demo, request)">
-                      (direct link)
-                  </a>
-                </td>
-                <td class="demo_button">
-                  <a href="#" class="start"
-                     tal:condition="python: demo['status'] == 'STOPPED'"
-                     tal:attributes="href string:/start?name=${demo['name']}">
-                    start
-                  </a>
-                  <a href="#" class="stop"
-                     tal:condition="python: demo['status'] == 'RUNNING'"
-                     tal:attributes="href string:/stop?name=${demo['name']}">
-                    stop
-                  </a>
-                </td>
-                <td class="demo_button">
-                  <a href="#" class="destroy"
-                     tal:condition="python: demo['status'] == 'STOPPED'"
-                     tal:attributes="href string:/destroy?name=${demo['name']}">
-                    destroy
-                  </a>
-                </td>
-              </tr>
-            </table>
-        </td>
-    </tr>
-    <tr>
-        <!-- end content -->
-        <!-- start footer -->
-        <td colspan="2" id="footer">
-            Application propulsée par <a href="http://bfg.repoze.org">Repoze.BFG</a>
-        </td>
-    </tr>
-</table>
-<!-- end footer -->
 </body>
 </html>

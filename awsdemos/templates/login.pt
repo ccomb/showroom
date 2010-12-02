@@ -28,7 +28,7 @@ $('document').ready(function(){
 <table id="layout" cellspacing="0" cellpadding="0">
     <tr>
         <td id="logo">
-            <a href="${request.application_url}"><img src="${request.application_url}/static/images/Alter_Way_SOLUTIONS.png"/></a>
+            <a href="${request.application_url}"><img src="${request.application_url}/static/images/logo.png"/></a>
         </td>
         <td id="title">
             Applications de démonstration.

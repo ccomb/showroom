@@ -27,19 +27,19 @@ function update_app_form(url, app) {
             for (param in params) {
                 if (params[param]=='plugins') {
                     $("#app_form_dynamic").append(
-                        '<br/>'+params[param]+':<textarea name="plugins"></textarea>'
+                        '<div><span>'+params[param]+':</span><textarea name="plugins"></textarea></div>'
                     );
                 } else {
                   $("#app_form_dynamic").append(
-                    '<br/>'+params[param].split('=')[0]+':<input '+(params[param].toLowerCase()=='password' && 'type="password"' || '')+'name="'+params[param].split('=')[0]+'" value="' + (params[param].split('=')[1] || '') + '"></input>'
+                    '<div><span>'+params[param].split('=')[0]+':</span><input '+(params[param].toLowerCase()=='password' && 'type="password"' || '')+'name="'+params[param].split('=')[0]+'" value="' + (params[param].split('=')[1] || '') + '"></input></div>'
                   );
                 }
             }
-        }
-    );
     $("#app_form_dynamic").append(
-        '<input id="app_form_submit" type="submit"'+
+        '<input id="app_form_submit" type="submit" value="ok"'+
         'onclick="on_valid_form();"/>'
     )
+        }
+    );
 }
 

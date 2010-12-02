@@ -124,7 +124,7 @@ def deploy(request):
 
     demo = utils.InstalledDemo(name)
     _flash_message(request,
-        u"application %s created at port %s" % (demo.name, demo.get_port()))
+        u"application %s created on port %s" % (demo.name, demo.get_port()))
     return HTTPFound(location='/')
 
 

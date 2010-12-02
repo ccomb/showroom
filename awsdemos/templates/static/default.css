@@ -1,91 +1,45 @@
-/*
-Design by Free CSS Templates
-http://www.freecsstemplates.org
-Released for free under a Creative Commons Attribution 2.5 License
-*/
-
 body {
     margin: 0;
     padding: 0;
-    background-color: #b2b2ff;
+    background-color: white;
     font-size: 13px;
     font-family: "Trebuchet MS", Georgia, "Times New Roman", Times, serif;
     text-align: justify;
-    color: #000000;
+    color: #000;
     height: 100%;
     width: 100%;
 }
-
 h1, h2, h3 {
     margin: 0;
     text-transform: lowercase;
     font-weight: normal;
-    color: #FFFFFF;
+    color: #000;
 }
-
-h1 {
-    letter-spacing: -1px;
-    font-size: 32px;
-}
-
-h2 {
-    font-size: 23px;
-}
-
-p, ul, ol {
-    margin: 0 0 2em 0;
-    text-align: justify;
-    line-height: 26px;
-}
-
-a:link {
-    color: #5A55DB;
-}
-
-a:hover, a:active {
-    text-decoration: none;
-    color: #8BD80E;
-}
-
-a:visited {
-    color: #5A55DB;
-}
-
-#message {
-    text-align: middle;
-    margin-top: 2em;
-    margin-bottom: 2em;
-    margin-left: 20%;
-    margin-right: 20%;
-    padding: 2em;
-    border-color: #85A5FF;
-    -moz-border-radius: 1em 1em;
-    -webkitmoz-border-radius: 1em 1em;
-    background-color: #85A5FF;
-}
-
 img {
     border: none;
+}
+a:link {
+    color: #000;
+}
+a:hover, a:active {
+    text-decoration: none;
+    color: #000;
+}
+a:visited {
+    color: #777;
+}
+#header {
+    height: 100px;
 }
 td {
     vertical-align: top;
     text-align: middle;
 }
-
-td#logo {
-    height: 93px;
-    margin: 0;
-    padding: 0;
-}
-
-td#logo a,
-td#logo img {
-    display: block;
-}
+#logo { float: left; }
 
 #title{
     top: 0;
-    background-color: #d9b2ff;
+    background-color: white;
     height: 93px;
     font-size: 3em;
     text-align: center;
@@ -93,73 +47,34 @@ td#logo img {
     margin:0;
     padding: 0;
 }
-
-table#layout {
-    width: 100%;
-    height: 100%;
-    border: 0;
-    border-collapse: collapse;
-}
-
-table#layout > tr {
-    border-spacing: 0;
-}
-
-#demos_list {
-    margin-left: 20%;
-    margin-right: 20%;
+#demos_list, #message, #app_form {
+    background-color: #F0F0F0;
     text-align: middle;
     margin: 1em;
     padding: 1em;
-    -moz-border-radius: 1em 1em;
-    -webkit-border-radius: 1em 1em;
-    background-color: #BDCEFF;
-    -moz-box-shadow: 2px 3px 3px #737373;
-    -webkit-box-shadow: 2px 3px 3px #737373;
+    -moz-border-radius: 0.5em 0.5em;
+    -webkit-border-radius: 0.5em 0.5em;
 }
 
+#app_form_dynamic div {
+margin: 0.5em 0;
+vertical-align: middle;
+}
+#app_form_dynamic div span {
+display: inline-block;
+vertical-align: top;
+width: 5em;
+margin: 0.2em;
+}
+input, textarea {
+    width: 15em;
+}
+#message {
+    background-color: #ffe57f;
+}
 #content {
     top: 93px;
     left: 200px;
-}
-
-#application_list {
-    top: 4em;
-    text-align: center;
-}
-
-/* Post */
-
-.post {
-    padding: 15px 0px;
-    margin-bottom: 20px;
-}
-
-/* Sidebar */
-
-#sidebar {
-    width: 200px;
-    margin-left: 0;
-    padding: 0;
-    background-color: #FFC7B6;
-}
-
-#app_form {
-    top: 2em;
-    padding-top: 1em;
-    padding-left: 0.5em;
-}
-
-#footer {
-    clear: both;
-    padding-top: 17px;
-    text-align: center;
-    color: #FFFFFF;
-}
-
-#legal a {
-    font-weight: normal;
-    color: #FFFFFF;
 }
 
 td.demo_title {
@@ -167,12 +82,9 @@ td.demo_title {
     padding: 0em 1em;
     vertical-align: middle;
 }
-
 div.status {
 display: inline-block;
-width: 1em;
-height: 1em;
-margin-top: 40%;
+padding: 0.5em;
 -moz-border-radius: 0.5em;
 -webkit-border-radius: 0.5em;
 }
@@ -183,7 +95,7 @@ div.STOPPED {
     background: #C00;
 }
 div.EXITED {
-    background: black;
+    background: white;
 }
 div.SHUTDOWN {
     background: orange;
@@ -200,14 +112,23 @@ div.FATAL {
 a.start, a.stop, a.destroy {
     color: black;
     display: inline-block;
-    background: #eee;
+    background: #FFF;
     text-decoration: none;
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
     padding: 0.5em;
+    -moz-box-shadow: 1px 1px 1px 1px #737373;
+    -webkit-box-shadow: 1px 1px 1px 1px #737373;
 }
 a.destroy {
     color: red;
 }
 
-
+#user_ID {
+    margin: 0.5em;
+    float: right;
+    text-align: center;
+}
+#footer {
+    text-align: center;
+}
