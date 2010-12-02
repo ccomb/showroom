@@ -32,7 +32,7 @@ requirements, which can be fullfilled by installing the following packages::
 sudo aptitude install subversion mercurial build-essential python-virtualenv \
   python-dev libldap2-dev libsasl2-dev libssl-dev libpq-dev postgresql \
   libxml2-dev libxslt1-dev apache2 libapache2-mod-php5 libapache2-mod-python \
-  mysql-server php5 php5-mysql php5-gd wv poppler-utils zlib1g-dev
+  mysql-server php5 php5-mysql php5-gd wv poppler-utils zlib1g-dev curl
 
 Then you can install the development trunk of Showroom with::
 

@@ -1,10 +1,11 @@
 #!/bin/bash
-# PARAMS: name 
+# PARAMS: name, version=7.0rc1
 # sudo aptitude install php5-cli apache2
 # sudo pear install Console_Table
 
 # download drupal
-drupal_version=7.0-beta3
+drupal_version=7.0-rc1
+drush_version=drush-6.x-3.3.tar.gz
 db_name=drupal
 db_user=drupal
 db_pass=drupal
@@ -14,9 +15,9 @@ echo $db_port
 
 wget http://ftp.drupal.org/files/projects/drupal-$drupal_version.tar.gz
 tar xzf drupal-$drupal_version.tar.gz
-mv drupal-$drupal_version drupal7
-cp drupal7/sites/default/default.settings.php drupal7/sites/default/settings.php
-cat >> drupal7/sites/default/settings.php << EOF
+mv drupal-$drupal_version drupal
+cp drupal/sites/default/default.settings.php drupal/sites/default/settings.php
+cat >> drupal/sites/default/settings.php << EOF
 \$databases['default']['default'] = array(
   'driver' => 'mysql',
   'database' => '$db_name',
@@ -29,19 +30,13 @@ cat >> drupal7/sites/default/settings.php << EOF
 );
 EOF
 
-# download drush
-#drush=drush-All-versions-3.0.tar.gz
-#drush_version=drush-6.x-3.1.tar.gz
-#wget http://ftp.drupal.org/files/projects/$drush_version
-#tar xzf $drush_version
-
 # create the Apache config
 cat > apache2.conf << EOF
 Listen $PORT
 NameVirtualHost *:$PORT
 <VirtualHost *:$PORT>
 ServerName localhost
-DocumentRoot $PWD/drupal7
+DocumentRoot $PWD/drupal
 #ErrorLog var/error.log
 </VirtualHost>
 EOF
@@ -70,6 +65,26 @@ echo "GRANT ALL ON drupal.* TO 'drupal'@'localhost';" >> mysql.tmp
 echo "FLUSH PRIVILEGES;" >> mysql.tmp
 mysql --socket=$PWD/mysql/mysqld.sock --user=root mysql < mysql.tmp
 rm mysql.tmp
+
+# install drush and additional plugins
+#if [ "$plugins" != "" ]; then
+#    wget http://ftp.drupal.org/files/projects/$drush_version
+#    tar xzf $drush_version
+#
+#    # install additional modules
+#    cd drupal
+#    ../drush/drush dl $plugins
+#    cd ..
+#fi
+
+# install drush
+wget http://ftp.drupal.org/files/projects/$drush_version
+tar xzf $drush_version
+
+# install additional modules
+cd drupal
+../drush/drush dl $plugins
+cd ..
 
 # stop mysql
 mysqladmin --socket=$PWD/mysql/mysqld.sock --user=root shutdown
