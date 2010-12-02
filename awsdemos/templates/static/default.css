@@ -57,17 +57,20 @@ td {
 }
 
 #app_form_dynamic div {
-margin: 0.5em 0;
-vertical-align: middle;
+    margin: 0.5em 0;
+    vertical-align: middle;
 }
 #app_form_dynamic div span {
-display: inline-block;
-vertical-align: top;
-width: 5em;
-margin: 0.2em;
+    display: inline-block;
+    vertical-align: top;
+    width: 5em;
+    margin: 0.2em;
 }
 input, textarea {
     width: 15em;
+}
+#loading {
+    margin: 0.5em;   
 }
 #message {
     background-color: #ffe57f;
