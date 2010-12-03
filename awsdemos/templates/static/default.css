@@ -84,10 +84,10 @@ padding: 0.5em;
 -webkit-border-radius: 0.5em;
 }
 div.RUNNING {
-    background: #0C0;
+    background: #5E5;
 }
 div.STOPPED {
-    background: #C00;
+    background: #E55;
 }
 div.EXITED {
     background: white;
@@ -96,7 +96,7 @@ div.SHUTDOWN {
     background: orange;
 }
 div.STARTING, div.RESTARTING {
-    background: green;
+    background: #5B5;
 }
 div.FATAL {
     background: transparent;
