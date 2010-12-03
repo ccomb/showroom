@@ -1,122 +1,48 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:tal="http://xml.zope.org/namespaces/tal"
-      xmlns:metal="http://xml.zope.org/namespaces/metal">
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:define-macro="master">
 <head>
-<meta http-equiv="content-type" content="text/xml+xhtml; charset=utf-8" />
-<title>Showroom</title>
-<meta name="keywords" content="python web application" />
-<meta name="description" content="repoze.bfg web application" />
-<script type="text/javascript" src="${request.application_url}/static/jquery-1.4.1.min.js"></script>
-<link href="${request.application_url}/static/default.css" rel="stylesheet" type="text/css" />
-<script type="text/javascript" src="${request.application_url}/static/functions.js"></script>
-<script type="text/javascript">
-$('document').ready(function(){
-    jQuery('#sidebar').css(
-        'height',
-        $(window).height()-130+'px'
-        );
-    }
-)
-</script>
+  <meta http-equiv="content-type" content="text/xml+xhtml; charset=utf-8" />
+  <title>Showroom</title>
+  <meta name="keywords" content="python web application" />
+  <meta name="description" content="repoze.bfg web application" />
+  <script type="text/javascript" src="${request.application_url}/static/jquery-1.4.1.min.js"></script>
+  <link href="${request.application_url}/static/default.css" rel="stylesheet" type="text/css" />
+  <script type="text/javascript" src="${request.application_url}/static/functions.js"></script>
 </head>
 
 <body>
 
-<!-- header -->
-<div id="header">
-  <!-- logo -->
-  <div id="logo">
-      <a href="${request.application_url}"><img src="${request.application_url}/static/images/logo.png"/></a>
-  </div>
+<div id="wrapper">
 
-  <!-- user -->
-  <div id="user_ID">
-      ${logged_in}
-      <a href='${request.application_url}/logout'> disconnect</a>
-  </div>
-</div>
-
-<!-- form to create a demo -->
-<form id="app_form" method="POST"
-action="${request.application_url}/deploy">
-    <div>
-    <span>create a demo</span>
-    <select name="app"
-            onchange="update_app_form('${request.application_url}', this.value)">
-    <option></option>
-    <option tal:repeat="app apps" tal:content="python:app">placeholder</option>
-    </select>
+  <!-- header -->
+  <div id="header">
+    <!-- logo -->
+    <div id="logo">
+        <a href="${request.application_url}">
+            <img src="${request.application_url}/static/images/logo.png" alt="logo" />
+        </a>
     </div>
-    <span id="app_form_dynamic"></span>
-    <img id="loading" style="display:none;"
-    src="static/images/loading.gif" /><br />
-</form>
 
-<!-- content -->
-<div id="content">
-
-  <!-- message -->
-  <tal:block define="session python:request.environ.get('beaker.session', {})"
-             condition="session.has_key('message')">
-  <div id="message"
-       tal:define="message python:session.pop('message', None)"
-       tal:content="structure message" />
-  <div tal:replace="python:session.save() or ''" />
-  </tal:block>
-
-  <!-- demo list -->
-  <div id="demos_list">
-  <table>
-    <tr tal:repeat="demo demos">
-      <td>
-        <div class="STOPPED"
-             tal:attributes="class python:'status ' + demo.get('status'); title python:demo.get('status')"
-             tal:content="python:demo.get('status')">
-       </div>
-      </td>
-      <td class="demo_title">
-        <a tal:attributes="href python: proxied_url(demo, request)"
-           tal:content="python: demo.get('name')">
-            app name
-        </a>
-      </td>
-      <td class="demo_title">
-        <a tal:attributes="href python: direct_url(demo, request)">
-            (direct link)
-        </a>
-      </td>
-      <td class="demo_button">
-        <a href="#" class="start"
-           tal:condition="python: demo['status'] == 'STOPPED'"
-           tal:attributes="href string:/start?name=${demo['name']}">
-          start
-        </a>
-        <a href="#" class="stop"
-           tal:condition="python: demo['status'] == 'RUNNING'"
-           tal:attributes="href string:/stop?name=${demo['name']}">
-          stop
-        </a>
-      </td>
-      <td class="demo_button">
-        <a href="#" class="destroy"
-           onclick="if(!confirm('Do you really want to destroy this demo? This cannot be undone')) {return false;}"
-           tal:condition="python: demo['status'] == 'STOPPED'"
-           tal:attributes="href string:/destroy?name=${demo['name']}">
-          destroy
-        </a>
-      </td>
-    </tr>
-  </table>
+    <div id="header-infos" metal:define-slot="header">
+    placeholder for header infos
+    </div>
   </div>
-</div>
 
+  <!-- content -->
+  <div id="content" metal:define-slot="content">
+  page content
+  </div>
 
-<!-- start footer -->
-<div colspan="2" id="footer">
-    Powered by <a href="http://bfg.repoze.org">repoze.BFG</a>
-    - <a href="https://bitbucket.org/alterway/showroom">Source code</a>
-    - copyleft <a href="http://alterway.fr">Alter Way</a> 2010
+  <!-- start footer -->
+  <div id="footer">
+      Powered by <a href="http://bfg.repoze.org">repoze.BFG</a>
+      - <a href="https://bitbucket.org/alterway/showroom">Source code</a>
+      - copyleft <a href="http://alterway.fr">Alter Way</a> 2010
+  </div>
+
 </div>
 
 </body>

@@ -10,7 +10,7 @@ body {
     width: 100%;
 }
 h1, h2, h3 {
-    margin: 0;
+    margin: 0.5em;
     text-transform: lowercase;
     font-weight: normal;
     color: #000;
@@ -37,7 +37,7 @@ td {
 }
 #logo { float: left; }
 
-#demos_list, #message, #app_form {
+div.subcontent {
     background-color: #F0F0F0;
     text-align: middle;
     margin: 1em;
@@ -49,7 +49,7 @@ td {
     margin: 0.5em 0;
     vertical-align: middle;
 }
-#app_form_dynamic div span, #app_form div span {
+form div span {
     display: inline-block;
     vertical-align: top;
     width: 8em;
@@ -57,9 +57,7 @@ td {
 }
 input, textarea, select {
     width: 15em;
-}
-#create input {
-    height: 2em;
+    margin: 0.2em 0;
 }
 #loading {
     margin: 0.5em;   

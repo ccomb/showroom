@@ -1,66 +1,34 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:tal="http://xml.zope.org/namespaces/tal"
-      xmlns:metal="http://xml.zope.org/namespaces/metal">
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="master.macros['master']">
+
 <head>
-<meta http-equiv="content-type" content="text/xml+xhtml; charset=utf-8" />
-<title>Liste des démos</title>
-<meta name="keywords" content="python web application" />
-<meta name="description" content="repoze.bfg web application" />
-<script type="text/javascript" src="${request.application_url}/static/jquery-1.4.1.min.js"></script>
-<link href="${request.application_url}/static/default.css" rel="stylesheet" type="text/css" />
-<script type="text/javascript">
-$('document').ready(function(){
-    jQuery('#sidebar').css(
-        'height',
-        $(window).height()-130+'px'
-        );
-    }
-)
-</script>
+<title>Login</title>
 </head>
 
 <body>
-<!-- start header -->
-<!--div tal:content="demos">debug</div-->
-<!--div id="debug"></div-->
 
-<table id="layout" cellspacing="0" cellpadding="0">
-    <tr>
-        <td id="logo">
-            <a href="${request.application_url}"><img src="${request.application_url}/static/images/logo.png"/></a>
-        </td>
-        <td id="title">
-            Applications de démonstration.
-        </td>
-    </tr>
-    <tr>
-        <td id="sidebar">
-        </td>
-        <td id="content">
-            <tal:if condition="message is not None">
-                <div id="message" tal:content="message or ''"> </div>
-            </tal:if>
-            <div id='demos_list'>
-            Connectez-vous avec votre compte LDAP.<br/><br/>
-            <form action="${request.application_url}/login" method="post">
-                <input type="hidden" name="came_from" value="${came_from}"/>
-                <input type="text" name="login" value="${login}"/><br/>
-                <input type="password" name="password" value="${password}"/><br/>
-                <input type="submit" name="form.submitted" value="Log In"/>
-            </form>
-            </div>
-        </td>
-    </tr>
-    <tr>
-        <!-- end content -->
-        <!-- start footer -->
-        <td colspan="2" id="footer">
-            Application propulsée par <a href="http://repoze.org">Repoze.BFG</a>
-        </td>
-    </tr>
-</table>
-<!-- end footer -->
+<div metal:fill-slot="header">
+</div>
+
+<div class="subcontent" metal:fill-slot="content">
+  <h2>Log in with your LDAP account</h2>
+  <form action="${request.application_url}/login" method="post">
+    <div>
+      <input type="hidden" name="came_from" value="${came_from}"/>
+    </div>
+    <div>
+      <span>login: </span><input type="text" name="login" value="${login}"/><br/>
+    </div>
+    <div>
+      <span>password: </span><input type="password" name="password" value="${password}"/><br/>
+    </div>
+    <div>
+      <input type="submit" name="form.submitted" value="Log In"/>
+    </div>
+  </form>
+</div>
 </body>
 </html>
 
