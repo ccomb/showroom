@@ -37,16 +37,6 @@ td {
 }
 #logo { float: left; }
 
-#title{
-    top: 0;
-    background-color: white;
-    height: 93px;
-    font-size: 3em;
-    text-align: center;
-    vertical-align: middle;
-    margin:0;
-    padding: 0;
-}
 #demos_list, #message, #app_form {
     background-color: #F0F0F0;
     text-align: middle;
@@ -55,19 +45,21 @@ td {
     -moz-border-radius: 0.5em 0.5em;
     -webkit-border-radius: 0.5em 0.5em;
 }
-
 #app_form_dynamic div {
     margin: 0.5em 0;
     vertical-align: middle;
 }
-#app_form_dynamic div span {
+#app_form_dynamic div span, #app_form div span {
     display: inline-block;
     vertical-align: top;
-    width: 5em;
+    width: 8em;
     margin: 0.2em;
 }
-input, textarea {
+input, textarea, select {
     width: 15em;
+}
+#create input {
+    height: 2em;
 }
 #loading {
     margin: 0.5em;   

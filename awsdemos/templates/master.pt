@@ -4,7 +4,7 @@
       xmlns:metal="http://xml.zope.org/namespaces/metal">
 <head>
 <meta http-equiv="content-type" content="text/xml+xhtml; charset=utf-8" />
-<title>Liste des démos</title>
+<title>Showroom</title>
 <meta name="keywords" content="python web application" />
 <meta name="description" content="repoze.bfg web application" />
 <script type="text/javascript" src="${request.application_url}/static/jquery-1.4.1.min.js"></script>
@@ -40,7 +40,8 @@ $('document').ready(function(){
 <!-- form to create a demo -->
 <form id="app_form" method="POST"
 action="${request.application_url}/deploy">
-    <div>create a demo
+    <div>
+    <span>create a demo</span>
     <select name="app"
             onchange="update_app_form('${request.application_url}', this.value)">
     <option></option>
@@ -99,6 +100,7 @@ action="${request.application_url}/deploy">
       </td>
       <td class="demo_button">
         <a href="#" class="destroy"
+           onclick="if(!confirm('Do you really want to destroy this demo? This cannot be undone')) {return false;}"
            tal:condition="python: demo['status'] == 'STOPPED'"
            tal:attributes="href string:/destroy?name=${demo['name']}">
           destroy
@@ -112,8 +114,9 @@ action="${request.application_url}/deploy">
 
 <!-- start footer -->
 <div colspan="2" id="footer">
-    Powered by <a href="http://bfg.repoze.org">Repoze.BFG</a>
+    Powered by <a href="http://bfg.repoze.org">repoze.BFG</a>
     - <a href="https://bitbucket.org/alterway/showroom">Source code</a>
+    - copyleft <a href="http://alterway.fr">Alter Way</a> 2010
 </div>
 
 </body>

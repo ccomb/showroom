@@ -36,8 +36,8 @@ function update_app_form(url, app) {
                 }
             }
     $("#app_form_dynamic").append(
-        '<input id="app_form_submit" type="submit" value="ok"'+
-        'onclick="on_valid_form();"/>'
+        '<div id="create"><span></span><input id="app_form_submit" type="submit" value="ok"'+
+        'onclick="on_valid_form();"/></div>'
     )
         }
     );
