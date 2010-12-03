@@ -102,8 +102,7 @@ def logout(request):
     """ Get out of the application.
     """
     headers = forget(request)
-    return HTTPFound(location = route_url('view_wiki', request),
-                     headers = headers)
+    return HTTPFound(location = '/', headers = headers)
 
 
 def deploy(request):
