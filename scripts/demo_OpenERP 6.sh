@@ -32,7 +32,7 @@ cd ..
 NETRPC=$(($PORT+1000))
 cp ./sandbox/lib/python2.6/site-packages/openerp_web-*-py2.6.egg/openerp-web/doc/openerp-web.cfg .
 sed -i "s/^server.socket_port =.*/server.socket_port = $PORT/" openerp-web.cfg
-sed -i "s/^port = '8070'/port = '$NETRPC'/" openerp-web.cfg
+sed -i "s/^openerp.server.port = '8070'/openerp.server.port = '$NETRPC'/" openerp-web.cfg
 
 # initialise and create the database
 /usr/lib/postgresql/8.4/bin/initdb postgresql
