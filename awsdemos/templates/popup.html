@@ -1,0 +1,13 @@
+<div id="showroompopup" style="display: none">
+  <div id="showroomlogo">
+      <img src="/showroomstatic/images/logo.png" border="0" />
+  </div>
+  <div>
+    %s
+  </div>
+</div>
+<script>
+$(document).ready(function() {
+    $("#showroompopup").dialog({width: "40%%", title: 'Installation instructions'}).parents(".ui-dialog:eq(0)").wrap('<div id="showroomscope"></div>');
+})
+</script>

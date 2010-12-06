@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
-from wsgiproxy.exactproxy import proxy_exact_request
+from os.path import join, dirname, abspath
 from webob import Request, Response
 from webob.exc import HTTPFound
+from wsgiproxy.exactproxy import proxy_exact_request
 import urllib
-from ConfigParser import ConfigParser
-from os.path import join, dirname
 
 from awsdemos.utils import PATHS, ADMIN_HOST, InstalledDemo
 
@@ -16,11 +15,11 @@ class Proxy(object):
 
     def __call__(self, environ, start_response):
         global ADMIN_HOST
+        # we'll get the demo name from the url
+        request = Request(environ)
         if ADMIN_HOST is None:
             ADMIN_HOST = request.host
 
-        # we'll get the demo name from the url
-        request = Request(environ)
         splitted_host = request.host.split(':')[0].split('.')
         hostname = request.host.split(':')[0]
 
@@ -61,7 +60,26 @@ class Proxy(object):
         request.path_info = path_info
         request.environ['SERVER_NAME'] = 'localhost'
         request.environ['SERVER_PORT'] = demo.get_port()
+        # disable compression to be able to insert the js popup
+        request.environ['HTTP_ACCEPT_ENCODING'] = ''
         response = request.get_response(proxy_exact_request)
+
+        # add the info popup
+        content = "koukou " * 120
+        popup = open(join(abspath(dirname(__file__)),
+                          'templates', 'popup.html')).read() % content
+        css = ('<link href="/showroomstatic/jquery/css/showroom/jquery-ui-1.8.6.custom.css" type="text/css" rel="stylesheet" />\n'
+               '<link href="/showroomstatic/popup.css" type="text/css" rel="stylesheet" />\n')
+        js = ('<script type="text/javascript" src="/showroomstatic/jquery/js/jquery-1.4.2.min.js"></script>\n'
+              '<script type="text/javascript" src="/showroomstatic/jquery/js/jquery-ui-1.8.6.custom.min.js"></script>\n')
+
+        if 'html' in (response.content_type or ''):
+            if '</body>' in response.body and '<head>' in response.body:
+                response.body = response.body.replace('</head>', css + js + '</head>')
+                response.body = response.body.replace('</body>', popup + '</body>')
+            else:
+                response.body = css + js + response.body + popup
+
         return response(environ, start_response)
 
 

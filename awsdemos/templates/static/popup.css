@@ -1,0 +1,18 @@
+/* Add css missing from jquery ui */
+#showroompopup a:link {
+background-color: transparent;
+}
+
+/* additional style for the popup contents */
+#showroomscope .ui-dialog-titlebar {
+line-height: 0.5em;
+}
+#showroomscope {
+font-size: 8pt;
+line-height: 1.5em;
+}
+#showroompopup img {
+float: none;
+margin-bottom: 0.5em;
+}
+

@@ -35,7 +35,7 @@ td {
     vertical-align: top;
     text-align: middle;
 }
-#logo { float: left; }
+#logo { float: left; margin: 2em;}
 
 div.subcontent {
     background-color: #F0F0F0;
