@@ -77,15 +77,6 @@ rm mysql.tmp
 #    cd ..
 #fi
 
-# install drush
-wget http://ftp.drupal.org/files/projects/$drush_version
-tar xzf $drush_version
-
-# install additional modules
-cd drupal
-../drush/drush dl $plugins
-cd ..
-
 # stop mysql
 mysqladmin --socket=$PWD/mysql/mysqld.sock --user=root shutdown
 
@@ -99,9 +90,8 @@ cat > popup.html << EOF
 <p>To finish the Drupal installation, do the following:</p>
 <ol>
     <li>Visit the <a href="install.php">install.php</a> page.</li>
-    <li>Click on "Install Drupal in English"</li>
-    <li>Complete the form to create the initial user account</li>
-    <li>Enjoy</li>
+    <li>Finish the installation by filling in the forms</li>
+    <li>Enjoy!</li>
 </ol>
 EOF
 
