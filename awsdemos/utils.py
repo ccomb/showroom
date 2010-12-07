@@ -221,7 +221,7 @@ class InstalledDemo(object):
             a2status = XMLRPC.supervisor.getProcessInfo('apache2')['statename']
             if a2status == 'RUNNING':
                 retcode = subprocess.call(
-                    ["apache2ctl",  "-f", PATHS['etc']+"/apache2/apache2.conf", "-k", "graceful"])
+                    ["/usr/sbin/apache2ctl",  "-f", PATHS['etc']+"/apache2/apache2.conf", "-k", "graceful"])
                 return retcode
             else:
                 try:
