@@ -60,9 +60,10 @@ cat > popup.html << EOF
     <li>Click on <a href="manage">Zope Management Interface</a> and connect with the password you chose</li>
     <li>In the top right selection list, select "Plone Site"</li>
     <li>Choose an <i>Id</i> and a <i>Title</i> for your Plone site.<br/>
-        The id will be visible in the URL<br/>
-        then click on "Add Plone Site"</li>
-    <li>To visit you new Plone site, remove "manage" from the URL and replace it with the <i>Id</i> you just created</li>
+        The id will be visible in the URL<li/>
+    <li>Click on "Add Plone Site", you should then see your site in the list</li>
+    <li>Click on your site in the list</li>
+    <li>right-click on the "View" tab on the top, and select "Open in a new window (or tab)"</li>
     <li>Enjoy!</li>
 </ol>
 EOF
