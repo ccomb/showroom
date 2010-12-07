@@ -54,6 +54,7 @@ EOF
 #bin/instance run bin/initialize.py
 
 # create a popup for installation instruction
+cd ..
 cat > popup.html << EOF
 <p>To start using Plone 3, you must create a plone site. Do the following:</p>
 <ol>
