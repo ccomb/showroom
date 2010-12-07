@@ -46,7 +46,7 @@ mkdir mysql
 mysql_install_db --no-defaults --datadir=$PWD/mysql/
 
 # start mysql temporarily
-mysqld --no-defaults --socket=$PWD/mysql/mysqld.sock --datadir=$PWD/mysql/ --log-error=$PWD/mysql/mysql-error.log --port=$((PORT+1000)) &
+/usr/sbin/mysqld --no-defaults --socket=$PWD/mysql/mysqld.sock --datadir=$PWD/mysql/ --log-error=$PWD/mysql/mysql-error.log --port=$((PORT+1000)) &
 
 # wait for mysql to be started
 echo "Waiting for mysql to start..."
@@ -91,7 +91,7 @@ mysqladmin --socket=$PWD/mysql/mysqld.sock --user=root shutdown
 
 # create a startup script
 cat > start.sh << EOF
-exec mysqld --no-defaults --socket=$PWD/mysql/mysqld.sock --datadir=$PWD/mysql/ --log-error=$PWD/mysql/mysql-error.log --port=$((PORT+1000))
+exec /usr/sbin/mysqld --no-defaults --socket=$PWD/mysql/mysqld.sock --datadir=$PWD/mysql/ --log-error=$PWD/mysql/mysql-error.log --port=$((PORT+1000))
 EOF
 
 # create a popup for installation instruction
