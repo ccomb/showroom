@@ -53,3 +53,16 @@ EOF
 #
 #bin/instance run bin/initialize.py
 
+# create a popup for installation instruction
+cat > popup.html << EOF
+<p>To start using Plone 3, you must create a plone site. Do the following:</p>
+<ol>
+    <li>Click on <a href="manage">Zope Management Interface</a> and connect with the password you chose</li>
+    <li>In the top right selection list, select "Plone Site"</li>
+    <li>Choose an <i>Id</i> and a <i>Title</i> for your Plone site.<br/>
+        The id will be visible in the URL<br/>
+        then click on "Add Plone Site"</li>
+    <li>To visit you new Plone site, remove "manage" from the URL and replace it with the <i>Id</i> you just created</li>
+    <li>Enjoy!</li>
+</ol>
+EOF

@@ -94,7 +94,14 @@ cat > start.sh << EOF
 exec mysqld --no-defaults --socket=$PWD/mysql/mysqld.sock --datadir=$PWD/mysql/ --log-error=$PWD/mysql/mysql-error.log --port=$((PORT+1000))
 EOF
 
-
-
-
+# create a popup for installation instruction
+cat > popup.html << EOF
+<p>To finish the Drupal installation, do the following:</p>
+<ol>
+    <li>Visit the <a href="install.php">install.php</a> page.</li>
+    <li>Click on "Install Drupal in English"</li>
+    <li>Complete the form to create the initial user account</li>
+    <li>Enjoy</li>
+</ol>
+EOF
 

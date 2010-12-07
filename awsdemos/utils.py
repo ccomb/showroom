@@ -144,10 +144,16 @@ class InstalledDemo(object):
         self.start_script = join(PATHS['demos'], name, 'start.sh')
         self.apache_config_file = join(PATHS['demos'], name, 'apache2.conf')
         self.apache_config_link = join(PATHS['var'], 'apache2', 'demos', name + '.conf')
+        self.popup = None
+        self.popup_file = join(PATHS['demos'], name, 'popup.html')
+        if self.has_popup:
+            with open(self.popup_file) as p:
+                self.popup = p.read()
 
     has_startup_script = property(lambda self: os.path.exists(self.start_script))
     has_apache_link = property(lambda self: os.path.exists(self.apache_config_link))
     has_apache_conf = property(lambda self: os.path.exists(self.apache_config_file))
+    has_popup = property(lambda self: os.path.exists(self.popup_file))
 
     def get_port(self):
         conf = SafeConfigParser()

@@ -55,3 +55,22 @@ trap "kill \$web_pid; kill \$openerp_pid; kill \$postgres_pid" EXIT
 cat
 EOF
 
+# create a popup for installation instruction
+cat > popup.html << EOF
+<p>To start using OpenERP, you must create a database. Do the following:</p>
+<ol>
+    <li>Click on "Databases"</li>
+    <li>Click on "Create"</li>
+    <li>Fill in the form:
+        <ul>
+            <li>Super admin password: admin</li>
+            <li>New database name: <your_database_name></li>
+            <li>Load Demonstration data: check if you need demo data</li>
+            <li>Default Language: choose your language</li>
+            <li>Administrator password: <choose a password for the "admin" account></li>
+            <li>Confirm password: <repeat the same password></li>
+        </ul>
+    <li>Click on OK, and wait a few seconds</li>
+    <li>Start configuring your new database</li>
+</ol>
+EOF

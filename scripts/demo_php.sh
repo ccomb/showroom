@@ -1,5 +1,6 @@
 #!/bin/bash
 # PARAMS: name
+
 set -e
 
 
@@ -7,7 +8,7 @@ set -e
 mkdir htdocs
 cat > htdocs/index.php << EOF
 <?php
-    echo 'hello world';
+    phpinfo();
 ?>
 EOF
 
