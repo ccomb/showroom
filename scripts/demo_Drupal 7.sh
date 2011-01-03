@@ -1,10 +1,10 @@
 #!/bin/bash
-# PARAMS: name, version=7.0rc1
+# PARAMS: name, version=7.0-rc4
 # sudo aptitude install php5-cli apache2
 # sudo pear install Console_Table
 
 # download drupal
-drupal_version=7.0-rc1
+drupal_version=$version
 drush_version=drush-6.x-3.3.tar.gz
 db_name=drupal
 db_user=drupal
