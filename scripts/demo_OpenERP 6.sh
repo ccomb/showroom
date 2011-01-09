@@ -30,7 +30,7 @@ cd ..
 
 # copy and change the default config
 NETRPC=$(($PORT+1000))
-cp ./sandbox/lib/python2.6/site-packages/openerp_web-*-py2.6.egg/openerp-web/doc/openerp-web.cfg .
+cp ./sandbox/lib/python2.6/site-packages/openerp_web-*-py2.6.egg/doc/openerp-web.cfg .
 sed -i "s/^server.socket_port =.*/server.socket_port = $PORT/" openerp-web.cfg
 sed -i "s/^openerp.server.port = '8070'/openerp.server.port = '$NETRPC'/" openerp-web.cfg
 
