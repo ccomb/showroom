@@ -3,9 +3,10 @@
 # sudo aptitude install php5-cli apache2
 
 # download sugar
-version=6.1.0
+version=6.1.1
 
-wget http://www.sugarforge.org/frs/download.php/7567/SugarCE-$version.zip
+#wget http://www.sugarforge.org/frs/download.php/7567/SugarCE-$version.zip
+wget http://www.sugarforge.org/frs/download.php/7678/SugarCE-6.1.1.zip
 unzip SugarCE-$version.zip
 mv SugarCE-Full-$version sugar
 
@@ -48,9 +49,13 @@ rm mysql.tmp
 # stop mysql
 mysqladmin --socket=$PWD/mysql/mysqld.sock --user=root shutdown
 
+# add contrab rule
+crontab -l >/tmp/crontab
+echo "* * * * * cd $PWD/sugar; php -f cron.php >/dev/null 2>&1">>/tmp/crontab
+crontab /tmp/crontab
+rm /tmp/crontab
+
 # create a startup script
 cat > start.sh << EOF
 exec /usr/sbin/mysqld --no-defaults --socket=$PWD/mysql/mysqld.sock --datadir=$PWD/mysql/ --log-error=$PWD/mysql/mysql-error.log --port=$((PORT+1000))
 EOF
-
-

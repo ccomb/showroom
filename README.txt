@@ -36,8 +36,8 @@ sudo aptitude install subversion mercurial build-essential python-virtualenv \
 
 Then you can install the development trunk of Showroom with::
 
-  $ hg clone https://bitbucket.org/alterway/aws.demos
-  $ cd aws.demos
+  $ hg clone https://bitbucket.org/alterway/showroom
+  $ cd showroom
   $ virtualenv --no-site-packages --distribute sandbox
   $ sandbox/bin/python bootstrap.py
   $ ./bin/buildout
