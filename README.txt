@@ -40,6 +40,7 @@ Then you can install the development trunk of Showroom with::
   $ cd showroom
   $ virtualenv --no-site-packages --distribute sandbox
   $ sandbox/bin/python bootstrap.py
+  $ mkdir src
   $ ./bin/buildout
 
 Starting
