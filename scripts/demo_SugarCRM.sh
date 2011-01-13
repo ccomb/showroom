@@ -1,16 +1,17 @@
 #!/bin/bash
 # PARAMS: name, username, password, usermail
-# sudo aptitude install php5-cli apache2
-db_name=sugar_crm$name
-db_password=sugar_crm$username$password
+# sudo aptitude install php5-cli apache2 php5-imap php5-curl
+db_name=sugar
+db_password=sugar
+db_host=127.0.0.1
 db_port=$((PORT+1000))
 # download sugar
 version=6.1.1
 url=$REQUEST_HOST
 
 #wget http://www.sugarforge.org/frs/download.php/7567/SugarCE-$version.zip
-#wget http://www.sugarforge.org/frs/download.php/7678/SugarCE-6.1.1.zip
-cp ../SugarCE-$version.zip .
+wget http://www.sugarforge.org/frs/download.php/7678/SugarCE-6.1.1.zip
+#cp ../SugarCE-$version.zip .
 unzip SugarCE-$version.zip
 mv SugarCE-Full-$version sugar
 
@@ -40,13 +41,10 @@ while [ $? -ne 0 ]; do
     mysqladmin --socket=$PWD/mysql/mysqld.sock --user=root status
 done
 
-# create a database
-mysqladmin --socket=$PWD/mysql/mysqld.sock --user=root create sugar
-
 # create a user with all privileges on the database
 echo "\
 CREATE USER 'sugar'@'localhost' IDENTIFIED BY 'sugar';
-GRANT ALL ON sugar.* TO 'sugar'@'localhost';
+GRANT ALL ON sugarcrm.* TO 'sugar'@'localhost';
 FLUSH PRIVILEGES;
 " | mysql --socket=$PWD/mysql/mysqld.sock --user=root mysql
 
@@ -54,16 +52,16 @@ FLUSH PRIVILEGES;
 mysqladmin --socket=$PWD/mysql/mysqld.sock --user=root shutdown
 
 # hack into install script!
-sed 3i\$_SESSION[\'setup_db_host_name\']=\'127.0.0.1:$db_port\'\; -i sugar/install/dbConfig_a.php
+sed 3i\$_SESSION[\'setup_db_host_name\']=\'$db_host:$db_port\'\; -i sugar/install/dbConfig_a.php
 sed 4i\$_SESSION[\'setup_db_admin_user_name\']=\'sugar\'\; -i sugar/install/dbConfig_a.php
 sed 5i\$_SESSION[\'setup_db_admin_password\']=\'sugar\'\; -i sugar/install/dbConfig_a.php
 
 
 # add contrab rule
-crontab -l >/tmp/crontab
-echo "* * * * * cd $PWD/sugar; php -f cron.php >/dev/null 2>&1">>/tmp/crontab
-crontab /tmp/crontab
-rm /tmp/crontab
+#crontab -l >/tmp/crontab
+#echo "* * * * * cd $PWD/sugar; php -f cron.php >/dev/null 2>&1">>/tmp/crontab
+#crontab /tmp/crontab
+#rm /tmp/crontab
 
 # create a startup script
 cat > start.sh << EOF
