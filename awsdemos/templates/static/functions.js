@@ -23,7 +23,10 @@ function update_app_form(url, app) {
     jQuery.getJSON(
         url+"/app_params?app="+app,
         function(data){
-            params = data['params']
+            $("#app_form_dynamic").append(
+                '<a href=/script/'+app+'>source</a>'
+            );
+            params = data['params'];
             for (param in params) {
                 if (params[param]=='plugins') {
                     $("#app_form_dynamic").append(

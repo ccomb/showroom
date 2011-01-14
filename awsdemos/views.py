@@ -196,3 +196,18 @@ def app_params(request):
     else:
         return ("No application name given or unknown application.",)
 
+def app_script(request):
+    """ return the script of a given demo, this is a link avaiable during the
+    demo creation process
+    """
+    if 'app' in request.params and request.params['app'] in available_demos:
+        return render_template_to_response(
+        join(abspath(dirname(__file__)), 'templates', 'script.pt'),
+        master=get_template('templates/master.pt'),
+        lines=enumerate(open(utils.scriptname(app)).readlines()),
+        logged_in=authenticated_userid(request),
+        )
+
+    else:
+        return ("No application name given or unknown application.",)
+

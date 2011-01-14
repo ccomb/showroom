@@ -371,7 +371,3 @@ def deploy(params, app_name):
         app_conf.write(configfile)
     LOG.info('section %s added', app_name)
 
-
-
-
-

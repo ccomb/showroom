@@ -69,6 +69,12 @@
          view_permission="edit"
   />
 
+  <route name="app_scripts"
+         path="/script/"
+         view=".views.app_script"
+         view_permission="edit"
+  />
+
   <static
      name="static"
      path="templates/static"
