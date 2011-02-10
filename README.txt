@@ -61,18 +61,16 @@ Once started, you can access Showroom at http://localhost:6543/
 
 TODO :
 
-* arreter automatiquement le supervisor si zero demo
-* pouvoir visualiser les scripts
-* afficher le nombre de lignes du script
-* calculer le temps de déploiement
-* (tracer des courbes avec toutes ces valeurs)
-* mettre un bouton "ajouter la prise en charge d'une nouvelle démo" qui explique
-  comment faire et donne le squelette du script 
-* lancer les déploiements en asynchrone, et afficher un gif animé pour montrer
-  que ça tourne.
-* Eventuellement faire ça avec zc.async.
-* pouvoir sauvegarder un déploiement pour le reproduire (sauf le port)
-* stopper les demos si aucune requete n'est faite pendant 5min. proposer de
-  redémarrer si on essaye d'y accéder quand-même.
-* ajouter un indicateur vert/rouge pour apache et supervisor
-* ajouter un proxy de téléchargement pour accélérer les déploiements
+* automatically stop supervisor if no demo
+* being able to visualize scripts
+* show script LOC wheight
+* calculate deployment time
+* generate graphics with those datas
+* add a button "add a new demo script", which explain how to do it and provide
+  a script template
+* makes deployments asynchrones, add a small animated gif to show it's running
+  zc.async can help
+* being able to save a deployment to be able to reproduce it (except the port)
+* stop demos if no request are done in 5 minutes, propose to restart if someone try to access
+* add an indication green/red for apache and supervisord
+* add a download proxy to accelerate deployments
