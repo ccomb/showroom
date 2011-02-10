@@ -70,7 +70,7 @@
   />
 
   <route name="app_scripts"
-         path="/script/"
+         path="/script"
          view=".views.app_script"
          view_permission="edit"
   />
