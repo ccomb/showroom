@@ -1,5 +1,5 @@
 #!/bin/bash
-# PARAMS: name, version=7.0-rc4
+# PARAMS: name, version=7.0
 # sudo aptitude install php5-cli apache2
 # sudo pear install Console_Table
 
