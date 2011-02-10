@@ -16,9 +16,9 @@ requires = [
     'interlude',
 ]
 
-setup(name='aws.demos',
-      version='0.0',
-      description='aws.demos',
+setup(name='showroom',
+      version='0.1dev',
+      description='Deploy web app demos in 1 click',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
         "Programming Language :: Python",
@@ -35,12 +35,12 @@ setup(name='aws.demos',
       zip_safe=False,
       install_requires=requires,
       tests_require=requires,
-      test_suite="awsdemos",
+      test_suite="showroom",
       entry_points = """\
       [paste.app_factory]
-      app = awsdemos.run:app
+      app = showroom.run:app
       [paste.filter_factory]
-      proxy = awsdemos.proxy:make_filter
+      proxy = showroom.proxy:make_filter
       """
       )
 

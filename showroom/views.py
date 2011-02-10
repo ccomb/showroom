@@ -1,5 +1,5 @@
 # coding: utf-8
-from awsdemos.security import ldaplogin
+from showroom.security import ldaplogin
 from repoze.bfg.chameleon_zpt import get_template
 from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.exceptions import NotFound

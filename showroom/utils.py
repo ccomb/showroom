@@ -51,7 +51,7 @@ def connect_supervisor():
     # try again
     XMLRPC.supervisor.getPID()
 
-from awsdemos import currently_testing
+from showroom import currently_testing
 if not currently_testing:
     connect_supervisor()
 

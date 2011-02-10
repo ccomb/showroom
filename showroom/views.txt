@@ -2,10 +2,10 @@ Test some views
 
 #>>> from repoze.bfg import configuration
 #>>> from repoze.bfg.testing import DummyRequest
-#>>> from awsdemos import views
-#>>> import awsdemos
+#>>> from showroom import views
+#>>> import showroom
 #
-#>>> conf = configuration.Configurator(package=awsdemos)
+#>>> conf = configuration.Configurator(package=showroom)
 #>>> conf.testing_add_renderer('templates/master.pt')
 #>>> views.installed_demos(DummyRequest())
 #Traceback (most recent call last):

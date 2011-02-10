@@ -1,11 +1,11 @@
-AWS Demos comes with several predefined deployment scripts for the demos.
+Showroom comes with several predefined deployment scripts for the demos.
 
 Available Demos
 ---------------
 
 We can get the list of available demos as a dict:
 
->>> from awsdemos import utils
+>>> from showroom import utils
 >>> available_demos = utils.available_demos()
 >>> from pprint import pprint
 >>> pprint(available_demos, width=1)

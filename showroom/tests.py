@@ -1,19 +1,19 @@
 # keep this at the top:
-import awsdemos
-awsdemos.currently_testing = True
+import showroom
+showroom.currently_testing = True
 ###
 from os import mkdir, chdir, getcwd
 from os.path import abspath, dirname, join
 from repoze.bfg import testing
 from repoze.bfg.configuration import Configurator
 from repoze.bfg.exceptions import NotFound
-import awsdemos.utils
-import awsdemos.views
+import showroom.utils
+import showroom.views
 import subprocess
 import tempfile, shutil
 import unittest, doctest
 
-PATHS = awsdemos.utils.PATHS
+PATHS = showroom.utils.PATHS
 
 def setUp(self):
     # For the tests, we change the location of the demos
@@ -65,7 +65,7 @@ def setUp(self):
     self.cwd = getcwd()
     chdir(base_dir)
     subprocess.call(PATHS['bin'] + "/supervisord -c " + self.supervisor, shell=True)
-    awsdemos.utils.connect_supervisor()
+    showroom.utils.connect_supervisor()
 
 
 def tearDown(self):
@@ -94,7 +94,7 @@ class ViewTests(unittest.TestCase):
     def test_view_app_list(self):
         """check that the app list don't fail
         """
-        from awsdemos.views import installed_demos
+        from showroom.views import installed_demos
         request = testing.DummyRequest()
         info = installed_demos(request)
         self.assertEqual(info.status, '200 OK')
@@ -102,12 +102,12 @@ class ViewTests(unittest.TestCase):
     def test_deploy(self):
         """a deploy without argument should return NotFound
         """
-        from awsdemos.views import deploy
+        from showroom.views import deploy
         request = testing.DummyRequest()
         self.assertRaises(NotFound, deploy, request)
 
     def test_new_app(self):
-        from awsdemos.views import deploy
+        from showroom.views import deploy
         request = testing.DummyRequest(params={'app':'not_existing'},
                                        path='/new')
         self.assertRaises(NotFound, deploy, request)
@@ -119,8 +119,8 @@ def test_suite():
         unittest.makeSuite(ViewTests),
         doctest.DocFileSuite('views.txt', optionflags=optionflags, setUp=setUp, tearDown=tearDown),
         doctest.DocFileSuite('utils.txt', optionflags=optionflags, setUp=setUp, tearDown=tearDown),
-        doctest.DocTestSuite(awsdemos.views, optionflags=optionflags),
-        doctest.DocTestSuite(awsdemos.utils, optionflags=optionflags),
+        doctest.DocTestSuite(showroom.views, optionflags=optionflags),
+        doctest.DocTestSuite(showroom.utils, optionflags=optionflags),
     ])
     return suite
 

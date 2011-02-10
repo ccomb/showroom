@@ -1,10 +1,10 @@
 from repoze.bfg.configuration import Configurator
-from awsdemos.models import RootFactory
+from showroom.models import RootFactory
 
 def app(global_config, **settings):
     """ This function returns a WSGI application.
-    
-    It is usually called by the PasteDeploy framework during 
+
+    It is usually called by the PasteDeploy framework during
     ``paster serve``.
     """
     zcml_file = settings.get('configure_zcml', 'configure.zcml')

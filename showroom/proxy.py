@@ -5,7 +5,7 @@ from webob.exc import HTTPFound
 from wsgiproxy.exactproxy import proxy_exact_request
 import urllib
 
-from awsdemos.utils import PATHS, ADMIN_HOST, InstalledDemo
+from showroom.utils import PATHS, ADMIN_HOST, InstalledDemo
 
 class Proxy(object):
     """ wsgi middleware that acts as a proxy, or directs to the admin
