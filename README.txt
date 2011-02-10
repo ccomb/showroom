@@ -65,10 +65,10 @@ TODO :
 * being able to visualize scripts
 * show script LOC wheight
 * calculate deployment time
-* generate graphics with those datas
+* generate graphics with those data
 * add a button "add a new demo script", which explain how to do it and provide
   a script template
-* makes deployments asynchrones, add a small animated gif to show it's running
+* make deployments asynchronouss, add a small animated gif to show it's running
   zc.async can help
 * being able to save a deployment to be able to reproduce it (except the port)
 * stop demos if no request are done in 5 minutes, propose to restart if someone try to access
