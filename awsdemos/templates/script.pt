@@ -1,0 +1,52 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="master.macros['master']">
+<head>
+  <title>Showroom</title>
+</head>
+
+<body>
+
+<!-- header -->
+<div id="header">
+
+  <!-- user -->
+  <div metal:fill-slot="header" id="user_ID">
+      ${logged_in}
+      <a href='${request.application_url}/logout'>disconnect</a>
+  </div>
+</div>
+
+<div id="content" metal:fill-slot="content">
+  <!-- demo list -->
+  <div id="demos_list" class="subcontent">
+  <table>
+   <tr>
+    <td>
+     <span tal:repeat="line lines">
+       <a tal:attributes="href #${line[0]}"
+       tal:content="line[0]"> line num </a>
+     </span>
+    </td>
+   <td>
+    <span tal:repeat="line lines" tal:content="line[1]">
+     line
+    </span>
+   </td>
+   </tr>
+  </table>
+  </div>
+</div>
+
+
+<!-- start footer -->
+<div colspan="2" id="footer">
+    Powered by <a href="http://bfg.repoze.org">repoze.BFG</a>
+    - <a href="https://bitbucket.org/alterway/showroom">Source code</a>
+    - copyleft <a href="http://alterway.fr">Alter Way</a> 2010
+</div>
+
+</body>
+</html>
