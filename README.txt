@@ -74,3 +74,4 @@ TODO :
 * stop demos if no request are done in 5 minutes, propose to restart if someone try to access
 * add an indication green/red for apache and supervisord
 * add a download proxy to accelerate deployments
+* makes application tweet deployments
