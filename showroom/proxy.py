@@ -76,7 +76,8 @@ class Proxy(object):
 
             if 'html' in (response.content_type or ''):
                 if '</body>' in response.body and '<head>' in response.body:
-                    response.body = response.body.replace('</head>', css + js + '</head>')
+                    response.body = response.body.replace('<head>', '</head>' + js)
+                    response.body = response.body.replace('</head>', css + '</head>')
                     response.body = response.body.replace('</body>', popup + '</body>')
                 else:
                     response.body = css + js + response.body + popup
