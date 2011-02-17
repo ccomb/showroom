@@ -40,6 +40,7 @@ echo "ident_file = '$PWD/postgresql/pg_ident.conf'" >> postgresql/postgresql.con
 echo "unix_socket_directory='$PWD'" >> postgresql/postgresql.conf
 echo "port = $((PORT+2000))" >> postgresql/postgresql.conf
 
+# create the startup script
 cat > start.sh << EOF
 #!/bin/bash
 trap "pkill -1 -P \$\$" EXIT

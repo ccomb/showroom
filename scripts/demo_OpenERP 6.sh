@@ -40,12 +40,25 @@ echo "ident_file = '$PWD/postgresql/pg_ident.conf'" >> postgresql/postgresql.con
 echo "unix_socket_directory='$PWD'" >> postgresql/postgresql.conf
 echo "port = $((PORT+2000))" >> postgresql/postgresql.conf
 
+# prepare the server config file
+cat > $PWD/openerp-server.conf << EOF
+[options]
+netrpc = True
+netrpc_interface = localhost
+netrpc_port = $NETRPC
+xmlrpcs = False
+xmlrpc = False
+db_host = localhost
+db_port = $((PORT+2000))
+EOF
+
+# create the startup script
 cat > start.sh << EOF
 #!/bin/bash
 trap "pkill -1 -P \$\$" EXIT
 /usr/lib/postgresql/8.4/bin/postgres -D $PWD/postgresql &
 postgres_pid=\$!
-./sandbox/bin/openerp-server --netrpc-interface=localhost --netrpc-port=$NETRPC --no-xmlrpc --no-xmlrpcs --db_host=localhost --db_port=$((PORT+2000)) &
+./sandbox/bin/openerp-server -c $PWD/openerp-server.conf &
 openerp_pid=\$!
 ./sandbox/bin/openerp-web -c openerp-web.cfg &
 web_pid=\$!
