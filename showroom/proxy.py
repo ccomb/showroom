@@ -8,7 +8,7 @@ import urllib
 from showroom.utils import PATHS, ADMIN_HOST, InstalledDemo
 
 class Proxy(object):
-    """ wsgi middleware that acts as a proxy, or directs to the admin
+    """ wsgi middleware that acts as a proxy, or redirects to the admin
     """
     def __init__(self, app):
         self.app = app
@@ -64,9 +64,13 @@ class Proxy(object):
         request.environ['HTTP_ACCEPT_ENCODING'] = ''
         response = request.get_response(proxy_exact_request)
 
+        # disable the popup if asked
+        if 'showroompopup_hide' in environ['QUERY_STRING']:
+            demo.disable_popup()
+
         # add the info popup
         content = demo.popup
-        if content is not None:
+        if content is not None and demo.is_popup_displayed:
             popup = open(join(abspath(dirname(__file__)),
                               'templates', 'popup.html')).read() % content
             css = ('<link href="/showroomstatic/jquery/css/showroom/jquery-ui-1.8.6.custom.css" type="text/css" rel="stylesheet" />\n'
@@ -76,7 +80,7 @@ class Proxy(object):
 
             if 'html' in (response.content_type or ''):
                 if '</body>' in response.body and '<head>' in response.body:
-                    response.body = response.body.replace('<head>', '</head>' + js)
+                    response.body = response.body.replace('<head>', '<head>' + js)
                     response.body = response.body.replace('</head>', css + '</head>')
                     response.body = response.body.replace('</body>', popup + '</body>')
                 else:

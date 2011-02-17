@@ -149,21 +149,34 @@ class InstalledDemo(object):
         if self.has_popup:
             with open(self.popup_file) as p:
                 self.popup = p.read()
+        # read the demo config
+        self.democonf = SafeConfigParser()
+        self.democonf_path = join(PATHS['demos'], name, 'demo.conf')
+        self.democonf.read(self.democonf_path)
 
     has_startup_script = property(lambda self: os.path.exists(self.start_script))
     has_apache_link = property(lambda self: os.path.exists(self.apache_config_link))
     has_apache_conf = property(lambda self: os.path.exists(self.apache_config_file))
     has_popup = property(lambda self: os.path.exists(self.popup_file))
 
-    def get_port(self):
-        conf = SafeConfigParser()
-        conf_path = join(PATHS['demos'], self.name, 'demo.conf')
+    @property
+    def is_popup_displayed(self):
+        """tells if the popup should be displayed
+        """
         try:
-            conf.read(conf_path)
-            return conf.get(self.name, 'port')
-        except:
-            self.broken = True; return ''
+            return self.democonf.getboolean(self.name, 'displaypopup')
+        except Exception:
+            return True
 
+    def disable_popup(self):
+        """disable the popup
+        """
+        self.democonf.set(self.name, 'displaypopup', '0')
+        with open(self.democonf_path, 'w') as democonf_file:
+            self.democonf.write(democonf_file)
+
+    def get_port(self):
+        return self.democonf.get(self.name, 'port')
 
     def get_status(self):
         """return the status of the demo

@@ -28,3 +28,10 @@ color: red;
 #showroomscope a:visited, #showroomscope a {
 text-decoration: underline;
 }
+
+#showroompopup_hide {
+position: absolute;
+bottom: 0.5em;
+right: 0.5em;
+}
+
