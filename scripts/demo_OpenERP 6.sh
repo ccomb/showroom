@@ -10,7 +10,7 @@ virtualenv --no-site-packages --distribute sandbox
 # egenix distribution setup is just a pain
 sandbox/bin/easy_install http://downloads.egenix.com/python/egenix-mx-base-3.1.2.tar.gz
 sandbox/bin/pip install http://download.gna.org/pychart/PyChart-1.39.tar.gz
-sandbox/bin/pip install --download-cache=$HOME/eggs psycopg2==2.2.2 reportlab==2.4 pydot==1.0.2 lxml==2.2.8 pytz==2010k PIL==1.1.7 PyYAML==3.09
+sandbox/bin/pip install --download-cache=$HOME/eggs psycopg2==2.2.2 reportlab==2.4 pydot==1.0.2 lxml==2.2.8 pytz==2010k PIL==1.1.7 PyYAML==3.09 cherrypy==3.1.2
 
 # download and install the server
 wget http://openerp.com/download/stable/source/openerp-server-$version.tar.gz
