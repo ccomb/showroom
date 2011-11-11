@@ -1,10 +1,10 @@
 # coding: utf-8
 from showroom.security import ldaplogin
-from repoze.bfg.chameleon_zpt import get_template
-from repoze.bfg.chameleon_zpt import render_template_to_response
-from repoze.bfg.exceptions import NotFound
-from repoze.bfg.security import authenticated_userid, forget, remember
-from repoze.bfg.url import route_url
+from pyramid.chameleon_zpt import get_template
+from pyramid.chameleon_zpt import render_template_to_response
+from pyramid.exceptions import NotFound
+from pyramid.security import authenticated_userid, forget, remember
+from pyramid.url import route_url
 from urlparse import urlsplit, urlunsplit
 from os.path import join, abspath, dirname
 from utils import ADMIN_HOST

@@ -1,4 +1,4 @@
-from repoze.bfg.security import Allow, Authenticated
+from pyramid.security import Allow, Authenticated
 
 class RootFactory(object):
     """

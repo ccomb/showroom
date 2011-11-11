@@ -4,9 +4,9 @@ showroom.currently_testing = True
 ###
 from os import mkdir, chdir, getcwd
 from os.path import abspath, dirname, join
-from repoze.bfg import testing
-from repoze.bfg.configuration import Configurator
-from repoze.bfg.exceptions import NotFound
+from pyramid import testing
+from pyramid.configuration import Configurator
+from pyramid.exceptions import NotFound
 import showroom.utils
 import showroom.views
 import subprocess

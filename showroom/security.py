@@ -1,4 +1,4 @@
-from repoze.bfg.security import Authenticated
+from pyramid.security import Authenticated
 
 from dataflake.ldapconnection.connection import LDAPConnection as ldap
 from ldap import INVALID_CREDENTIALS as invalid_credentials
