@@ -8,7 +8,7 @@ CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
 requires = [
     'setuptools',
-    'repoze.bfg',
+    'pyramid',
     'WSGIProxy',
     'afpy.ldap',
     'python-ldap',
