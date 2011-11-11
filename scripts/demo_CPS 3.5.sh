@@ -20,7 +20,7 @@ cd Zope-${zope_version}
 ./configure --with-python=../sandbox/bin/python2.4
 make
 make inplace
-./bin/mkzopeinstance.py -d cps -u admin:admin
+./bin/mkzopeinstance.py -d cps -u admin:$password
 
 # install CPS
 cd cps
