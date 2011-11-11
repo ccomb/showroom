@@ -9,6 +9,7 @@ CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 requires = [
     'setuptools',
     'pyramid',
+    'pyramid_zcml',
     'WSGIProxy',
     'afpy.ldap',
     'python-ldap',
