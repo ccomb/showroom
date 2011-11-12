@@ -75,3 +75,8 @@ TODO :
 * add an indication green/red for apache and supervisord
 * add a download proxy to accelerate deployments
 * makes application tweet deployments
+* debug option to display the deployment console in the browser
+* debug option to display the apache log (or others) in the browser
+* allow several deployments to be made at the same time
+* more ajax in the management view
+

@@ -10,8 +10,8 @@ which lynx unzip xsltproc pdftohtml ghostscript unrtf wvHtml xlhtml ppthtml || e
 # dependencies
 sandbox/bin/pip install --download-cache=$HOME/eggs -f http://dist.plone.org/thirdparty/ PIL==1.1.7
 sandbox/bin/pip install --download-cache=$HOME/eggs -f http://dist.plone.org/thirdparty/ lxml==2.3.1
-sandbox/bin/pip install --download-cache=$HOME/eggs -f http://dist.plone.org/thirdparty/ python-ldap=2.3.13
-sandbox/bin/pip install --download-cache=$HOME/eggs -f http://dist.plone.org/thirdparty/ docutils=0.8.1
+sandbox/bin/pip install --download-cache=$HOME/eggs -f http://dist.plone.org/thirdparty/ python-ldap==2.3.13
+sandbox/bin/pip install --download-cache=$HOME/eggs -f http://dist.plone.org/thirdparty/ docutils==0.8.1
 
 # install Zope
 wget http://old.zope.org/Products/Zope/2.9.12/Zope-2.9.12-final.tgz
@@ -20,18 +20,24 @@ cd Zope-${zope_version}
 ./configure --with-python=../sandbox/bin/python2.4
 make
 make inplace
-./bin/mkzopeinstance.py -d cps -u admin:$password
+cd ..
+./Zope-${zope_version}/bin/mkzopeinstance.py -d zinstance -u $login:$password
 
 # install CPS
-cd cps
+cd zinstance
 wget http://download.cps-cms.org/CPS-${version}/CPS-Full-${version}.tgz
 tar xzf CPS-Full-${version}.tgz
 mv CPS-Full-${version}/* Products/
 
+# change the port
+sed -i "s/address 8080/address $PORT/" "etc/zope.conf"
+
+cd ..
+
 # create the startup script
-cat > ../start.sh << EOF
+cat > start.sh << EOF
 #!/usr/bin/env sh
-exec Zope-${zope_version}/cps/bin/runzope
+exec zinstance/bin/runzope
 EOF
 
 # create a popup for installation instruction
