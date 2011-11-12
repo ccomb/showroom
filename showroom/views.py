@@ -1,5 +1,5 @@
 # coding: utf-8
-from showroom.security import ldaplogin
+from showroom.security import check_login
 from pyramid.chameleon_zpt import get_template
 from pyramid.chameleon_zpt import render_template_to_response
 from pyramid.exceptions import NotFound
@@ -84,7 +84,7 @@ def login(request):
     if 'form.submitted' in request.params:
         login = request.params['login']
         password = request.params['password']
-        if ldaplogin(login, password):
+        if check_login(login, password):
             headers = remember(request, login)
             return HTTPFound(location = came_from,
                              headers = headers)
@@ -200,7 +200,8 @@ def app_script(request):
     """ return the script of a given demo, this is a link avaiable during the
     demo creation process
     """
-    if 'app' in request.params and request.params['app'] in available_demos:
+    if 'app' in request.params and request.params['app'] in utils.available_demos():
+        app = request.params['app']
         return render_template_to_response(
         join(abspath(dirname(__file__)), 'templates', 'script.pt'),
         master=get_template('templates/master.pt'),

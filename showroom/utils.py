@@ -14,7 +14,7 @@ LOG = logging.getLogger(__name__)
 CONFIG = SafeConfigParser()
 PATH = dirname(dirname(__file__))
 
-CONFIG.read(join(PATH, 'deploy.ini'))
+CONFIG.read(join(PATH, 'showroom.ini'))
 # XXX don't use this file for that
 PATHS = {
   'bin' : join(PATH, CONFIG.get('paths', 'bin')),
@@ -24,8 +24,7 @@ PATHS = {
   'etc' : join(PATH, CONFIG.get('paths', 'etc')),
   'supervisor' : join(PATH, CONFIG.get('paths', 'supervisor')),
 }
-ADMIN_HOST = CONFIG.get('DEFAULT', 'hostname')
-del CONFIG
+ADMIN_HOST = CONFIG.get('global', 'hostname')
 
 if not isdir(PATHS['demos']):
     os.makedirs(PATHS['demos'])
