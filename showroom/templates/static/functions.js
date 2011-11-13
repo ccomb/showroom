@@ -46,3 +46,4 @@ function update_app_form(url, app) {
     );
 }
 
+$( function(event) { $("#message").effect('pulsate', 100); })

@@ -13,7 +13,7 @@
 </div>
 
 <div class="subcontent" metal:fill-slot="content">
-  <h2>Log in with your LDAP account</h2>
+  <h2>ShowRoom log in</h2>
   <form action="${request.application_url}/login" method="post">
     <div>
       <input type="hidden" name="came_from" value="${came_from}"/>
