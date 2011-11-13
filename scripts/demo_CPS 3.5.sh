@@ -41,7 +41,6 @@ exec zinstance/bin/runzope
 EOF
 
 # create a popup for installation instruction
-cd ..
 cat > popup.html << EOF
 <p>To start using CPS, you must create a CPS site. Do the following:</p>
 <ol>

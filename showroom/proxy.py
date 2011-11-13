@@ -73,10 +73,10 @@ class Proxy(object):
         if content is not None and demo.is_popup_displayed:
             popup = open(join(abspath(dirname(__file__)),
                               'templates', 'popup.html')).read() % content
-            css = ('<link href="/showroomstatic/jquery/css/showroom/jquery-ui-1.8.6.custom.css" type="text/css" rel="stylesheet" />\n'
+            css = ('<link href="/showroomstatic/jquery/css/showroom/jquery-ui-1.8.16.custom.css" type="text/css" rel="stylesheet" />\n'
                    '<link href="/showroomstatic/popup.css" type="text/css" rel="stylesheet" />\n')
-            js = ('<script type="text/javascript" src="/showroomstatic/jquery/js/jquery-1.4.2.min.js"></script>\n'
-                  '<script type="text/javascript" src="/showroomstatic/jquery/js/jquery-ui-1.8.6.custom.min.js"></script>\n')
+            js = ('<script type="text/javascript" src="/showroomstatic/jquery/js/jquery-1.6.2.min.js"></script>\n'
+                  '<script type="text/javascript" src="/showroomstatic/jquery/js/jquery-ui-1.8.16.custom.min.js"></script>\n')
 
             if 'html' in (response.content_type or ''):
                 if '</body>' in response.body and '<head>' in response.body:
