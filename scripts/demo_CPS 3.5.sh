@@ -44,14 +44,14 @@ EOF
 cat > popup.html << EOF
 <p>To start using CPS, you must create a CPS site. Do the following:</p>
 <ol>
-    <li>Click on <a href="manage">Zope Management Interface</a> and connect with the password you chose</li>
+    <li>Click on <a href="manage_main">Zope Management Interface</a> and connect with the password you chose</li>
     <li>In the top right selection list, select "CPSDefault Site"</li>
     <li>Fill in the required informations for your CPS site.<br/>
         Note that the Site id will be visible in the URL<li/>
     <li>Choose the extensions you need by checking the wanted checkboxes<li/>
     <li>Click on the "Add" button on the bottom of the page, you should then see your site in the list</li>
     <li>Click on your CPS site in the list</li>
-    <li>right-click on the "View" tab on the top, and select "Open in a new window (or tab)"</li>
+    <li>Click on the "View" tab on the top</li>
     <li>Enjoy!</li>
 </ol>
 EOF
