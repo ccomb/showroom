@@ -11,7 +11,6 @@ from utils import ADMIN_HOST
 from webob.exc import HTTPFound
 import logging
 import utils
-import webob
 
 LOG = logging.getLogger(__name__)
 
@@ -89,6 +88,8 @@ def login(request):
             return HTTPFound(location = came_from,
                              headers = headers)
         message = 'Failed login'
+        _flash_message(request,
+            u"%s" % message)
 
     return dict(
         master=get_template('templates/master.pt'),

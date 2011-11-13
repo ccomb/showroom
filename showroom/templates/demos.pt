@@ -39,15 +39,6 @@
     </form>
   </div>
 
-  <!-- message -->
-  <tal:block define="session python:request.environ.get('beaker.session', {})"
-             condition="session.has_key('message')">
-  <div id="message" class="subcontent"
-       tal:define="message python:session.pop('message', None)"
-       tal:content="structure message" />
-  <div tal:replace="python:session.save() or ''" />
-  </tal:block>
-
   <!-- demo list -->
   <div id="demos_list" class="subcontent">
   <table>
