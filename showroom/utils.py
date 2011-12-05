@@ -26,37 +26,48 @@ PATHS = {
 }
 ADMIN_HOST = CONFIG.get('global', 'hostname')
 
+
 if not isdir(PATHS['demos']):
     os.makedirs(PATHS['demos'])
     LOG.info('%s created.', PATHS['demos'])
 
-XMLRPC = None
 
-def connect_supervisor():
-    # connect to supervisor
-    supervisor_conf = SafeConfigParser()
-    supervisor_conf.read(PATHS['supervisor'])
-    global XMLRPC
-    XMLRPC = ServerProxy(supervisor_conf.get('supervisorctl', 'serverurl'))
+class SuperVisor(object):
+    """class to manage the supervisor process
+    """
+    def __init__(self, configpath=None):
+        # connect to supervisor
+        if configpath is None:
+            self.configpath = PATHS['supervisor']
+        else:
+            self.configpath = configpath
+        supervisor_conf = SafeConfigParser()
+        supervisor_conf.read(self.configpath)
+        serverurl = supervisor_conf.get('supervisorctl', 'serverurl')
+        self.xmlrpc = ServerProxy(serverurl)
 
-    # if not started, start supervisor in daemon mode
-    try:
-        XMLRPC.supervisor.getPID()
-        LOG.info(u'OK, supervisor was already running.')
-    except socket.error:
-        LOG.info(u'Starting supervisor...')
-        subprocess.Popen([join(PATH, 'bin', 'supervisord'),
-                          '-c', PATHS['supervisor']]).wait()
-    # try again
-    XMLRPC.supervisor.getPID()
+    @property
+    def is_running(self):
+        try:
+            self.xmlrpc.supervisor.getPID()
+            return True
+        except:
+            return False
 
-from showroom import currently_testing
-if not currently_testing:
-    connect_supervisor()
+    def start(self):
+        if self.is_running:
+            LOG.info(u'OK, supervisor was already running.')
+            return
+        else:
+            LOG.info(u'Starting supervisor...')
+            subprocess.Popen([join(PATH, 'bin', 'supervisord'),
+                              '-c', PATHS['supervisor']],
+                              close_fds=True).wait()
+        assert(self.is_running)
 
-#@atexit.register
-#def stop_supervisor():
-#    subprocess.call("bin/supervisorctl -c supervisord.cfg shutdown", shell=True)
+    def stop(self):
+        subprocess.Popen([join(PATH, 'bin', 'supervisorctl'),
+                          '-c', PATHS['supervisor'], 'shutdown']).wait()
 
 
 def daemon(name, command='restart'):
@@ -123,7 +134,7 @@ def installed_demos():
         demo = InstalledDemo(name)
         demo_infos.append(dict(
             name=demo.name,
-            port=demo.get_port(),
+            port=demo.port,
             status = demo.get_status(),
             comment='',
             #comment=demo.get_comment()
@@ -152,6 +163,14 @@ class InstalledDemo(object):
         self.democonf = SafeConfigParser()
         self.democonf_path = join(PATHS['demos'], name, 'demo.conf')
         self.democonf.read(self.democonf_path)
+        try:
+            self.port = self.democonf.get(self.name, 'port')
+        except:
+            LOG.warning(u'Demo %s seems broken: no port' % self.name)
+            self.port = ''
+
+        # init the supervisor
+        self.supervisor = SuperVisor()
 
     has_startup_script = property(lambda self: os.path.exists(self.start_script))
     has_apache_link = property(lambda self: os.path.exists(self.apache_config_link))
@@ -174,9 +193,6 @@ class InstalledDemo(object):
         with open(self.democonf_path, 'w') as democonf_file:
             self.democonf.write(democonf_file)
 
-    def get_port(self):
-        return self.democonf.get(self.name, 'port')
-
     def get_status(self):
         """return the status of the demo
         We use the same status as supervisor
@@ -184,25 +200,47 @@ class InstalledDemo(object):
         status = 'STOPPED'
         if not os.path.exists(self.path):
             return 'DESTROYED'
+        if self.port is '':
+            return 'FATAL'
+
+        statuses = set()
+
         democontent = os.listdir(self.path)
+        # get the status of the process monitored by supervisor if any
         if 'supervisor.cfg' in democontent:
             try:
-                status = XMLRPC.supervisor.getProcessInfo(self.name)['statename']
+                status = self.supervisor.xmlrpc.supervisor.getProcessInfo(self.name)['statename']
             except:
-                status = 'STOPPED'
+                status = 'UNKNOWN'
+            statuses.add(status)
+
         apache_links = os.listdir(join(PATHS['var'], 'apache2', 'demos'))
 
+        # get the status of apache
         if 'apache2.conf' in democontent:
-            a2status = XMLRPC.supervisor.getProcessInfo('apache2')['statename']
-            if self.name + '.conf' in apache_links and a2status == 'RUNNING':
-                status = 'RUNNING'
-        return status
+            # unless Apache is stopped
+            try:
+                status = self.supervisor.xmlrpc.supervisor.getProcessInfo('apache2')['statename']
+            except:
+                status = 'UNKNOWN'
+            # consider apache running if we have a link
+            if status == 'RUNNING':
+                if self.name + '.conf' not in apache_links:
+                    status = 'STOPPED'
+            statuses.add(status)
+
+        if len(statuses) == 1:
+            # consistent state
+            return statuses.pop()
+        else:
+            # half started!
+            return 'PARTIAL'
 
     def start(self):
         """start the demo
         """
         if self.has_startup_script:
-            XMLRPC.supervisor.startProcess(self.name)
+            self.supervisor.xmlrpc.supervisor.startProcess(self.name)
         if self.has_apache_conf:
             self._a2ensite()
 
@@ -210,10 +248,13 @@ class InstalledDemo(object):
         """stop the demo
         """
         if self.has_startup_script:
-            XMLRPC.supervisor.stopProcess(self.name)
+            try:
+                self.supervisor.xmlrpc.supervisor.stopProcess(self.name)
+            except:
+                LOG.warning('Could not stop %s' % self.name)
         if self.has_apache_link:
             self._a2dissite()
-        assert(self.get_status() != 'RUNNING')
+        assert(self.get_status() != 'RUNNING'), "Stopping the demo failed"
 
     def _reload_apache(self):
         """reload apache config, or shutdown if it is not needed anymore
@@ -221,30 +262,30 @@ class InstalledDemo(object):
         apache_confs = [conf
                         for conf in os.listdir(join(PATHS['var'], 'apache2', 'demos'))
                         if conf.endswith('.conf')]
-        a2status = XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+        a2status = self.supervisor.xmlrpc.supervisor.getProcessInfo('apache2')['statename']
 
         if len(apache_confs) == 0:
             try:
-                retcode = XMLRPC.supervisor.stopProcess('apache2')
+                retcode = self.supervisor.xmlrpc.supervisor.stopProcess('apache2')
             except:
                 return 0
         else:
             # reload the config or start Apache if needed (WITH supervisor!)
-            a2status = XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+            a2status = self.supervisor.xmlrpc.supervisor.getProcessInfo('apache2')['statename']
             if a2status == 'RUNNING':
                 retcode = subprocess.call(
                     ["/usr/sbin/apache2ctl",  "-f", PATHS['etc']+"/apache2/apache2.conf", "-k", "graceful"])
                 return retcode
             else:
                 try:
-                    XMLRPC.supervisor.startProcess('apache2')
+                    self.supervisor.xmlrpc.supervisor.startProcess('apache2')
                 except:
                     return 1
                 return 0
 
 
     def _a2ensite(self):
-        """sandbox equivalent to the a2ensite command
+        """sandbox equivalent to the Apache a2ensite command
         """
         config_file = join(PATHS['demos'], self.name, 'apache2.conf')
         config_link = join(PATHS['var'], 'apache2', 'demos', self.name + '.conf')
@@ -256,14 +297,14 @@ class InstalledDemo(object):
             # if apache doesn't restart because of us,
             # we should disable the new config and stop the app.
             # Supervisor should immediately try to restart apache
-            retcode = self._reload_apache()
-            if retcode != 0:
-                self._a2dissite()
-                self.stop()
+        retcode = self._reload_apache()
+        if retcode != 0:
+            self._a2dissite()
+            self.stop()
 
 
     def _a2dissite(self):
-        """sandbox equivalent to the a2dissite command
+        """sandbox equivalent to the Apache a2dissite command
         """
         config_link = join(PATHS['var'], 'apache2', 'demos', self.name + '.conf')
         if os.path.exists(config_link):
@@ -281,8 +322,14 @@ class InstalledDemo(object):
             subprocess.call(['chmod', '-R', '777', self.path])
             shutil.rmtree(self.path)
         if had_startup_script:
-            XMLRPC.supervisor.removeProcessGroup(self.name)
-            XMLRPC.supervisor.reloadConfig()
+            try:
+                self.supervisor.xmlrpc.supervisor.removeProcessGroup(self.name)
+            except:
+                LOG.warning(u'Got error trying to remove %s' % self.name)
+            try:
+                self.supervisor.xmlrpc.supervisor.reloadConfig()
+            except:
+                LOG.warning(u'Got error trying to reload supervisor config')
 
 
 def get_available_port():
@@ -372,8 +419,9 @@ def deploy(params, app_name):
             supervisor_conf.write(supervisor_file)
 
         # reload the supervisor config
-        XMLRPC.supervisor.reloadConfig()
-        XMLRPC.supervisor.addProcessGroup(app_name)
+        supervisor = SuperVisor()
+        supervisor.xmlrpc.supervisor.reloadConfig()
+        supervisor.xmlrpc.supervisor.addProcessGroup(app_name)
 
     # create a config file in the demo directory
     app_conf = SafeConfigParser()

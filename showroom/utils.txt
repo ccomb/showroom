@@ -1,22 +1,42 @@
 Showroom comes with several predefined deployment scripts for the demos.
 
+supervisor control
+------------------
+
+We have a class to control supervisor (already transmitted from the test setUp)
+
+We can start and stop it:
+
+    >>> supervisor.is_running
+    False
+    >>> supervisor.start()
+    >>> supervisor.is_running
+    True
+    >>> supervisor.stop()
+    >>> supervisor.is_running
+    False
+    >>> supervisor.start()
+    >>> supervisor.is_running
+    True
+
+
 Available Demos
 ---------------
 
 We can get the list of available demos as a dict:
 
->>> from showroom import utils
->>> available_demos = utils.available_demos()
->>> from pprint import pprint
->>> pprint(available_demos, width=1)
-{'error':           {'params': ['name', 'comment']},
- 'error2':           {'params': ['name', 'comment']},
- 'error3':           {'params': ['name', 'comment']},
- 'error4':           {'params': ['name', 'comment']},
- 'test1':           {'params': ['name', 'comment']},
- 'test2':           {'params': ['name', 'comment']},
- 'testapache':      {'params': ['name', 'comment']},
- 'testapachebad':   {'params': ['name', 'comment']}}
+    >>> from showroom import utils
+    >>> available_demos = utils.available_demos()
+    >>> from pprint import pprint
+    >>> pprint(available_demos, width=1)
+    {'error':           {'params': ['name', 'comment']},
+     'error2':           {'params': ['name', 'comment']},
+     'error3':           {'params': ['name', 'comment']},
+     'error4':           {'params': ['name', 'comment']},
+     'test1':           {'params': ['name', 'comment']},
+     'test2':           {'params': ['name', 'comment']},
+     'testapache':      {'params': ['name', 'comment']},
+     'testapachebad':   {'params': ['name', 'comment']}}
 
 Each demo definition itself is a dict.
 
@@ -166,7 +186,7 @@ We stop it:
 >>> demo.stop()
 >>> demo.get_status()
 'STOPPED'
->>> utils.XMLRPC.supervisor.getProcessInfo('test1')['statename']
+>>> supervisor.xmlrpc.supervisor.getProcessInfo('test1')['statename']
 'STOPPED'
 >>> demo.destroy()
 
@@ -184,7 +204,7 @@ True
 ...     time.sleep(0.2)
 >>> utils.InstalledDemo('error2').get_status()
 'FATAL'
->>> utils.XMLRPC.supervisor.getProcessInfo('error2')['statename']
+>>> supervisor.xmlrpc.supervisor.getProcessInfo('error2')['statename']
 'FATAL'
 >>> utils.InstalledDemo('error2').destroy()
 
@@ -200,18 +220,18 @@ status.
 >>> demo = utils.InstalledDemo('test')
 >>> demo.get_status()
 'STOPPED'
->>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+>>> supervisor.xmlrpc.supervisor.getProcessInfo('apache2')['statename']
 'STOPPED'
 >>> demo.start()
 >>> demo.get_status()
 'RUNNING'
->>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+>>> supervisor.xmlrpc.supervisor.getProcessInfo('apache2')['statename']
 'RUNNING'
 >>> demo.stop()
 >>> demo.get_status()
 'STOPPED'
 >>> demo.destroy()
->>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+>>> supervisor.xmlrpc.supervisor.getProcessInfo('apache2')['statename']
 'STOPPED'
 
 If the provided apache config is erroneous, we don't start the app.
@@ -220,18 +240,18 @@ If the provided apache config is erroneous, we don't start the app.
 >>> demo = utils.InstalledDemo('test')
 >>> demo.get_status()
 'STOPPED'
->>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+>>> supervisor.xmlrpc.supervisor.getProcessInfo('apache2')['statename']
 'STOPPED'
 >>> demo.start()
 >>> demo.get_status()
 'STOPPED'
->>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+>>> supervisor.xmlrpc.supervisor.getProcessInfo('apache2')['statename']
 'STOPPED'
 >>> demo.stop()
 >>> demo.get_status()
 'STOPPED'
 >>> demo.destroy()
->>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+>>> supervisor.xmlrpc.supervisor.getProcessInfo('apache2')['statename']
 'STOPPED'
 
 Check that the process is stopped
@@ -250,12 +270,12 @@ The same with 2 corrects, and 1 bad :
 'RUNNING'
 >>> utils.InstalledDemo('test2').get_status()
 'RUNNING'
->>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+>>> supervisor.xmlrpc.supervisor.getProcessInfo('apache2')['statename']
 'RUNNING'
 >>> utils.deploy({'app':'testapachebad'}, 'test3')
 >>> utils.InstalledDemo('test3').get_status()
 'STOPPED'
->>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+>>> supervisor.xmlrpc.supervisor.getProcessInfo('apache2')['statename']
 'RUNNING'
 >>> utils.InstalledDemo('test').get_status()
 'RUNNING'
@@ -266,12 +286,12 @@ The same with 2 corrects, and 1 bad :
 'DESTROYED'
 >>> utils.InstalledDemo('test2').get_status()
 'RUNNING'
->>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+>>> supervisor.xmlrpc.supervisor.getProcessInfo('apache2')['statename']
 'RUNNING'
 >>> utils.InstalledDemo('test2').destroy()
 >>> utils.InstalledDemo('test2').get_status()
 'DESTROYED'
->>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+>>> supervisor.xmlrpc.supervisor.getProcessInfo('apache2')['statename']
 'STOPPED'
 >>> utils.InstalledDemo('test3').destroy()
 
@@ -285,12 +305,12 @@ We deploy a demo which contains both an apache config and a startup script:
 >>> utils.InstalledDemo('test2').start()
 >>> utils.InstalledDemo('test2').get_status()
 'RUNNING'
->>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+>>> supervisor.xmlrpc.supervisor.getProcessInfo('apache2')['statename']
 'RUNNING'
 >>> utils.InstalledDemo('test2').stop()
 >>> utils.InstalledDemo('test2').get_status()
 'STOPPED'
->>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+>>> supervisor.xmlrpc.supervisor.getProcessInfo('apache2')['statename']
 'STOPPED'
 >>> utils.InstalledDemo('test2').destroy()
 
@@ -298,7 +318,7 @@ The same with 2 demos:
 
 >>> utils.deploy({'app':'test2'}, 'test2')
 >>> utils.deploy({'app':'test2'}, 'test2bis')
->>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+>>> supervisor.xmlrpc.supervisor.getProcessInfo('apache2')['statename']
 'STOPPED'
 >>> utils.InstalledDemo('test2').start()
 >>> utils.InstalledDemo('test2bis').start()
@@ -306,13 +326,13 @@ The same with 2 demos:
 'RUNNING'
 >>> utils.InstalledDemo('test2bis').get_status()
 'RUNNING'
->>> while utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']=='STARTING':
+>>> while supervisor.xmlrpc.supervisor.getProcessInfo('apache2')['statename']=='STARTING':
 ...     time.sleep(0.2)
 >>> utils.InstalledDemo('test2').stop()
->>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+>>> supervisor.xmlrpc.supervisor.getProcessInfo('apache2')['statename']
 'RUNNING'
 >>> utils.InstalledDemo('test2bis').stop()
->>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+>>> supervisor.xmlrpc.supervisor.getProcessInfo('apache2')['statename']
 'STOPPED'
 >>> utils.InstalledDemo('test2').get_status()
 'STOPPED'
@@ -324,14 +344,14 @@ The same with 2 demos:
 A script with a bad apache conf and a good startup script:
 
 >>> utils.deploy({'app':'error3'}, 'error3')
->>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+>>> supervisor.xmlrpc.supervisor.getProcessInfo('apache2')['statename']
 'STOPPED'
 >>> utils.InstalledDemo('error3').start()
 >>> utils.InstalledDemo('error3').get_status()
 'STOPPED'
->>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+>>> supervisor.xmlrpc.supervisor.getProcessInfo('apache2')['statename']
 'STOPPED'
->>> utils.XMLRPC.supervisor.getProcessInfo('error3')['statename']
+>>> supervisor.xmlrpc.supervisor.getProcessInfo('error3')['statename']
 'STOPPED'
 >>> utils.InstalledDemo('error3').destroy()
 
@@ -340,7 +360,7 @@ Apache should restart
 A script with a good apache conf and a bad startup script:
 
 >>> utils.deploy({'app':'error4'}, 'error4')
->>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+>>> supervisor.xmlrpc.supervisor.getProcessInfo('apache2')['statename']
 'STOPPED'
 >>> utils.InstalledDemo('error4').start()
 Traceback (most recent call last):
@@ -348,13 +368,13 @@ Traceback (most recent call last):
 Fault: <Fault 40: 'ABNORMAL_TERMINATION: error4'>
 >>> utils.InstalledDemo('error4').get_status() in ('STARTING', 'BACKOFF')
 True
->>> utils.XMLRPC.supervisor.getProcessInfo('apache2')['statename']
+>>> supervisor.xmlrpc.supervisor.getProcessInfo('apache2')['statename']
 'STOPPED'
->>> utils.XMLRPC.supervisor.getProcessInfo('error4')['statename'] in ('STARTING', 'BACKOFF')
+>>> supervisor.xmlrpc.supervisor.getProcessInfo('error4')['statename'] in ('STARTING', 'BACKOFF')
 True
->>> while utils.XMLRPC.supervisor.getProcessInfo('error4')['statename'] in ('STARTING', 'BACKOFF'):
+>>> while supervisor.xmlrpc.supervisor.getProcessInfo('error4')['statename'] in ('STARTING', 'BACKOFF'):
 ...     time.sleep(0.2)
->>> utils.XMLRPC.supervisor.getProcessInfo('error4')['statename']
+>>> supervisor.xmlrpc.supervisor.getProcessInfo('error4')['statename']
 'FATAL'
 >>> utils.InstalledDemo('error4').destroy()
 

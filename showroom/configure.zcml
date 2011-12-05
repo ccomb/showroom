@@ -50,6 +50,16 @@
          view=".views.stop"
          view_permission="edit"
   />
+  <route name="start_all"
+         path="/start_all"
+         view=".views.start_all"
+         view_permission="edit"
+  />
+  <route name="stop_all"
+         path="/stop_all"
+         view=".views.stop_all"
+         view_permission="edit"
+  />
   <route name="destroy"
          path="/destroy"
          view=".views.destroy"

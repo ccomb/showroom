@@ -1,7 +1,3 @@
-# keep this at the top:
-import showroom
-showroom.currently_testing = True
-###
 from os import mkdir, chdir, getcwd
 from os.path import abspath, dirname, join
 from pyramid import testing
@@ -9,7 +5,6 @@ from pyramid.configuration import Configurator
 from pyramid.exceptions import NotFound
 import showroom.utils
 import showroom.views
-import subprocess
 import tempfile, shutil
 import unittest, doctest
 
@@ -64,18 +59,15 @@ def setUp(self):
     # we start supervisor again with the new config
     self.cwd = getcwd()
     chdir(base_dir)
-    subprocess.call(PATHS['bin'] + "/supervisord -c " + self.supervisor, shell=True)
-    showroom.utils.connect_supervisor()
+    supervisor = showroom.utils.SuperVisor(self.supervisor)
+    self.globs = {'supervisor': supervisor}
 
 
 def tearDown(self):
     # we restore the scripts path
     PATHS['scripts'] = self.scripts
     # we stop our custom supervisor
-    subprocess.call(PATHS['bin'] + "/supervisorctl -c %s stop all" % self.supervisor,
-                    shell=True)
-    subprocess.call(PATHS['bin'] + "/supervisorctl -c %s shutdown" % self.supervisor,
-                    shell=True)
+    showroom.utils.SuperVisor(self.supervisor).stop()
     shutil.rmtree(self.tempdir)
     chdir(self.cwd)
 
@@ -114,13 +106,14 @@ class ViewTests(unittest.TestCase):
 
 
 def test_suite():
+
     optionflags = doctest.NORMALIZE_WHITESPACE+doctest.ELLIPSIS
     suite = unittest.TestSuite([
         unittest.makeSuite(ViewTests),
-        doctest.DocFileSuite('views.txt', optionflags=optionflags, setUp=setUp, tearDown=tearDown),
         doctest.DocFileSuite('utils.txt', optionflags=optionflags, setUp=setUp, tearDown=tearDown),
-        doctest.DocTestSuite(showroom.views, optionflags=optionflags),
         doctest.DocTestSuite(showroom.utils, optionflags=optionflags),
+        doctest.DocFileSuite('views.txt', optionflags=optionflags, setUp=setUp, tearDown=tearDown),
+        doctest.DocTestSuite(showroom.views, optionflags=optionflags),
     ])
     return suite
 

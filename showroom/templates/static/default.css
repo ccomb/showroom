@@ -79,7 +79,9 @@ td.demo_title {
 }
 div.status {
 display: inline-block;
-padding: 0.5em;
+padding-top: 0.5em;
+padding-bottom: 0.5em;
+width: 6em;
 -moz-border-radius: 0.5em;
 -webkit-border-radius: 0.5em;
 }
@@ -98,11 +100,9 @@ div.SHUTDOWN {
 div.STARTING, div.RESTARTING {
     background: #5B5;
 }
-div.FATAL {
+div.FATAL, div.UNKNOWN, div.PARTIAL {
     background: transparent;
     border: solid 0.1em black;
-    width: 0.8em;
-    height: 0.8em;
 }
 a.start, a.stop, a.destroy {
     color: black;

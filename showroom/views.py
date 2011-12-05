@@ -38,6 +38,8 @@ def proxied_url(demo, request):
 def direct_url(demo, request):
     """Give the direct url of the demo
     """
+    if demo['port'] is '':
+        return "#"
     current_host = urlsplit(request.host_url)
     return urlunsplit(
         (current_host.scheme, ADMIN_HOST + ':' + demo['port'], '/', '', ''))
@@ -53,6 +55,7 @@ def installed_demos(request):
         proxied_url=proxied_url,
         direct_url=direct_url,
         demos=utils.installed_demos(),
+        supervisor=utils.SuperVisor().is_running,
         logged_in=authenticated_userid(request),
         )
 
@@ -126,7 +129,7 @@ def deploy(request):
 
     demo = utils.InstalledDemo(name)
     _flash_message(request,
-        u"application %s created on port %s" % (demo.name, demo.get_port()))
+        u"application %s created on port %s" % (demo.name, demo.port))
     return HTTPFound(location='/')
 
 
@@ -169,6 +172,20 @@ def stop(request):
     if new_status == 'STOPPED' and new_status != old_status:
         message = u'Demo "%s" succesfully stopped' % demo.name
     _flash_message(request, message)
+    return HTTPFound(location='/')
+
+
+def start_all(request):
+    """ view to stop supervisor and all demos
+    """
+    utils.SuperVisor().start()
+    return HTTPFound(location='/')
+
+
+def stop_all(request):
+    """ view to stop supervisor and all demos
+    """
+    utils.SuperVisor().stop()
     return HTTPFound(location='/')
 
 

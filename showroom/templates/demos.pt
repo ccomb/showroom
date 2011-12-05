@@ -21,22 +21,39 @@
 
 <div id="content" metal:fill-slot="content">
 
-  <!-- form to create a demo -->
+  <!-- general shutdown -->
+
   <div id="app_form" class="subcontent">
-    <form method="POST"
-          action="${request.application_url}/deploy">
-        <div>
-        <span>create a demo</span>
-        <select name="app"
-                onchange="update_app_form('${request.application_url}', this.value)">
-        <option></option>
-        <option tal:repeat="app apps" tal:content="python:app">placeholder</option>
-        </select>
-        </div>
-        <span id="app_form_dynamic"></span>
-        <img id="loading" style="display:none;"
-        src="static/images/loading.gif" />
-    </form>
+    <!-- form to create a demo -->
+    <div>
+      <form method="POST"
+            action="${request.application_url}/deploy">
+          <div>
+          <span>create a demo</span>
+          <select name="app"
+                  onchange="update_app_form('${request.application_url}', this.value)">
+          <option></option>
+          <option tal:repeat="app apps" tal:content="python:app">placeholder</option>
+          </select>
+          </div>
+          <span id="app_form_dynamic"></span>
+          <img id="loading" style="display:none;"
+          src="static/images/loading.gif" />
+      </form>
+    </div>
+    <!-- form to create a demo -->
+    <div>
+        <a href="#" class="start_all"
+           tal:condition="python: not supervisor"
+           tal:attributes="href string:/start_all">
+          switch on
+        </a>
+        <a href="#" class="start_all"
+           tal:condition="python: supervisor"
+           tal:attributes="href string:/stop_all">
+          switch off
+        </a>
+    </div>
   </div>
 
   <!-- demo list -->
@@ -67,7 +84,7 @@
           start
         </a>
         <a href="#" class="stop"
-           tal:condition="python: demo['status'] == 'RUNNING'"
+           tal:condition="python: demo['status'] in ['RUNNING', 'PARTIAL']"
            tal:attributes="href string:/stop?name=${demo['name']}">
           stop
         </a>
@@ -75,7 +92,7 @@
       <td class="demo_button">
         <a href="#" class="destroy"
            onclick="if(!confirm('Do you really want to destroy this demo? This cannot be undone')) {return false;}"
-           tal:condition="python: demo['status'] == 'STOPPED'"
+           tal:condition="python: demo['status'] in ['STOPPED', 'FATAL']"
            tal:attributes="href string:/destroy?name=${demo['name']}">
           destroy
         </a>

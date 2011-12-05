@@ -59,7 +59,7 @@ class Proxy(object):
         path_info = urllib.quote(request.path_info)
         request.path_info = path_info
         request.environ['SERVER_NAME'] = 'localhost'
-        request.environ['SERVER_PORT'] = demo.get_port()
+        request.environ['SERVER_PORT'] = demo.port
         # disable compression to be able to insert the js popup
         request.environ['HTTP_ACCEPT_ENCODING'] = ''
         response = request.get_response(proxy_exact_request)
