@@ -1,11 +1,16 @@
 # -*- coding: utf-8 -*-
-from os.path import join, dirname, abspath
+from os.path import join, dirname, abspath, basename, exists, splitext
 from webob import Request, Response
 from webob.exc import HTTPFound
 from wsgiproxy.exactproxy import proxy_exact_request
 import urllib
+import logging
+import os
 
 from showroom.utils import PATHS, ADMIN_HOST, InstalledDemo
+
+logging.basicConfig(level=logging.DEBUG)
+LOG = logging.getLogger(__name__)
 
 class Proxy(object):
     """ wsgi middleware that acts as a proxy, or redirects to the admin
@@ -15,8 +20,8 @@ class Proxy(object):
 
     def __call__(self, environ, start_response):
         global ADMIN_HOST
-        # we'll get the demo name from the url
         request = Request(environ)
+
         if ADMIN_HOST is None:
             ADMIN_HOST = request.host
 
@@ -68,7 +73,7 @@ class Proxy(object):
         if 'showroompopup_hide' in environ['QUERY_STRING']:
             demo.disable_popup()
 
-        # add the info popup
+        # inject the information popup
         content = demo.popup
         if content is not None and demo.is_popup_displayed:
             popup = open(join(abspath(dirname(__file__)),
@@ -89,11 +94,80 @@ class Proxy(object):
         return response(environ, start_response)
 
 
+class StreamingIterator(object):
+    """Iterator used during streaming
+    infile : the file being read by chunks (cache file or download)
+    outfile : the file being written (cache file)
+    """
+    def __init__(self, infile, outfile=None):
+        self.infile = infile
+        self.outfile = outfile
+
+    def __iter__(self):
+        return self
+
+    def next(self):
+        chunk = self.infile.read(2**16) #64k
+        LOG.info('Reading chunk')
+        if self.outfile is not None:
+            LOG.info('Saving cache chunk')
+            self.outfile.write(chunk)
+        if len(chunk) == 0:
+            self.infile.close()
+            if self.outfile is not None:
+                LOG.info('Finished saving cache')
+                self.outfile.close()
+            LOG.info('Finished reading chunks')
+            raise StopIteration
+        return chunk
+
+
+
+class DownloadCacheProxy(object):
+    """wsgi proxy that caches downloads
+    """
+    def __init__(self, app):
+        self.app = app
+
+    def __call__(self, environ, start_response):
+        # test whether we're trying to download something
+        host = environ.get('paste.httpserver.proxy.host', '')
+        scheme = environ.get('paste.httpserver.proxy.scheme', '')
+        path_info = environ.get('PATH_INFO', '')
+
+        # do nothing if we're not acting as a proxy
+        if host is '' or scheme is '':
+            return self.app(environ, start_response)
+        
+        # do nothing if we're not handling this type of file
+        extensions_to_cache = ('.gz', '.zip', '.egg', '.tar') #TODO move ot the conf
+        filename = join(PATHS['downloads'], host, basename(path_info))
+        extension = splitext(filename)[1].lower()
+        if extension not in extensions_to_cache:
+            return self.app(environ, start_response)
+
+        # If we already have the file, stream it
+        if exists(filename):
+            LOG.info('Found in the download cache: %s' % filename)
+            response = Response()
+            response.app_iter = StreamingIterator(open(filename))
+            return response(environ, start_response)
+
+        # We don't have the file, download and stream
+        if not exists(dirname(filename)):
+            os.mkdir(dirname(filename))
+        response = Response()
+        response.app_iter = StreamingIterator(
+                urllib.urlopen('%s://%s%s' % (scheme, host, environ['PATH_INFO'])),
+                outfile=open(filename, 'w'))
+        return response(environ, start_response)
+
+
 def make_filter(global_conf, **local_conf):
     """factory for the [paste.filter_factory] entry-point
     (see setup.py)
     """
     def filter(app):
-        return Proxy(app)
+        return DownloadCacheProxy(Proxy(app))
     return filter
 

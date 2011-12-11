@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 from ConfigParser import SafeConfigParser
-from os.path import isdir, join, dirname
+from os.path import isdir, join, dirname, exists
 from xmlrpclib import ServerProxy
 import logging
 import os
 import shutil
-import socket
 import string
 import subprocess
 
+logging.basicConfig(level=logging.DEBUG)
 LOG = logging.getLogger(__name__)
 
 CONFIG = SafeConfigParser()
@@ -23,13 +23,17 @@ PATHS = {
   'var' : join(PATH, CONFIG.get('paths', 'var')),
   'etc' : join(PATH, CONFIG.get('paths', 'etc')),
   'supervisor' : join(PATH, CONFIG.get('paths', 'supervisor')),
+  'downloads' : join(PATH, CONFIG.get('paths', 'downloads')),
 }
 ADMIN_HOST = CONFIG.get('global', 'hostname')
+ADMIN_PORT = CONFIG.get('global', 'port')
 
-
-if not isdir(PATHS['demos']):
-    os.makedirs(PATHS['demos'])
-    LOG.info('%s created.', PATHS['demos'])
+# create directories if they don't exist
+for d in PATHS:
+    directory = PATHS[d]
+    if not exists(directory) and not isdir(directory):
+        os.makedirs(directory)
+        LOG.info('%s created.', directory)
 
 
 class SuperVisor(object):
@@ -197,15 +201,14 @@ class InstalledDemo(object):
         """return the status of the demo
         We use the same status as supervisor
         """
-        status = 'STOPPED'
         if not os.path.exists(self.path):
             return 'DESTROYED'
         if self.port is '':
             return 'FATAL'
 
         statuses = set()
-
         democontent = os.listdir(self.path)
+        
         # get the status of the process monitored by supervisor if any
         if 'supervisor.cfg' in democontent:
             try:
@@ -232,9 +235,11 @@ class InstalledDemo(object):
         if len(statuses) == 1:
             # consistent state
             return statuses.pop()
-        else:
+        elif len(statuses) > 1:
             # half started!
             return 'PARTIAL'
+        else:
+            return 'FATAL'
 
     def start(self):
         """start the demo
@@ -376,6 +381,8 @@ def deploy(params, app_name):
     env['PATH'] = os.path.abspath('bin') + ':' + env['PATH']
     env['HOST'] = ADMIN_HOST
     env.update(params)
+    # add ourselves as http_proxy to manage a download cache
+    env['http_proxy'] = '%s:%s' % (ADMIN_HOST, ADMIN_PORT)
 
     # create the directory for the demo
     demopath = join(PATHS['demos'], app_name)
