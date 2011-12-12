@@ -2,6 +2,7 @@
 from os.path import join, dirname, abspath, basename, exists, splitext
 from webob import Request, Response
 from webob.exc import HTTPFound
+from paste.proxy import TransparentProxy
 from wsgiproxy.exactproxy import proxy_exact_request
 import urllib
 import logging
@@ -107,17 +108,17 @@ class StreamingIterator(object):
         return self
 
     def next(self):
-        chunk = self.infile.read(2**16) #64k
         LOG.info('Reading chunk')
+        chunk = self.infile.read(2**16) #64k
         if self.outfile is not None:
-            LOG.info('Saving cache chunk')
+            LOG.info('Saving chunk to cache')
             self.outfile.write(chunk)
         if len(chunk) == 0:
+            LOG.info('Finished reading chunks')
             self.infile.close()
             if self.outfile is not None:
                 LOG.info('Finished saving cache')
                 self.outfile.close()
-            LOG.info('Finished reading chunks')
             raise StopIteration
         return chunk
 
@@ -136,7 +137,7 @@ class DownloadCacheProxy(object):
         scheme = environ.get('paste.httpserver.proxy.scheme', '')
         path_info = environ.get('PATH_INFO', '')
 
-        # do nothing if we're not acting as a proxy
+        # do nothing and use the app if we're not acting as a proxy
         if host is '' or scheme is '':
             return self.app(environ, start_response)
 
@@ -145,8 +146,7 @@ class DownloadCacheProxy(object):
         filename = join(PATHS['downloads'], host, basename(path_info))
         extension = splitext(filename)[1].lower()
         if extension not in extensions_to_cache:
-            response = Response()
-            response.app_iter = StreamingIterator(urllib.urlopen(request.url))
+            response = request.get_response(TransparentProxy())
             return response(environ, start_response)
 
         # If we already have the file, stream it
@@ -159,7 +159,7 @@ class DownloadCacheProxy(object):
         # We don't have the file, download and stream
         if not exists(dirname(filename)):
             os.mkdir(dirname(filename))
-        response = Response()
+        response = request.get_response(TransparentProxy())
         response.app_iter = StreamingIterator(
                 urllib.urlopen(request.url),
                 outfile=open(filename, 'wb'))
