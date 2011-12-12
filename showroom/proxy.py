@@ -130,6 +130,7 @@ class DownloadCacheProxy(object):
         self.app = app
 
     def __call__(self, environ, start_response):
+        request = Request(environ)
         # test whether we're trying to download something
         host = environ.get('paste.httpserver.proxy.host', '')
         scheme = environ.get('paste.httpserver.proxy.scheme', '')
@@ -140,7 +141,7 @@ class DownloadCacheProxy(object):
             return self.app(environ, start_response)
         
         # do nothing if we're not handling this type of file
-        extensions_to_cache = ('.gz', '.zip', '.egg', '.tar') #TODO move ot the conf
+        extensions_to_cache = ('.gz', '.zip', '.egg', '.tar') #TODO move to the conf
         filename = join(PATHS['downloads'], host, basename(path_info))
         extension = splitext(filename)[1].lower()
         if extension not in extensions_to_cache:
@@ -158,7 +159,7 @@ class DownloadCacheProxy(object):
             os.mkdir(dirname(filename))
         response = Response()
         response.app_iter = StreamingIterator(
-                urllib.urlopen('%s://%s%s' % (scheme, host, environ['PATH_INFO'])),
+                urllib.urlopen(request.url),
                 outfile=open(filename, 'w'))
         return response(environ, start_response)
 
