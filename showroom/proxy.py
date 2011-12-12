@@ -112,6 +112,8 @@ class StreamingIterator(object):
         LOG.info('Reading chunk')
         chunk = self.infile.read(2**16) #64k
         if self.outfilename is not None and self.outfile is None:
+            if not exists(dirname(self.outfilename)):
+                os.mkdir(dirname(self.outfilename))
             self.outfile = open(self.outfilename, 'wb')
         if self.outfile is not None:
             LOG.info('Saving chunk to cache')
@@ -160,8 +162,6 @@ class DownloadCacheProxy(object):
             return response(environ, start_response)
 
         # We don't have the file, download and stream
-        if not exists(dirname(filename)):
-            os.mkdir(dirname(filename))
         response = request.get_response(TransparentProxy())
         response.app_iter = StreamingIterator(
                 urllib.urlopen(request.url),
