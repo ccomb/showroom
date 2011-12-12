@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 from os.path import join, dirname, abspath, basename, exists, splitext
+from paste.proxy import TransparentProxy
 from webob import Request, Response
 from webob.exc import HTTPFound
-from paste.proxy import TransparentProxy
 from wsgiproxy.exactproxy import proxy_exact_request
-import urllib
 import logging
 import os
+import urllib
 
 from showroom.utils import PATHS, ADMIN_HOST, InstalledDemo
 
@@ -100,9 +100,10 @@ class StreamingIterator(object):
     infile : the file being read by chunks (cache file or download)
     outfile : the file being written (cache file)
     """
-    def __init__(self, infile, outfile=None):
+    def __init__(self, infile, outfilename=None):
         self.infile = infile
-        self.outfile = outfile
+        self.outfilename = outfilename
+        self.outfile = None
 
     def __iter__(self):
         return self
@@ -110,6 +111,8 @@ class StreamingIterator(object):
     def next(self):
         LOG.info('Reading chunk')
         chunk = self.infile.read(2**16) #64k
+        if self.outfilename is not None and self.outfile is None:
+            self.outfile = open(self.outfilename, 'wb')
         if self.outfile is not None:
             LOG.info('Saving chunk to cache')
             self.outfile.write(chunk)
@@ -149,7 +152,7 @@ class DownloadCacheProxy(object):
             response = request.get_response(TransparentProxy())
             return response(environ, start_response)
 
-        # If we already have the file, stream it
+        # we already have the file, stream it
         if exists(filename):
             LOG.info('Found in the download cache: %s' % filename)
             response = Response()
@@ -162,7 +165,7 @@ class DownloadCacheProxy(object):
         response = request.get_response(TransparentProxy())
         response.app_iter = StreamingIterator(
                 urllib.urlopen(request.url),
-                outfile=open(filename, 'wb'))
+                outfilename=filename)
         return response(environ, start_response)
 
 
