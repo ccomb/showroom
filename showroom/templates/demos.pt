@@ -27,11 +27,13 @@
     <!-- big red button -->
     <div id="big_switch">
         <a href="#" class="big_switch"
+           title="switch ON"
            tal:condition="python: not supervisor"
            tal:attributes="href string:/start_all">
            <img src="static/images/off.png" alt="switch on"/>
         </a>
         <a href="#" class="big_switch"
+           title="switch OFF"
            tal:condition="python: supervisor"
            tal:attributes="href string:/stop_all">
            <img src="static/images/on.png" alt="switch off"/>
