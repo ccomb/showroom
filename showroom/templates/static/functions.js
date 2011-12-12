@@ -41,7 +41,8 @@ function update_app_form(url, app) {
     $("#app_form_dynamic").append(
         '<div id="create"><span></span><input id="app_form_submit" type="submit" value="ok"'+
         'submit="on_valid_form();"/></div>'
-    )
+    );
+    $('input[name="name"]').focus();
         }
     );
 }
