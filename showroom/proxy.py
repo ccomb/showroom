@@ -114,7 +114,7 @@ class StreamingIterator(object):
         if self.outfilename is not None and self.outfile is None:
             if not exists(dirname(self.outfilename)):
                 os.mkdir(dirname(self.outfilename))
-            self.outfile = open(self.outfilename, 'wb')
+            self.outfile = open(self.outfilename + '.tmp', 'wb')
         if self.outfile is not None:
             LOG.info('Saving chunk to cache')
             self.outfile.write(chunk)
@@ -124,6 +124,7 @@ class StreamingIterator(object):
             if self.outfile is not None:
                 LOG.info('Finished saving cache')
                 self.outfile.close()
+                os.rename(self.outfilename + '.tmp', self.outfilename)
             raise StopIteration
         return chunk
 
