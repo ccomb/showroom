@@ -6,6 +6,7 @@ from webob.exc import HTTPFound
 from wsgiproxy.exactproxy import proxy_exact_request
 import logging
 import os
+import random
 import urllib
 
 from showroom.utils import PATHS, ADMIN_HOST, InstalledDemo
@@ -103,6 +104,7 @@ class StreamingIterator(object):
     def __init__(self, infile, outfilename=None):
         self.infile = infile
         self.outfilename = outfilename
+        self.outfilename_tmp = outfilename + '.' + str(random.getrandbits(32))
         self.outfile = None
 
     def __iter__(self):
@@ -114,7 +116,8 @@ class StreamingIterator(object):
         if self.outfilename is not None and self.outfile is None:
             if not exists(dirname(self.outfilename)):
                 os.mkdir(dirname(self.outfilename))
-            self.outfile = open(self.outfilename + '.tmp', 'wb')
+
+            self.outfile = open(self.outfilename_tmp, 'wb')
         if self.outfile is not None:
             LOG.info('Saving chunk to cache')
             self.outfile.write(chunk)
@@ -124,7 +127,7 @@ class StreamingIterator(object):
             if self.outfile is not None:
                 LOG.info('Finished saving cache')
                 self.outfile.close()
-                os.rename(self.outfilename + '.tmp', self.outfilename)
+                os.rename(self.outfilename_tmp, self.outfilename)
             raise StopIteration
         return chunk
 
