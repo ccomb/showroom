@@ -13,7 +13,7 @@
    height="297mm"
    id="svg2"
    version="1.1"
-   inkscape:version="0.48.0 r9654"
+   inkscape:version="0.48.1 r9760"
    sodipodi:docname="logo.svg"
    inkscape:export-filename="logo.png"
    inkscape:export-xdpi="55.512722"
@@ -28,15 +28,15 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.4"
-     inkscape:cx="281.13536"
-     inkscape:cy="744.06155"
+     inkscape:cx="212.7425"
+     inkscape:cy="784.41869"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="1920"
-     inkscape:window-height="1146"
+     inkscape:window-height="1141"
      inkscape:window-x="0"
-     inkscape:window-y="30"
+     inkscape:window-y="33"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata7">
@@ -59,6 +59,27 @@
      inkscape:label="Calque 1"
      inkscape:groupmode="layer"
      id="layer1">
+    <g
+       id="g4391"
+       transform="translate(58,0)"
+       style="fill:#00f31c;fill-opacity:1"
+       inkscape:export-filename="/home/dadafkas/projets/showroom/showroom/showroom/templates/static/images/on.png"
+       inkscape:export-xdpi="74.722015"
+       inkscape:export-ydpi="74.722015">
+      <path
+         style="opacity:0.44015442999999999;fill:#00f31c;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         d="m 137.6875,255.9375 c -7.84746,3.06223 -13.40625,10.69001 -13.40625,19.625 0,11.63743 9.42507,21.09375 21.0625,21.09375 11.63743,0 21.09375,-9.45632 21.09375,-21.09375 0,-8.92916 -5.55834,-16.55881 -13.40625,-19.625 0,2.39583 0,4.79167 0,7.1875 4.17177,2.57583 6.96875,7.17486 6.96875,12.4375 0,8.08703 -6.56922,14.65625 -14.65625,14.65625 -8.08703,0 -14.625,-6.56922 -14.625,-14.65625 0,-5.27204 2.79381,-9.86434 6.96875,-12.4375 0,-2.39583 0,-4.79167 0,-7.1875 z"
+         id="path4393"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="csssccssscc" />
+      <rect
+         y="254.86218"
+         x="141.60938"
+         height="27.142857"
+         width="7.4999995"
+         id="rect4395"
+         style="opacity:0.44015442999999999;fill:#00f31c;fill-opacity:1;fill-rule:nonzero;stroke:none" />
+    </g>
     <rect
        style="fill:#de3e3e;fill-opacity:1;stroke:none"
        id="rect2989"
@@ -144,5 +165,24 @@
        style="font-size:16.12241936px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Sans"
        id="text3017"
        transform="translate(4.5456865,20.708127)" />
+    <g
+       id="g3011"
+       inkscape:export-filename="/home/dadafkas/projets/showroom/showroom/showroom/templates/static/images/off.png"
+       inkscape:export-xdpi="74.722015"
+       inkscape:export-ydpi="74.722015">
+      <path
+         sodipodi:nodetypes="csssccssscc"
+         inkscape:connector-curvature="0"
+         id="path2994"
+         d="m 137.6875,255.9375 c -7.84746,3.06223 -13.40625,10.69001 -13.40625,19.625 0,11.63743 9.42507,21.09375 21.0625,21.09375 11.63743,0 21.09375,-9.45632 21.09375,-21.09375 0,-8.92916 -5.55834,-16.55881 -13.40625,-19.625 0,2.39583 0,4.79167 0,7.1875 4.17177,2.57583 6.96875,7.17486 6.96875,12.4375 0,8.08703 -6.56922,14.65625 -14.65625,14.65625 -8.08703,0 -14.625,-6.56922 -14.625,-14.65625 0,-5.27204 2.79381,-9.86434 6.96875,-12.4375 0,-2.39583 0,-4.79167 0,-7.1875 z"
+         style="opacity:0.44015443;fill:#a1a1a1;fill-opacity:1;fill-rule:nonzero;stroke:none" />
+      <rect
+         style="opacity:0.44015443;fill:#a1a1a1;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         id="rect3006"
+         width="7.4999995"
+         height="27.142857"
+         x="141.60938"
+         y="254.86218" />
+    </g>
   </g>
 </svg>
