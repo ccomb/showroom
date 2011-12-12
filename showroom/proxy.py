@@ -145,7 +145,9 @@ class DownloadCacheProxy(object):
         filename = join(PATHS['downloads'], host, basename(path_info))
         extension = splitext(filename)[1].lower()
         if extension not in extensions_to_cache:
-            return self.app(environ, start_response)
+            response = Response()
+            response.app_iter = StreamingIterator(urllib.urlopen(request.url))
+            return response(environ, start_response)
 
         # If we already have the file, stream it
         if exists(filename):

@@ -8,7 +8,7 @@ import shutil
 import string
 import subprocess
 
-logging.basicConfig(level=logging.DEBUG)
+#logging.basicConfig(level=logging.DEBUG)
 LOG = logging.getLogger(__name__)
 
 CONFIG = SafeConfigParser()

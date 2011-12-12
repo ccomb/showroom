@@ -6,7 +6,7 @@ set -e
 virtualenv --no-site-packages --distribute sandbox
 
 # install the required packages
-sandbox/bin/pip install django==1.2.1
+sandbox/bin/pip install Django==1.3.1
 
 # create a django project
 sandbox/bin/django-admin.py startproject project
