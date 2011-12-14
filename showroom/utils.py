@@ -382,7 +382,7 @@ def deploy(params, app_name):
     env['HOST'] = ADMIN_HOST
     env.update(params)
     # add ourselves as http_proxy to manage a download cache
-    env['http_proxy'] = 'http://%s:%s' % (ADMIN_HOST, ADMIN_PORT)
+    env['http_proxy'] = '%s:%s' % (ADMIN_HOST, ADMIN_PORT)
 
     # create the directory for the demo
     demopath = join(PATHS['demos'], app_name)

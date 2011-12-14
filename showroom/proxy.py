@@ -11,7 +11,7 @@ import urllib
 
 from showroom.utils import PATHS, ADMIN_HOST, InstalledDemo
 
-logging.basicConfig(level=logging.DEBUG)
+#logging.basicConfig(level=logging.DEBUG)
 LOG = logging.getLogger(__name__)
 
 class Proxy(object):
@@ -102,9 +102,10 @@ class StreamingIterator(object):
     outfile : the file being written (cache file)
     """
     def __init__(self, infile, outfilename=None):
-        if not infile.startswith('/'):
+        if infile.startswith('/'):
+            self.infile = open(infile)
+        else:
             self.infile = urllib.urlopen(infile)
-        self.infile = infile
         self.outfilename = outfilename
         self.outfilename_tmp = None
         self.outfile = None
@@ -152,11 +153,6 @@ class DownloadCacheProxy(object):
         if host is '' or scheme is '':
             return self.app(environ, start_response)
 
-        # do nothing if we are not the expected proxy
-        if host != ADMIN_HOST or scheme != 'http':
-            response = request.get_response(TransparentProxy())
-            return response(environ, start_response)
-
         # do nothing if we're not handling this type of file
         extensions_to_cache = ('.gz', '.zip', '.egg', '.tar') #TODO move to the conf
         filename = join(PATHS['downloads'], host, basename(path_info))
@@ -169,7 +165,7 @@ class DownloadCacheProxy(object):
         if exists(filename):
             LOG.info('Found in the download cache: %s' % filename)
             response = Response()
-            response.app_iter = StreamingIterator(open(filename))
+            response.app_iter = StreamingIterator(filename)
             return response(environ, start_response)
 
         # We don't have the file, download and stream
