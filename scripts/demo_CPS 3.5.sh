@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PARAMS:name, login=admin, password, version=3.5.2, zope_version=2.9.12-final
+# PARAMS:name, login=admin, password, version=3.5.4, zope_version=2.9.12-final
 set -e
 
 # create a virtualenv
@@ -8,10 +8,11 @@ virtualenv -p python2.4 --no-site-packages --distribute sandbox
 which lynx unzip xsltproc pdftohtml ghostscript unrtf wvHtml xlhtml ppthtml || exit 1
 
 # dependencies
-sandbox/bin/pip install --download-cache=$HOME/eggs -f http://dist.plone.org/thirdparty/ PIL==1.1.7
-sandbox/bin/pip install --download-cache=$HOME/eggs -f http://dist.plone.org/thirdparty/ lxml==2.3.1
-sandbox/bin/pip install --download-cache=$HOME/eggs -f http://dist.plone.org/thirdparty/ python-ldap==2.3.13
-sandbox/bin/pip install --download-cache=$HOME/eggs -f http://dist.plone.org/thirdparty/ docutils==0.8.1
+sandbox/bin/pip install distribute==0.6.24
+sandbox/bin/pip install PIL==1.1.7
+sandbox/bin/pip install lxml==2.3.1
+sandbox/bin/pip install python-ldap==2.3.13
+sandbox/bin/pip install docutils==0.8.1
 
 # install Zope
 wget http://old.zope.org/Products/Zope/2.9.12/Zope-2.9.12-final.tgz
