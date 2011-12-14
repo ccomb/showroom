@@ -154,7 +154,7 @@ class DownloadCacheProxy(object):
             return self.app(environ, start_response)
 
         # do nothing if we're not handling this type of file
-        extensions_to_cache = ('.gz', '.zip', '.egg', '.tar') #TODO move to the conf
+        extensions_to_cache = ('.gz', '.tgz', '.zip', '.egg', '.tar') #TODO move to the conf
         filename = join(PATHS['downloads'], host, basename(path_info))
         extension = splitext(filename)[1].lower()
         if extension not in extensions_to_cache:
