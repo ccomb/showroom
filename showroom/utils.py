@@ -67,7 +67,7 @@ class SuperVisor(object):
             subprocess.Popen([join(PATH, 'bin', 'supervisord'),
                               '-c', PATHS['supervisor']],
                               close_fds=True).wait()
-        assert(self.is_running)
+        assert(self.is_running), "Could not start supervisor"
 
     def stop(self):
         subprocess.Popen([join(PATH, 'bin', 'supervisorctl'),
