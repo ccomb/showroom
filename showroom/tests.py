@@ -27,7 +27,7 @@ def setUp(self):
     scripts = join(self.tempdir, 'scripts')
     shutil.copytree(join(PATHS['scripts'], 'test'), scripts)
     # copy the supervisor file
-    shutil.copy(join(base_dir, 'supervisord.cfg'), self.tempdir)
+    shutil.copy(join(base_dir, 'etc', 'supervisord.cfg'), self.tempdir)
     # create a demo directory
     demos = join(self.tempdir, 'demos')
     mkdir(demos)
