@@ -7,7 +7,10 @@ set -e
 virtualenv --no-site-packages --distribute sandbox
 
 # install the required packages
-sandbox/bin/pip install --download-cache=$HOME/eggs bluebream==1.0
+sandbox/bin/pip install distribute==0.6.24
+sandbox/bin/pip install PasteDeploy==1.3.4 Paste==1.7.5.1 PasteScript==1.7.4.2
+sandbox/bin/pip install bluebream==1.0
+
 
 # create a bfg project
 sandbox/bin/paster create --no-interactive -t bluebream bb

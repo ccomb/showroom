@@ -102,6 +102,8 @@ class StreamingIterator(object):
     outfile : the file being written (cache file)
     """
     def __init__(self, infile, outfilename=None):
+        if not infile.startswith('/'):
+            self.infile = urllib.urlopen(infile)
         self.infile = infile
         self.outfilename = outfilename
         self.outfilename_tmp = None
@@ -151,7 +153,7 @@ class DownloadCacheProxy(object):
             return self.app(environ, start_response)
 
         # do nothing if we are not the expected proxy
-        if host != ADMIN_HOST:
+        if host != ADMIN_HOST or scheme != 'http':
             response = request.get_response(TransparentProxy())
             return response(environ, start_response)
 
@@ -173,7 +175,7 @@ class DownloadCacheProxy(object):
         # We don't have the file, download and stream
         response = request.get_response(TransparentProxy())
         response.app_iter = StreamingIterator(
-                urllib.urlopen(request.url),
+                request.url,
                 outfilename=filename)
         return response(environ, start_response)
 
