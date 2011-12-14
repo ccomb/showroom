@@ -18,3 +18,4 @@ docs/modules/
 *.vim
 paster.pid
 .mr.developer.cfg
+downloads/
