@@ -6,12 +6,12 @@ db_password=sugar
 db_host=127.0.0.1
 db_port=$((PORT+1000))
 # download sugar
-version=6.1.6
+version=6.1.7
 url=$REQUEST_HOST
 
 #wget http://www.sugarforge.org/frs/download.php/7567/SugarCE-$version.zip
 #wget http://www.sugarforge.org/frs/download.php/7678/SugarCE-6.1.1.zip
-wget http://www.sugarforge.org/frs/download.php/8081/SugarCE-6.1.6.zip
+wget http://www.sugarforge.org/frs/download.php/8590/SugarCE-6.1.7.zip
 #cp ../SugarCE-$version.zip .
 unzip SugarCE-$version.zip
 mv SugarCE-Full-$version sugar
