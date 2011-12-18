@@ -6,7 +6,7 @@ set -e
 virtualenv --no-site-packages --distribute sandbox
 
 # install the project templates
-sandbox/bin/pip install --download-cache=$HOME/eggs ZopeSkel==2.17 PIL==1.1.7 PasteDeploy==1.3.4 Paste==1.6
+sandbox/bin/pip install ZopeSkel==2.17 PIL==1.1.7 PasteDeploy==1.3.4 Paste==1.6
 
 # create a project
 sandbox/bin/paster create --no-interactive -t plone3_buildout plone4 plone_version=$version zope_user=$login zope_password=$password http_port=$PORT

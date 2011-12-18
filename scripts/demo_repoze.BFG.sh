@@ -7,7 +7,7 @@ set -e
 virtualenv --no-site-packages --distribute sandbox
 
 # install the required packages
-sandbox/bin/pip install -i http://dist.repoze.org/bfg/current/simple --download-cache=$HOME/eggs repoze.bfg==1.3
+sandbox/bin/pip install -i http://dist.repoze.org/bfg/current/simple repoze.bfg==1.3
 
 # create a bfg project
 sandbox/bin/paster create -t bfg_starter bfg
