@@ -23,10 +23,10 @@ PATHS = {
   'var' : join(PATH, CONFIG.get('paths', 'var')),
   'etc' : join(PATH, CONFIG.get('paths', 'etc')),
   'supervisor' : join(PATH, CONFIG.get('paths', 'supervisor')),
-  'downloads' : join(PATH, CONFIG.get('paths', 'downloads')),
 }
 ADMIN_HOST = CONFIG.get('global', 'hostname')
-ADMIN_PORT = CONFIG.get('global', 'port')
+PROXY_HOST = CONFIG.get('global', 'proxy_host')
+PROXY_PORT = CONFIG.get('global', 'proxy_port')
 
 # create directories if they don't exist
 for d in PATHS:
@@ -381,8 +381,8 @@ def deploy(params, app_name):
     env['PATH'] = os.path.abspath('bin') + ':' + env['PATH']
     env['HOST'] = ADMIN_HOST
     env.update(params)
-    # add ourselves as http_proxy to manage a download cache
-    env['http_proxy'] = 'http://%s:%s' % (ADMIN_HOST, ADMIN_PORT)
+    # add an http_proxy to manage a download cache
+    env['http_proxy'] = 'http://%s:%s/' % (PROXY_HOST, PROXY_PORT)
 
     # create the directory for the demo
     demopath = join(PATHS['demos'], app_name)

@@ -96,91 +96,11 @@ class Proxy(object):
         return response(environ, start_response)
 
 
-class StreamingIterator(object):
-    """Iterator used during streaming
-    infile : the file being read by chunks (cache file or download)
-    outfile : the file being written (cache file)
-    """
-    def __init__(self, infile, outfilename=None):
-        if infile.startswith('/'):
-            self.infile = open(infile)
-        else:
-            self.infile = urllib.urlopen(infile)
-        self.outfilename = outfilename
-        self.outfilename_tmp = None
-        self.outfile = None
-
-    def __iter__(self):
-        return self
-
-    def next(self):
-        LOG.info('Reading chunk')
-        chunk = self.infile.read(2**16) #64k
-        if self.outfilename is not None and self.outfile is None:
-            if not exists(dirname(self.outfilename)):
-                os.mkdir(dirname(self.outfilename))
-            self.outfilename_tmp = self.outfilename + '.' + str(random.getrandbits(32))
-            self.outfile = open(self.outfilename_tmp, 'wb')
-        if self.outfile is not None:
-            LOG.info('Saving chunk to cache')
-            self.outfile.write(chunk)
-        if len(chunk) == 0:
-            LOG.info('Finished reading chunks')
-            self.infile.close()
-            if self.outfile is not None:
-                LOG.info('Finished saving cache')
-                self.outfile.close()
-                os.rename(self.outfilename_tmp, self.outfilename)
-            raise StopIteration
-        return chunk
-
-
-
-class DownloadCacheProxy(object):
-    """wsgi proxy that caches downloads
-    """
-    def __init__(self, app):
-        self.app = app
-
-    def __call__(self, environ, start_response):
-        request = Request(environ)
-        # test whether we're trying to download something
-        host = environ.get('paste.httpserver.proxy.host', '')
-        scheme = environ.get('paste.httpserver.proxy.scheme', '')
-        path_info = environ.get('PATH_INFO', '')
-
-        # do nothing and use the app if we're not acting as a proxy
-        if host is '' or scheme is '':
-            return self.app(environ, start_response)
-
-        # do nothing if we're not handling this type of file
-        extensions_to_cache = ('.gz', '.tgz', '.zip', '.egg', '.tar') #TODO move to the conf
-        filename = join(PATHS['downloads'], host, basename(path_info))
-        extension = splitext(filename)[1].lower()
-        if extension not in extensions_to_cache:
-            response = request.get_response(TransparentProxy())
-            return response(environ, start_response)
-
-        # we already have the file, stream it
-        if exists(filename):
-            LOG.info('Found in the download cache: %s' % filename)
-            response = Response()
-            response.app_iter = StreamingIterator(filename)
-            return response(environ, start_response)
-
-        # We don't have the file, download and stream
-        response = request.get_response(TransparentProxy())
-        response.app_iter = StreamingIterator(
-                request.url,
-                outfilename=filename)
-        return response(environ, start_response)
-
-
 def make_filter(global_conf, **local_conf):
     """factory for the [paste.filter_factory] entry-point
     (see setup.py)
     """
     def filter(app):
-        return DownloadCacheProxy(Proxy(app))
+        return Proxy(app)
     return filter
 
