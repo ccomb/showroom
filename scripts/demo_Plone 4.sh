@@ -3,7 +3,7 @@
 set -e
 
 # create a virtualenv
-virtualenv --no-site-packages --distribute sandbox
+virtualenv -p python2.7 --no-site-packages --distribute sandbox
 
 # install the project templates
 sandbox/bin/pip install ZopeSkel==2.17 PIL==1.1.7 PasteDeploy==1.3.4 Paste==1.6
