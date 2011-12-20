@@ -15,6 +15,7 @@ requires = [
     'python-ldap',
     'Beaker',
     'interlude',
+#    'gunicorn',
 ]
 
 setup(name='showroom',
