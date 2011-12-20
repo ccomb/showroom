@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PARAMS:name, version=6.0.1
+# PARAMS:name, version=6.0.3
 set -e
 
 
