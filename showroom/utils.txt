@@ -57,7 +57,7 @@ We shouldn't have any installed demos:
 Deploying a demo
 ----------------
 
-We try de deploy the 'test1' demo:
+We try to deploy the 'test1' demo:
 
 >>> utils.deploy({'app':'test1'}, 'test1')
 
