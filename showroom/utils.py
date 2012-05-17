@@ -70,6 +70,12 @@ class SuperVisor(object):
         assert(self.is_running), "Could not start supervisor"
 
     def stop(self):
+        # remove hard links for apache configs
+        for demo in installed_demos():
+            demo =  InstalledDemo(demo['name'])
+            if demo.has_apache_link:
+                demo._a2dissite(reload=False)
+        # shutdown supervisor and all demos
         subprocess.Popen([join(PATH, 'bin', 'supervisorctl'),
                           '-c', PATHS['supervisor'], 'shutdown']).wait()
 
@@ -308,13 +314,14 @@ class InstalledDemo(object):
             self.stop()
 
 
-    def _a2dissite(self):
+    def _a2dissite(self, reload=True):
         """sandbox equivalent to the Apache a2dissite command
         """
         config_link = join(PATHS['var'], 'apache2', 'demos', self.name + '.conf')
         if os.path.exists(config_link):
             os.remove(config_link)
-            self._reload_apache()
+            if reload:
+                self._reload_apache()
 
     def destroy(self):
         if not os.path.exists(self.path):
