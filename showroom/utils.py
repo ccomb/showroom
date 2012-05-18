@@ -7,6 +7,8 @@ import os
 import shutil
 import string
 import subprocess
+import urllib
+import time
 
 #logging.basicConfig(level=logging.DEBUG)
 LOG = logging.getLogger(__name__)
@@ -273,26 +275,18 @@ class InstalledDemo(object):
         apache_confs = [conf
                         for conf in os.listdir(join(PATHS['var'], 'apache2', 'demos'))
                         if conf.endswith('.conf')]
-        a2status = self.supervisor.xmlrpc.supervisor.getProcessInfo('apache2')['statename']
 
         if len(apache_confs) == 0:
-            try:
-                retcode = self.supervisor.xmlrpc.supervisor.stopProcess('apache2')
-            except:
-                return 0
+            # no more demos needing apache, we stop it
+            retcode = self.supervisor.xmlrpc.supervisor.stopProcess('apache2')
         else:
             # reload the config or start Apache if needed (WITH supervisor!)
             a2status = self.supervisor.xmlrpc.supervisor.getProcessInfo('apache2')['statename']
             if a2status == 'RUNNING':
-                retcode = subprocess.call(
+                subprocess.call(
                     ["/usr/sbin/apache2ctl",  "-f", PATHS['etc']+"/apache2/apache2.conf", "-k", "graceful"])
-                return retcode
             else:
-                try:
-                    self.supervisor.xmlrpc.supervisor.startProcess('apache2')
-                except:
-                    return 1
-                return 0
+                self.supervisor.xmlrpc.supervisor.startProcess('apache2')
 
 
     def _a2ensite(self):
@@ -308,9 +302,11 @@ class InstalledDemo(object):
             # if apache doesn't restart because of us,
             # we should disable the new config and stop the app.
             # Supervisor should immediately try to restart apache
-        retcode = self._reload_apache()
-        if retcode != 0:
-            self._a2dissite()
+        self._reload_apache()
+        time.sleep(0.5) # :( http://httpd.apache.org/docs/2.0/stopping.html
+        try:
+            urllib.urlopen('http://localhost:%s/server-status' % self.port)
+        except Exception, e:
             self.stop()
 
 
