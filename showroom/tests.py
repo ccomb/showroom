@@ -37,7 +37,7 @@ def setUp(self):
     with open(self.supervisor, 'r+') as s:
         content = s.read()
         content = content.replace('8002', '8003')
-        content = content.replace('../demos', 'demos')
+        content = content.replace('../../demos', 'demos')
         content = content.replace('etc/apache2', join(etc, 'apache2'))
         s.seek(0); s.truncate(); s.write(content)
 

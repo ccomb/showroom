@@ -10,15 +10,17 @@ Showroom is a web application which allows you to deploy/start/stop/destroy
 sandboxed *demos* of other web applications in one click. Currently supported
 applications are:
 
-- Plone 3, 4
-- Drupal 5, 6, 7
-- Karl 3
-- OpenERP 5, 6
+- Plone
+- Drupal
+- CPS
+- Karl
+- OpenERP
+- SugarCRM
 
 It can also deploy some web frameworks or environments, though it is of limited
 interest from a user point of view:
 
-- repoze.bfg
+- Pyramid
 - django
 - BlueBream
 - PHP
@@ -73,7 +75,6 @@ TODO :
 * being able to save a deployment to be able to reproduce it (except the port)
 * stop demos if no request are done in 5 minutes, propose to restart if someone try to access
 * add an indication green/red for apache and supervisord
-* add a download proxy to accelerate deployments
 * makes application tweet deployments
 * debug option to display the deployment console in the browser
 * debug option to display the apache log (or others) in the browser
