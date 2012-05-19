@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PARAMS: name, login=admin, password, version=4.1.3, plugins
+# PARAMS: name, login=admin, password, version=4.1.4, plugins
 set -e
 
 # create a virtualenv
