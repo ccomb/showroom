@@ -128,7 +128,7 @@ def deploy(request):
         utils.deploy(params, name)
     except utils.DeploymentError, e:
         _flash_message(request,
-            u"Error : %s" % e.message, 'ERROR')
+            u"Error deploying %s : %s" % (name, e.message), 'ERROR')
         return HTTPFound(location='/')
 
     demo = utils.InstalledDemo(name)

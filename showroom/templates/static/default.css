@@ -108,7 +108,7 @@ div.SHUTDOWN {
 div.STARTING, div.RESTARTING {
     background: #5B5;
 }
-div.FATAL, div.UNKNOWN, div.PARTIAL {
+div.FATAL, div.UNKNOWN, div.PARTIAL, div.DEPLOYING {
     background: transparent;
     border: solid 0.1em black;
 }

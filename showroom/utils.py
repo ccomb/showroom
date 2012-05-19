@@ -211,6 +211,13 @@ class InstalledDemo(object):
         """
         if not os.path.exists(self.path):
             return 'DESTROYED'
+        app_conf_path = join(PATHS['demos'], self.name, 'demo.conf')
+        if os.path.exists(app_conf_path):
+            app_conf = SafeConfigParser()
+            app_conf.read(app_conf_path)
+            if app_conf.has_section(self.name) \
+            and app_conf.has_option(self.name, 'status'):
+                return app_conf.get(self.name, 'status')
         if self.port is '':
             return 'FATAL'
 
@@ -278,7 +285,7 @@ class InstalledDemo(object):
 
         if len(apache_confs) == 0:
             # no more demos needing apache, we stop it
-            retcode = self.supervisor.xmlrpc.supervisor.stopProcess('apache2')
+            self.supervisor.xmlrpc.supervisor.stopProcess('apache2')
         else:
             # reload the config or start Apache if needed (WITH supervisor!)
             a2status = self.supervisor.xmlrpc.supervisor.getProcessInfo('apache2')['statename']
@@ -306,7 +313,7 @@ class InstalledDemo(object):
         time.sleep(0.5) # :( http://httpd.apache.org/docs/2.0/stopping.html
         try:
             urllib.urlopen('http://localhost:%s/server-status' % self.port)
-        except Exception, e:
+        except Exception:
             self.stop()
 
 
@@ -394,6 +401,16 @@ def deploy(params, app_name):
     else:
         raise DeploymentError('this app already exists')
 
+    # create a config file in the demo directory
+    app_conf = SafeConfigParser()
+    app_conf.add_section(app_name)
+    app_conf.set(app_name, 'port', str(port))
+    app_conf.set(app_name, 'status', 'DEPLOYING')
+    app_conf_path = join(PATHS['demos'], app_name, 'demo.conf')
+    with open(app_conf_path, 'w+') as configfile:
+        app_conf.write(configfile)
+    LOG.info('section %s added', app_name)
+
     # run the deployment script
     LOG.debug(script)
     retcode = subprocess.call('"'+script+'"', shell=True, cwd=demopath, env=env)
@@ -433,13 +450,12 @@ def deploy(params, app_name):
         supervisor.xmlrpc.supervisor.reloadConfig()
         supervisor.xmlrpc.supervisor.addProcessGroup(app_name)
 
-    # create a config file in the demo directory
     app_conf = SafeConfigParser()
-    app_conf.add_section(app_name)
-    app_conf.set(app_name, 'port', str(port))
-    with open(join(PATHS['demos'], app_name, 'demo.conf'), 'w+') as configfile:
+    app_conf.read(app_conf_path)
+    app_conf.remove_option(app_name, 'status')
+    with open(app_conf_path, 'w+') as configfile:
         app_conf.write(configfile)
-    LOG.info('section %s added', app_name)
+    LOG.info('Finished deploying %s', app_name)
 
 
 class WorkingDirectoryKeeper(object):
