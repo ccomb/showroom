@@ -405,7 +405,7 @@ def deploy(params, app_name):
     start_script = join(demopath, 'start.sh')
     if os.path.exists(start_script):
         os.chmod(start_script, 0744)
-        # add and shebang and trap if forgotten
+        # add a shebang and trap if forgotten
         with open(start_script, 'r+') as s:
             start = ''
             content = s.read()
@@ -440,4 +440,16 @@ def deploy(params, app_name):
     with open(join(PATHS['demos'], app_name, 'demo.conf'), 'w+') as configfile:
         app_conf.write(configfile)
     LOG.info('section %s added', app_name)
+
+
+class WorkingDirectoryKeeper(object):
+    """Context manager to get back to the previous working dir at exit
+    """
+    def __enter__(self):
+        self.wd = os.getcwd()
+
+    def __exit__(self, *exc_args):
+        os.chdir(self.wd)
+
+keep_working_dir = WorkingDirectoryKeeper()
 

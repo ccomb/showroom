@@ -1,15 +1,18 @@
 # coding: utf-8
-from showroom.security import check_login
+from os.path import join, abspath, dirname
 from pyramid.chameleon_zpt import get_template
 from pyramid.chameleon_zpt import render_template_to_response
 from pyramid.exceptions import NotFound
 from pyramid.security import authenticated_userid, forget, remember
 from pyramid.url import route_url
+from showroom.security import check_login
 from urlparse import urlsplit, urlunsplit
-from os.path import join, abspath, dirname
 from utils import ADMIN_HOST
+from utils import keep_working_dir
 from webob.exc import HTTPFound
 import logging
+import os
+import subprocess
 import utils
 
 LOG = logging.getLogger(__name__)
@@ -47,6 +50,7 @@ def direct_url(demo, request):
 def installed_demos(request):
     """ return the main page, with applications list, and actions.
     """
+    # XXX this is too slow
     return render_template_to_response(
         join(abspath(dirname(__file__)), 'templates', 'demos.pt'),
         master=get_template('templates/master.pt'),
@@ -229,4 +233,28 @@ def app_script(request):
 
     else:
         return ("No application name given or unknown application.",)
+
+def postinstall(request):
+    """ execute the postinstall script for a demo
+    """
+    if 'app' in request.params and request.params['app'] in [d['name'] for d in utils.installed_demos()]:
+        app = request.params['app']
+        demo = utils.InstalledDemo(app)
+        script = join(demo.path, 'post_install.sh')
+        with open(script, 'r+') as s:
+            start = ''
+            content = s.read()
+            if not content.startswith('#!'):
+                start = '#!/bin/bash\n'
+            content = start + content
+            s.seek(0); s.truncate(); s.write(content)
+        with keep_working_dir:
+            os.chdir(demo.path)
+            subprocess.call(['chmod', '+x', script])
+            subprocess.call([script])
+        os.rename(script, script + '.executed')
+    return HTTPFound(location=getattr(request, 'referrer', False) or '/')
+
+
+
 

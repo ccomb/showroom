@@ -1,20 +1,9 @@
 <div id="showroompopup" style="display: none">
   <div id="showroomlogo">
-      <img src="/showroomstatic/images/logo.png" border="0" />
+      <img src="/showroom_static/images/logo.png" border="0" />
   </div>
-  <div>
+  <div style="margin-bottom: 2em">
     %s
   </div>
 <div id="showroompopup_hide"><form method="POST" action=""><input type="checkbox" name="showroompopup_hide"/>Hide this popup<input type="hidden" name="toto" value="titi"/></form></div>
 </div>
-<script>
-$(document).ready(function() {
-    $("#showroompopup").dialog({width: "40%%", title: 'Installation instructions'}).parents(".ui-dialog:eq(0)").wrap('<div id="showroomscope"></div>');
-    $('#showroompopup_hide form input').click(
-        function() {
-            $.get(window.location.protocol + '//' + window.location.host + '/?showroompopup_hide');
-            $("#showroompopup").parent().hide();
-        }
-    );
-})
-</script>

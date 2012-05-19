@@ -2,7 +2,7 @@ from pyramid.configuration import Configurator
 from showroom.models import RootFactory
 import pyramid_zcml
 
-def app(global_config, **settings):
+def showroom(global_config, **settings):
     """ This function returns a WSGI application.
 
     It is usually called by the PasteDeploy framework during

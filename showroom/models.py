@@ -7,4 +7,4 @@ class RootFactory(object):
     """
     __acl__ = [ (Allow, Authenticated, 'edit'), ]
     def __init__(self, request):
-        self.__dict__.update(getattr(request, 'matchdict', {}))
+        self.__dict__.update(getattr(request, 'matchdict', {}) or {})

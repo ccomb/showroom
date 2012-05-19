@@ -14,6 +14,28 @@ from showroom.utils import PATHS, ADMIN_HOST, InstalledDemo
 #logging.basicConfig(level=logging.DEBUG)
 LOG = logging.getLogger(__name__)
 
+CSS = '''
+<link href="/showroom_static/jquery/css/showroom/jquery-ui-1.8.16.custom.css" type="text/css" rel="stylesheet" />
+<link href="/showroom_static/popup.css" type="text/css" rel="stylesheet" />
+'''
+
+JS = '''
+<script type="text/javascript" src="/showroom_static/jquery/js/jquery-1.6.2.min.js"></script>
+<script type="text/javascript" src="/showroom_static/jquery/js/jquery-ui-1.8.16.custom.min.js"></script>
+<script type="text/javascript">
+    $.noConflict();
+    jQuery(document).ready(function($) {
+        $("#showroompopup").dialog({width: "40%%", title: 'Installation instructions'}).parents(".ui-dialog:eq(0)").wrap('<div id="showroomscope"></div>');
+        $('#showroompopup_hide form input').click(
+            function() {
+                $.get(window.location.protocol + '//' + window.location.host + '/?showroompopup_hide');
+                $("#showroompopup").parent().hide();
+            }
+        );
+    })
+</script>
+'''
+
 class Proxy(object):
     """ wsgi middleware that acts as a proxy, or redirects to the admin
     """
@@ -80,18 +102,13 @@ class Proxy(object):
         if content is not None and demo.is_popup_displayed:
             popup = open(join(abspath(dirname(__file__)),
                               'templates', 'popup.html')).read() % content
-            css = ('<link href="/showroomstatic/jquery/css/showroom/jquery-ui-1.8.16.custom.css" type="text/css" rel="stylesheet" />\n'
-                   '<link href="/showroomstatic/popup.css" type="text/css" rel="stylesheet" />\n')
-            js = ('<script type="text/javascript" src="/showroomstatic/jquery/js/jquery-1.6.2.min.js"></script>\n'
-                  '<script type="text/javascript" src="/showroomstatic/jquery/js/jquery-ui-1.8.16.custom.min.js"></script>\n')
 
             if 'html' in (response.content_type or ''):
                 if '</body>' in response.body and '<head>' in response.body:
-                    response.body = response.body.replace('<head>', '<head>' + js)
-                    response.body = response.body.replace('</head>', css + '</head>')
+                    response.body = response.body.replace('</head>', CSS + JS + '</head>')
                     response.body = response.body.replace('</body>', popup + '</body>')
                 else:
-                    response.body = css + js + response.body + popup
+                    response.body = CSS + JS + response.body + popup
 
         return response(environ, start_response)
 

@@ -85,6 +85,12 @@
          view_permission="edit"
   />
 
+  <route name="postinstall"
+         path="/postinstall"
+         view=".views.postinstall"
+         view_permission="edit"
+  />
+
   <static
      name="static"
      path="templates/static"
