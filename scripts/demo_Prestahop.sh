@@ -1,7 +1,6 @@
 #!/bin/bash
 # PARAMS: name, version=1.4.8.2, admin_path=admin123
 
-prestashop_version=$version
 db_name=prestashop
 db_user=prestashop
 db_pass=prestashop
@@ -9,13 +8,9 @@ db_host=127.0.0.1
 db_port=$((PORT+1000))
 
 # download prestashop
-url_presta=http://www.prestashop.com/ajax/controller.php?method=download\&type=releases\&file=prestashop_$prestashop_version.zip\&language=en,fr
-echo $url_presta
-file_down=controller.php?method=download\&type=releases\&file=prestashop_$prestashop_version.zip\&language=en,fr
-echo $file_down
-wget $url_presta
-mv $file_down prestashop_$prestashop_version.zip
-unzip prestashop_$prestashop_version.zip
+url_presta=http://www.prestashop.com/ajax/controller.php?method=download\&type=releases\&file=prestashop_$version.zip\&language=en,fr
+wget $url_presta -O  prestashop_$version.zip
+unzip prestashop_$version.zip
 #change install form for have default config for db
 sed -i "s/localhost/$db_host:$db_port/" prestashop/install/index.php
 sed -i "s/root/prestashop/" prestashop/install/index.php
