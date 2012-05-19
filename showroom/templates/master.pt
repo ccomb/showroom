@@ -35,8 +35,10 @@
   <!-- message -->
   <tal:block define="session python:request.environ.get('beaker.session', {})"
              condition="session.has_key('message')">
-  <div id="message" class="subcontent appear"
-       tal:define="message python:session.pop('message', None)"
+  <div id="message"
+       tal:define="message python:session.pop('message', None);
+                   message_type python:session.pop('message_type', None);"
+       tal:attributes="class string:subcontent appear ${message_type};"
        tal:content="structure message" />
   <div tal:replace="python:session.save() or ''" />
   </tal:block>

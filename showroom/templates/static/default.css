@@ -63,9 +63,6 @@ input, textarea, select {
 #loading {
     margin: 0.5em;   
 }
-#message {
-    background-color: #ffe57f;
-}
 #content {
     top: 93px;
     left: 200px;
@@ -85,6 +82,17 @@ width: 6em;
 -moz-border-radius: 0.5em;
 -webkit-border-radius: 0.5em;
 }
+/* flash messages */
+div.SUCCESS {
+    background: #7fffa6;
+}
+div.WARNING {
+    background: #ffe57f;
+}
+div.ERROR {
+    background: #ff7fd9;
+}
+/* supervisor statuses */
 div.RUNNING {
     background: #5E5;
 }

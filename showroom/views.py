@@ -17,10 +17,10 @@ import utils
 
 LOG = logging.getLogger(__name__)
 
-
-def _flash_message(request, message):
+def _flash_message(request, message, message_type='SUCCESS'):
     """send a message through the session to the next url
     """
+    request.environ['beaker.session']['message_type'] = message_type
     request.environ['beaker.session']['message'] = message
     request.environ['beaker.session'].save()
 
@@ -96,7 +96,7 @@ def login(request):
                              headers = headers)
         message = 'Failed login'
         _flash_message(request,
-            u"%s" % message)
+            u"%s" % message, 'ERROR')
 
     return dict(
         master=get_template('templates/master.pt'),
@@ -128,12 +128,13 @@ def deploy(request):
         utils.deploy(params, name)
     except utils.DeploymentError, e:
         _flash_message(request,
-            u"Error : %s" % e.message)
+            u"Error : %s" % e.message, 'ERROR')
         return HTTPFound(location='/')
 
     demo = utils.InstalledDemo(name)
     _flash_message(request,
-        u"application %s created on port %s" % (demo.name, demo.port))
+        u"application %s created on port %s" % (demo.name, demo.port),
+        'SUCCESS')
     return HTTPFound(location='/')
 
 
@@ -149,12 +150,12 @@ def start(request):
         demo.start()
     except Exception, e:
         message = u'Error: %s' % e.message
-        _flash_message(request, message)
+        _flash_message(request, message, 'ERROR')
         return HTTPFound(location='/')
     new_status = demo.get_status()
     if new_status == 'RUNNING' and new_status != old_status:
         message = u'Demo "%s" succesfully started' % demo.name
-    _flash_message(request, message)
+    _flash_message(request, message, 'SUCCESS')
     return HTTPFound(location='/')
 
 
@@ -170,19 +171,23 @@ def stop(request):
         demo.stop()
     except Exception, e:
         message = u'Error: %s' % e.message
-        _flash_message(request, message)
+        _flash_message(request, message, 'ERROR')
         return HTTPFound(location='/')
     new_status = demo.get_status()
     if new_status == 'STOPPED' and new_status != old_status:
         message = u'Demo "%s" succesfully stopped' % demo.name
-    _flash_message(request, message)
+    _flash_message(request, message, 'SUCCESS')
     return HTTPFound(location='/')
 
 
 def start_all(request):
-    """ view to stop supervisor and all demos
+    """ view to start supervisor
     """
-    utils.SuperVisor().start()
+    try:
+        utils.SuperVisor().start()
+    except AssertionError:
+        message = u'Could not start supervisor. Please retry in a few seconds.'
+        _flash_message(request, message, 'ERROR')
     return HTTPFound(location='/')
 
 
@@ -201,10 +206,10 @@ def destroy(request):
         utils.InstalledDemo(name).destroy()
     except utils.DestructionError, e:
         message = 'Error: %s' % e.message
-        _flash_message(request, message)
+        _flash_message(request, message, 'ERROR')
         return HTTPFound(location='/')
 
-    _flash_message(request, '%s demo successfully deleted!' % name)
+    _flash_message(request, '%s demo successfully deleted!' % name, 'SUCCESS')
     return HTTPFound(location='/')
 
 
