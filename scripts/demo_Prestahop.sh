@@ -7,10 +7,10 @@ db_name=prestashop
 db_user=prestashop
 db_pass=prestashop
 
-# download prestashop
-url_presta=http://www.prestashop.com/ajax/controller.php?method=download\&type=releases\&file=prestashop_$version.zip\&language=en,fr
-wget $url_presta -O  prestashop_$version.zip
-unzip prestashop_$version.zip
+# download and extract prestashop
+url=http://www.prestashop.com/ajax/controller.php?method=download\&type=releases\&file=prestashop_${version}.zip\&language=en,fr
+wget $url -O  prestashop.zip
+unzip prestashop.zip
 
 # change install form to have default config for db
 sed -i "s/localhost/$db_host:$db_port/" prestashop/install/index.php

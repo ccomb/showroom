@@ -176,7 +176,7 @@ class InstalledDemo(object):
         self.democonf_path = join(PATHS['demos'], name, 'demo.conf')
         self.democonf.read(self.democonf_path)
         try:
-            self.port = self.democonf.get(self.name, 'port')
+            self.port = self.democonf.get('params', 'port')
         except:
             LOG.warning(u'Demo %s seems broken: no port' % self.name)
             self.port = ''
@@ -403,9 +403,13 @@ def deploy(params, app_name):
 
     # create a config file in the demo directory
     app_conf = SafeConfigParser()
-    app_conf.add_section(app_name)
-    app_conf.set(app_name, 'port', str(port))
-    app_conf.set(app_name, 'status', 'DEPLOYING')
+    app_conf.add_section('params')
+    app_conf.set('params', 'port', str(port))
+    app_conf.set('params', 'name', app_name.encode('utf-8'))
+    app_conf.set('params', 'status', 'DEPLOYING')
+    for param_name, param_value in params.values():
+        assert(param_name not in ('port', 'status'))
+        app_conf.set('params', param_name, param_value.encode('utf-8'))
     app_conf_path = join(PATHS['demos'], app_name, 'demo.conf')
     with open(app_conf_path, 'w+') as configfile:
         app_conf.write(configfile)
@@ -453,7 +457,7 @@ def deploy(params, app_name):
 
     app_conf = SafeConfigParser()
     app_conf.read(app_conf_path)
-    app_conf.remove_option(app_name, 'status')
+    app_conf.remove_option('params', 'status')
     with open(app_conf_path, 'w+') as configfile:
         app_conf.write(configfile)
     LOG.info('Finished deploying %s', app_name)
