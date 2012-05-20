@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 # PARAMS:name, version=6.0.4
-set -e
 
 # create a virtualenv
 virtualenv --no-site-packages --distribute sandbox

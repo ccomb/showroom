@@ -1,9 +1,6 @@
 #!/bin/bash
 # PARAMS: name
 
-set -e
-
-
 # create a PHP hello world
 mkdir htdocs
 cat > htdocs/index.php << EOF
