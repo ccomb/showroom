@@ -215,9 +215,9 @@ class InstalledDemo(object):
         if os.path.exists(app_conf_path):
             app_conf = SafeConfigParser()
             app_conf.read(app_conf_path)
-            if app_conf.has_section(self.name) \
-            and app_conf.has_option(self.name, 'status'):
-                return app_conf.get(self.name, 'status')
+            if app_conf.has_section('params') \
+            and app_conf.has_option('params', 'status'):
+                return app_conf.get('params', 'status')
         if self.port is '':
             return 'FATAL'
 
@@ -407,7 +407,7 @@ def deploy(params, app_name):
     app_conf.set('params', 'port', str(port))
     app_conf.set('params', 'name', app_name.encode('utf-8'))
     app_conf.set('params', 'status', 'DEPLOYING')
-    for param_name, param_value in params.values():
+    for param_name, param_value in params.items():
         assert(param_name not in ('port', 'status'))
         app_conf.set('params', param_name, param_value.encode('utf-8'))
     app_conf_path = join(PATHS['demos'], app_name, 'demo.conf')
@@ -418,7 +418,7 @@ def deploy(params, app_name):
     # run the deployment script
     LOG.debug(script)
     functions = join(PATHS['scripts'], 'functions.sh')
-    retcode = subprocess.call(['bash', '-c', 'source %s && bash -e "%s" ' % (functions, script)], cwd=demopath, env=env)
+    retcode = subprocess.call(['bash', '-c', 'source %s && source %s && export -f first_install && bash -xce first_install' % (functions, script)], cwd=demopath, env=env)
     if retcode != 0:
         shutil.rmtree(demopath)
         raise DeploymentError('installation ended with an error')

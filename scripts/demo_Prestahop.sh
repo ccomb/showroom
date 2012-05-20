@@ -1,12 +1,13 @@
 #!/bin/bash
-# PARAMS: name, version=1.4.8.2, admin_path=admin123
+# PARAMS: name, version=1.4.8.2
 
-db_host=127.0.0.1
-db_port=$((PORT+1000))
-db_name=prestashop
-db_user=prestashop
-db_pass=prestashop
+export db_host=127.0.0.1
+export db_port=$((PORT+1000))
+export db_name=prestashop
+export db_user=prestashop
+export db_pass=prestashop
 
+function first_install {
 # download and extract prestashop
 url=http://www.prestashop.com/ajax/controller.php?method=download\&type=releases\&file=prestashop_${version}.zip\&language=en,fr
 wget $url -O  prestashop.zip
@@ -40,8 +41,8 @@ EOF
 cat > popup.html << EOF
 <p>When you have finished the Prestashop installation wizard, do the following:</p>
 <ol>
-  <li>First <a href="/showroom_manage/postinstall?app=$name">click here</a>to delete the install folder and rename /admin to /$admin_path</li>
-  <li>Then you can go to your Prestashop <a href="/$admin_path">Admin panel</a></li>
+  <li>First <a href="/showroom_manage/postinstall?app=$name">click here</a>to delete the install folder and rename /admin to /myadmin</li>
+  <li>Then you can go to your Prestashop <a href="/myadmin">Admin panel</a></li>
 </ol>
 EOF
 
@@ -49,6 +50,15 @@ EOF
 cat > post_install.sh << EOF
 cd prestashop
 rm -R install
-mv admin $admin_path
+mv admin myadmin
 EOF
+}
+
+function reconfigure_clone {
+# $1 is the old name, $2 is the old port
+sed -i "s/app=$1/app=$name/" popup.html
+sed -i "s/$2/$PORT/" apache2.conf
+sed -i "s/$(($2 + 1000))/$db_port/" prestashop/install/index.php
+sed -i "s/$(($2 + 1000))/$db_port/" start.sh
+}
 
