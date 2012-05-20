@@ -250,7 +250,7 @@ class InstalledDemo(object):
         if len(statuses) == 1:
             # consistent state
             return statuses.pop()
-        elif len(statuses) > 1:
+        elif len(statuses) > 1 and 'RUNNING' in statuses:
             # half started!
             return 'PARTIAL'
         else:
