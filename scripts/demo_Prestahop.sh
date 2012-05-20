@@ -54,6 +54,7 @@ mv admin myadmin
 EOF
 }
 
+
 function reconfigure_clone {
 # $1 is the old name, $2 is the old port
 sed -i "s/app=$1/app=$name/" popup.html

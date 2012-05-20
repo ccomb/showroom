@@ -418,7 +418,7 @@ def deploy(params, app_name):
     # run the deployment script
     LOG.debug(script)
     functions = join(PATHS['scripts'], 'functions.sh')
-    retcode = subprocess.call(['bash', '-c', 'source %s && source %s && export -f first_install && bash -xce first_install' % (functions, script)], cwd=demopath, env=env)
+    retcode = subprocess.call(['bash', '-c', 'source "%s" && source "%s" && export -f first_install && bash -xce first_install' % (functions, script)], cwd=demopath, env=env)
     if retcode != 0:
         shutil.rmtree(demopath)
         raise DeploymentError('installation ended with an error')
