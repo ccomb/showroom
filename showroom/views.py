@@ -118,14 +118,14 @@ def logout(request):
 def deploy(request):
     """ deploy a demo
     """
-    params = request.params.copy()
+    params = dict(request.params.copy())
     if 'app' not in params or 'name' not in params:
         raise NotFound
-    name = params['name'].replace(' ', '_').lower() # FIXME
+    name = params['name'] = params['name'].replace(' ', '_').lower() # FIXME
     if 'plugins' in params:
         params['plugins'] = ' '.join(params['plugins'].split())
     try:
-        utils.deploy(params, name)
+        utils.deploy(params)
     except utils.DeploymentError, e:
         _flash_message(request,
             u"Error deploying %s : %s" % (name, e.message), 'ERROR')
@@ -204,7 +204,7 @@ def destroy(request):
     name=request.params['name']
     try:
         utils.InstalledDemo(name).destroy()
-    except utils.DestructionError, e:
+    except Exception, e:
         message = 'Error: %s' % e.message
         _flash_message(request, message, 'ERROR')
         return HTTPFound(location='/')

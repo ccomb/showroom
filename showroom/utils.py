@@ -2,6 +2,7 @@
 from ConfigParser import SafeConfigParser
 from os.path import isdir, join, dirname, exists
 from xmlrpclib import ServerProxy
+from base64 import b64encode
 import logging
 import os
 import shutil
@@ -22,6 +23,7 @@ PATHS = {
   'bin' : join(PATH, CONFIG.get('paths', 'bin')),
   'scripts' : join(PATH, CONFIG.get('paths', 'scripts')),
   'demos' : join(PATH, CONFIG.get('paths', 'demos')),
+  'templates' : join(PATH, CONFIG.get('paths', 'templates')),
   'var' : join(PATH, CONFIG.get('paths', 'var')),
   'etc' : join(PATH, CONFIG.get('paths', 'etc')),
   'supervisor' : join(PATH, CONFIG.get('paths', 'supervisor')),
@@ -128,6 +130,7 @@ def available_demos():
         params = []
         for line in open(join(PATHS['scripts'], filename)):
             if line.split(':')[0].strip() == '# PARAMS':
+                # params looks like: ['name', 'version=6.26', 'plugins']
                 params = map(string.strip, line.strip().split(':')[1].split(','))
 
         demos[(filename[5:-3])] = {'params':params}
@@ -139,11 +142,11 @@ def installed_demos():
         or info of a single demo
     """
     demo_infos = []
-    demo_names = os.listdir(PATHS['demos'])
-    for name in demo_names:
-        if not os.path.isdir(join(PATHS['demos'], name)):
+    demo_paths = os.listdir(PATHS['demos'])
+    for demo_path in demo_paths:
+        if not os.path.isdir(join(PATHS['demos'], demo_path)):
             continue
-        demo = InstalledDemo(name)
+        demo = InstalledDemo(demo_path)
         demo_infos.append(dict(
             name=demo.name,
             port=demo.port,
@@ -163,23 +166,27 @@ class InstalledDemo(object):
         if self.name == '':
             raise ValueError('empty demo name')
         self.path = join(PATHS['demos'], self.name)
-        self.start_script = join(PATHS['demos'], name, 'start.sh')
-        self.apache_config_file = join(PATHS['demos'], name, 'apache2.conf')
+        if not os.path.exists(self.path):
+            raise Exception('this demo does not exist')
+        self.start_script = join(self.path, 'start.sh')
+        self.apache_config_file = join(self.path, 'apache2.conf')
         self.apache_config_link = join(PATHS['var'], 'apache2', 'demos', name + '.conf')
         self.popup = None
-        self.popup_file = join(PATHS['demos'], name, 'popup.html')
+        self.popup_file = join(self.path, 'popup.html')
         if self.has_popup:
             with open(self.popup_file) as p:
                 self.popup = p.read()
         # read the demo config
         self.democonf = SafeConfigParser()
-        self.democonf_path = join(PATHS['demos'], name, 'demo.conf')
+        self.democonf_path = join(self.path, 'demo.conf')
         self.democonf.read(self.democonf_path)
         try:
             self.port = self.democonf.get('params', 'port')
         except:
             LOG.warning(u'Demo %s seems broken: no port' % self.name)
             self.port = ''
+        # get the real name of the demo
+        self.name = self.democonf.get('params', 'name')
 
         # init the supervisor
         self.supervisor = SuperVisor()
@@ -366,9 +373,10 @@ class DestructionError(Exception):
     pass
 
 
-def deploy(params, app_name):
+def deploy(params):
     """deploy a demo of 'app_type' in the 'app_name' directory
     """
+    app_name = params.pop('name')
     app_type = params.pop('app')
     if app_type not in available_demos():
         raise DeploymentError('this demo does not exist')
@@ -415,14 +423,33 @@ def deploy(params, app_name):
         app_conf.write(configfile)
     LOG.info('section %s added', app_name)
 
-    # run the deployment script
-    LOG.debug(script)
-    functions = join(PATHS['scripts'], 'functions.sh')
-    retcode = subprocess.call(['bash', '-c', 'source "%s" && source "%s" && export -f first_install && bash -xce first_install' % (functions, script)], cwd=demopath, env=env)
-    if retcode != 0:
-        shutil.rmtree(demopath)
-        raise DeploymentError('installation ended with an error')
+    # check whether we already have a template available
+    template_name = app_type + '_' + params['version'].strip() + '_' + b64encode(
+      ','.join(['%s=%s' % (n.strip(), '\n'.join([i.strip() for i in str(v).split('\n')]))
+                for (n, v) in sorted(params.items()) if n not in ('name',)]))
+    template_path = join(PATHS['templates'], template_name)
 
+    if os.path.exists(template_path):
+        for item in os.listdir(template_path):
+            # XXX replace this waste of space with a btrfs subvolume
+            subprocess.call(['cp', '-r', join(template_path, item), demopath])
+        # run the clone reconfiguration script
+        old_demo = InstalledDemo(app_name)
+        functions = join(PATHS['scripts'], 'functions.sh')
+        retcode = subprocess.call(['bash', '-c', 'source "%s" && source "%s" && export -f reconfigure_clone && bash -xce "reconfigure_clone \"%s\" %s"' % (functions, script, old_demo.name, old_demo.port)], cwd=demopath, env=env)
+        if retcode != 0:
+            shutil.rmtree(demopath)
+            raise DeploymentError('installation ended with an error')
+
+    else:
+        # run the deployment script
+        LOG.debug(script)
+        functions = join(PATHS['scripts'], 'functions.sh')
+        retcode = subprocess.call(['bash', '-c', 'source "%s" && source "%s" && export -f first_install && bash -xce first_install' % (functions, script)], cwd=demopath, env=env)
+        if retcode != 0:
+            shutil.rmtree(demopath)
+            raise DeploymentError('installation ended with an error')
+    
     # set the start script to executable
     start_script = join(demopath, 'start.sh')
     if os.path.exists(start_script):
@@ -437,8 +464,10 @@ def deploy(params, app_name):
                 start = '#!/bin/bash\ntrap "pkill -P \$\$" EXIT\n'
             content = start + content
             s.seek(0); s.truncate(); s.write(content)
-
-        # add a supervisor include file for this program
+    
+    # add a supervisor include file for this program
+    start_script = join(demopath, 'start.sh')
+    if os.path.exists(start_script):
         supervisor_conf = SafeConfigParser()
         section = 'program:%s' % app_name
         supervisor_conf.add_section(section)
@@ -449,7 +478,7 @@ def deploy(params, app_name):
         supervisor_conf.set(section, 'startsecs', '2')
         with open(join(demopath, 'supervisor.cfg'), 'w') as supervisor_file:
             supervisor_conf.write(supervisor_file)
-
+    
         # reload the supervisor config
         supervisor = SuperVisor()
         supervisor.xmlrpc.supervisor.reloadConfig()
@@ -457,10 +486,16 @@ def deploy(params, app_name):
 
     app_conf = SafeConfigParser()
     app_conf.read(app_conf_path)
+    app_conf.set('params', 'name', app_name.encode('utf-8'))
+    app_conf.set('params', 'port', str(port))
     app_conf.remove_option('params', 'status')
     with open(app_conf_path, 'w+') as configfile:
         app_conf.write(configfile)
     LOG.info('Finished deploying %s', app_name)
+
+    # now save this app in a template for cloning
+    if not os.path.exists(template_path):
+        shutil.copytree(demopath, template_path)
 
 
 class WorkingDirectoryKeeper(object):

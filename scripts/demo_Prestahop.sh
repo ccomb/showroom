@@ -34,7 +34,7 @@ mysql_create_and_stop $db_host $db_port $db_name $db_user $db_pass
 
 # create a startup script
 cat > start.sh << EOF
-exec /usr/sbin/mysqld --no-defaults --socket=$PWD/mysql/mysqld.sock --datadir=$PWD/mysql/ --log-error=$PWD/mysql/mysql-error.log --port=$db_port
+exec /usr/sbin/mysqld --no-defaults --socket=./mysql/mysqld.sock --datadir=./mysql/ --log-error=./mysql/mysql-error.log --port=$db_port
 EOF
 
 # create a popup for installation instruction
@@ -58,6 +58,7 @@ EOF
 function reconfigure_clone {
 # $1 is the old name, $2 is the old port
 sed -i "s/app=$1/app=$name/" popup.html
+sed -i "s/\/$1\//\/$name\//" apache2.conf
 sed -i "s/$2/$PORT/" apache2.conf
 sed -i "s/$(($2 + 1000))/$db_port/" prestashop/install/index.php
 sed -i "s/$(($2 + 1000))/$db_port/" start.sh

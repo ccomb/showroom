@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
-from os.path import join, dirname, abspath, basename, exists, splitext
-from paste.proxy import TransparentProxy
+from os.path import join, dirname, abspath
 from webob import Request, Response
 from webob.exc import HTTPFound
 from wsgiproxy.exactproxy import proxy_exact_request
 import logging
-import os
-import random
 import urllib
 
 from showroom.utils import PATHS, ADMIN_HOST, InstalledDemo
@@ -75,7 +72,7 @@ class Proxy(object):
 
         # if the app is not running, tell it
         if demo.get_status() != 'RUNNING':
-            admin_url = request.url.replace(demo_name+'.', '')
+            admin_url = request.host_url.replace(demo_name+'.', '')
             message = (u'<html><body>'
                        u'This demo is not running. You can start it from the '
                        u'<a href="%s">admin interface</a>'
