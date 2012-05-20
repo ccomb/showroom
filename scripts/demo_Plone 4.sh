@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # PARAMS: name, login=admin, password, version=4.1.4, plugins
 
+function first_install {
 # create a virtualenv
 virtualenv -p python2.7 --no-site-packages --distribute sandbox
 
@@ -25,4 +26,13 @@ cat > ../start.sh << EOF
 #!/usr/bin/env sh
 exec plone4/bin/instance console
 EOF
+}
 
+
+function configure_clone {
+# $1 is the old name, $2 is the old port
+cd plone4
+sed -i "s/$2/$PORT/" buildout.cfg
+sed -i "s/user = .*/user = $login:$password/" buildout.cfg
+./bin/buildout -o
+}
