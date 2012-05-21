@@ -201,14 +201,14 @@ class InstalledDemo(object):
         """tells if the popup should be displayed
         """
         try:
-            return self.democonf.getboolean(self.name, 'displaypopup')
+            return self.democonf.getboolean('params', 'displaypopup')
         except Exception:
             return True
 
     def disable_popup(self):
         """disable the popup
         """
-        self.democonf.set(self.name, 'displaypopup', '0')
+        self.democonf.set('params', 'displaypopup', '0')
         with open(self.democonf_path, 'w') as democonf_file:
             self.democonf.write(democonf_file)
 
@@ -424,9 +424,9 @@ def deploy(params):
     LOG.info('section %s added', app_name)
 
     # check whether we already have a template available
-    template_name = app_type + '_' + params['version'].strip() + '_' + b64encode(
+    template_name = app_type + '_' + '_' + b64encode(
       ','.join(['%s=%s' % (n.strip(), '\n'.join([i.strip() for i in str(v).split('\n')]))
-                for (n, v) in sorted(params.items()) if n not in ('name',)]))
+                for (n, v) in sorted(params.items()) if n not in ('name','login','user','password')]))
     template_path = join(PATHS['templates'], template_name)
 
     if os.path.exists(template_path):
@@ -459,8 +459,7 @@ def deploy(params):
             start = ''
             content = s.read()
             if (not content.startswith('#!')
-                or all([not line.startswith('trap') for line in content.splitlines()[:5]])
-                or all([not line.startswith('set -e') for line in content.splitlines()[:5]])):
+                or all([not line.startswith('trap') for line in content.splitlines()[:5]])):
                 start = '#!/bin/bash\ntrap "pkill -P \$\$" EXIT\n'
             content = start + content
             s.seek(0); s.truncate(); s.write(content)

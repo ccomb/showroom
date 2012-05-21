@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
-# PARAMS:name, version=5.0.15
+# PARAMS:name, version=5.0.16
 
+function first_install {
 # create a virtualenv
-virtualenv --no-site-packages --distribute sandbox
+virtualenv -p python2.6 --no-site-packages --distribute sandbox
 
 # install the required packages
 # egenix distribution setup is just a pain
@@ -24,27 +25,30 @@ cd openerp-web-$version
 ../sandbox/bin/python setup.py install
 cd ..
 
+# needed to be able to clone the virtualenv
+virtualenv -p python2.6 --no-site-packages --distribute sandbox --relocatable
+
 # copy and change the default config
 NETRPC=$(($PORT+1000))
-cp ./sandbox/lib/python2.6/site-packages/openerp_web-$version-py2.6.egg/config/openerp-web.cfg .
+cp ./sandbox/lib/python*/site-packages/openerp_web-$version-*.egg/config/openerp-web.cfg .
 sed -i "s/^server.socket_port =.*/server.socket_port = $PORT/" openerp-web.cfg
 sed -i "s/^port = '8070'/port = '$NETRPC'/" openerp-web.cfg
 
 # initialise and create the database
 /usr/lib/postgresql/8.4/bin/initdb postgresql
-echo "data_directory = '$PWD/postgresql'" >> postgresql/postgresql.conf
-echo "hba_file = '$PWD/postgresql/pg_hba.conf'" >> postgresql/postgresql.conf
-echo "ident_file = '$PWD/postgresql/pg_ident.conf'" >> postgresql/postgresql.conf
-echo "unix_socket_directory='$PWD'" >> postgresql/postgresql.conf
+echo "data_directory = './postgresql'" >> postgresql/postgresql.conf
+echo "hba_file = './postgresql/pg_hba.conf'" >> postgresql/postgresql.conf
+echo "ident_file = './postgresql/pg_ident.conf'" >> postgresql/postgresql.conf
+echo "unix_socket_directory='.'" >> postgresql/postgresql.conf
 echo "port = $((PORT+2000))" >> postgresql/postgresql.conf
 
 # create the startup script
 cat > start.sh << EOF
 #!/bin/bash
 trap "pkill -1 -P \$\$" EXIT
-/usr/lib/postgresql/8.4/bin/postgres -D $PWD/postgresql &
+/usr/lib/postgresql/8.4/bin/postgres -D ./postgresql &
 postgres_pid=\$!
-./sandbox/bin/openerp-server --net_port=$NETRPC --db_host=localhost --db_port=$((PORT+2000)) &
+./sandbox/bin/openerp-server --no-xmlrpc --net_port=$NETRPC --db_host=localhost --db_port=$((PORT+2000)) &
 openerp_pid=\$!
 ./sandbox/bin/openerp-web -c openerp-web.cfg &
 web_pid=\$!
@@ -71,4 +75,18 @@ cat > popup.html << EOF
     <li>Start configuring your new database</li>
 </ol>
 EOF
+}
 
+function reconfigure_clone {
+# $1 is the old name, $2 is the old port
+cd openerp-server-$version
+../sandbox/bin/python setup.py install
+cd ../openerp-web-$version
+../sandbox/bin/python setup.py install
+cd ..
+NETRPC=$(($PORT+1000))
+sed -i "s/^server.socket_port =.*/server.socket_port = $PORT/" openerp-web.cfg
+sed -i "s/^port = .*/port = '$NETRPC'/" openerp-web.cfg
+sed -i "s/^port.*/port = $((PORT+2000))/" postgresql/postgresql.conf
+sed -i "s/--net_port=.*/--net_port=$NETRPC --db_host=localhost --db_port=$((PORT+2000)) \&/" start.sh
+}

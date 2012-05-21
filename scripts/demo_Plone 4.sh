@@ -4,6 +4,7 @@
 function first_install {
 # create a virtualenv
 virtualenv -p python2.7 --no-site-packages --distribute sandbox
+virtualenv -p python2.7 --no-site-packages --distribute sandbox --relocatable
 
 # install the project templates
 sandbox/bin/pip install ZopeSkel==2.17 PIL==1.1.7 PasteDeploy==1.3.4 Paste==1.6
@@ -29,10 +30,11 @@ EOF
 }
 
 
-function configure_clone {
+function reconfigure_clone {
 # $1 is the old name, $2 is the old port
 cd plone4
 sed -i "s/$2/$PORT/" buildout.cfg
 sed -i "s/user = .*/user = $login:$password/" buildout.cfg
+../sandbox/bin/python bootstrap.py -d -v 1.4.4
 ./bin/buildout -o
 }

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # PARAMS:name
 
+function first_install {
 # get the last version in svn (no release yet)
 svn co http://osi.agendaless.com/bfgsvn/karlsample/trunk/ karl
 
@@ -22,6 +23,9 @@ sed -i "s/8886/$(($PORT+1000))/" -i etc/karl.ini
 
 cd ..
 
+# needed to be able to clone the virtualenv
+virtualenv --no-site-packages --distribute -p python2.5 sandbox --relocatable
+
 # create a unique startup script
 cat > start.sh <<EOF
 #!/bin/bash
@@ -33,7 +37,16 @@ EOF
 
 # create a popup for installation instruction
 cat > popup.html << EOF
-<p>The initial use account is<br/>
+<p>The initial user account is<br/>
 user : admin<br/>
 pass : admin</p>
 EOF
+}
+
+function reconfigure_clone {
+# $1 is the old name, $2 is the old port
+sed -i "s/$2/$PORT/" -i etc/karl.ini
+sed -i "s/$(($2+1000))/$(($PORT+1000))/" -i etc/zeo.conf
+sed -i "s/$(($2+1000))/$(($PORT+1000))/" -i etc/karl.ini
+
+}

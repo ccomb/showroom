@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 # PARAMS:name, login=admin, password, version=3.3.6, plugins
 
+function first_install {
 # create a virtualenv
 virtualenv -p python2.4 --no-site-packages --distribute sandbox
+virtualenv -p python2.4 --no-site-packages --distribute sandbox --relocatable
 
 # install the project templates
 sandbox/bin/pip install ZopeSkel==2.17 PasteDeploy==1.3.4 Paste==1.7.5.1 PasteScript==1.7.4.2
@@ -67,3 +69,13 @@ cat > popup.html << EOF
     <li>Enjoy!</li>
 </ol>
 EOF
+}
+
+function reconfigure_clone {
+cd plone3
+sed -i "s/$2/$PORT/" buildout.cfg
+sed -i "s/user = .*/user = $login:$password/" buildout.cfg
+../sandbox/bin/python bootstrap.py -d -v 1.4.3
+./bin/buildout -o
+
+}

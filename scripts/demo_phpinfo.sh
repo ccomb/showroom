@@ -1,6 +1,7 @@
 #!/bin/bash
 # PARAMS: name
 
+function first_install {
 # create a PHP hello world
 mkdir htdocs
 cat > htdocs/index.php << EOF
@@ -19,4 +20,9 @@ DocumentRoot $PWD/htdocs
 #ErrorLog var/error.log
 </VirtualHost>
 EOF
+}
+
+function reconfigure_clone {
+echo
+}
 

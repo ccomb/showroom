@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # PARAMS:name, version=6.0.4
 
+function first_install {
 # create a virtualenv
 virtualenv --no-site-packages --distribute sandbox
 
@@ -24,6 +25,9 @@ cd openerp-web-$version
 ../sandbox/bin/python setup.py install
 cd ..
 
+# needed to be able to clone the virtualenv
+virtualenv --no-site-packages --distribute sandbox
+
 # copy and change the default config
 NETRPC=$(($PORT+1000))
 cp ./sandbox/lib/python2.*/site-packages/openerp_web-*.egg/doc/openerp-web.cfg .
@@ -32,14 +36,14 @@ sed -i "s/^openerp.server.port = '8070'/openerp.server.port = '$NETRPC'/" opener
 
 # initialise and create the database
 /usr/lib/postgresql/8.4/bin/initdb postgresql
-echo "data_directory = '$PWD/postgresql'" >> postgresql/postgresql.conf
-echo "hba_file = '$PWD/postgresql/pg_hba.conf'" >> postgresql/postgresql.conf
-echo "ident_file = '$PWD/postgresql/pg_ident.conf'" >> postgresql/postgresql.conf
-echo "unix_socket_directory='$PWD'" >> postgresql/postgresql.conf
+echo "data_directory = './postgresql'" >> postgresql/postgresql.conf
+echo "hba_file = './postgresql/pg_hba.conf'" >> postgresql/postgresql.conf
+echo "ident_file = './postgresql/pg_ident.conf'" >> postgresql/postgresql.conf
+echo "unix_socket_directory='.'" >> postgresql/postgresql.conf
 echo "port = $((PORT+2000))" >> postgresql/postgresql.conf
 
 # prepare the server config file
-cat > $PWD/openerp-server.conf << EOF
+cat > ./openerp-server.conf << EOF
 [options]
 netrpc = True
 netrpc_interface = localhost
@@ -54,7 +58,7 @@ EOF
 cat > start.sh << EOF
 #!/bin/bash
 trap "pkill -1 -P \$\$" EXIT
-/usr/lib/postgresql/8.4/bin/postgres -D $PWD/postgresql &
+/usr/lib/postgresql/8.4/bin/postgres -D ./postgresql &
 postgres_pid=\$!
 ./sandbox/bin/openerp-server -c $PWD/openerp-server.conf &
 openerp_pid=\$!
@@ -83,3 +87,19 @@ cat > popup.html << EOF
     <li>Start configuring your new database</li>
 </ol>
 EOF
+}
+
+function reconfigure_clone {
+cd openerp-server-$version
+../sandbox/bin/python setup.py install
+cd ../openerp-web-$version
+../sandbox/bin/python setup.py install
+cd ..
+NETRPC=$(($PORT+1000))
+sed -i "s/^port.*/port = $((PORT+2000))/" postgresql/postgresql.conf
+sed -i "s/^netrpc_port.*/netrpc_port = $NETRPC/" openerp-server.conf
+sed -i "s/^db_port.*/db_port = $((PORT+2000))/" openerp-server.conf
+sed -i "s/^server.socket_port =.*/server.socket_port = $PORT/" openerp-web.cfg
+sed -i "s/^openerp.server.port = .*/openerp.server.port = '$NETRPC'/" openerp-web.cfg
+sed -i "s%.*openerp-server.conf.*%./sandbox/bin/openerp-server -c \"$PWD/openerp-server.conf\" \&%" start.sh
+}

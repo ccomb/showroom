@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # PARAMS:name, login=admin, password, version=3.5.4, zope_version=2.9.12-final
 
+function first_install {
 # create a virtualenv
 virtualenv -p python2.4 --no-site-packages --distribute sandbox
 
@@ -34,6 +35,9 @@ sed -i "s/address 8080/address $PORT/" "etc/zope.conf"
 
 cd ..
 
+# needed to clone the virtualenv
+virtualenv -p python2.4 --no-site-packages --distribute sandbox --relocatable
+
 # create the startup script
 cat > start.sh << EOF
 #!/usr/bin/env sh
@@ -55,3 +59,9 @@ cat > popup.html << EOF
     <li>Enjoy!</li>
 </ol>
 EOF
+}
+
+function reconfigure_clone {
+cd zinstance
+sed -i "s/address 8080/address $PORT/" "etc/zope.conf"
+}
