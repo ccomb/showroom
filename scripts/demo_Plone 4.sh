@@ -4,7 +4,6 @@
 function first_install {
 # create a virtualenv
 virtualenv -p python2.7 --no-site-packages --distribute sandbox
-virtualenv -p python2.7 --no-site-packages --distribute sandbox --relocatable
 
 # install the project templates
 sandbox/bin/pip install ZopeSkel==2.17 PIL==1.1.7 PasteDeploy==1.3.4 Paste==1.6
@@ -27,6 +26,9 @@ cat > ../start.sh << EOF
 #!/usr/bin/env sh
 exec plone4/bin/instance console
 EOF
+
+cd ..
+virtualenv -p python2.7 --no-site-packages --distribute sandbox --relocatable
 }
 
 
