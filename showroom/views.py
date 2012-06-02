@@ -1,10 +1,13 @@
 # coding: utf-8
 from os.path import join, abspath, dirname
+from pyramid_signup.managers import UserManager
 from pyramid.chameleon_zpt import get_template
+from pyramid.request import Response
 from pyramid.chameleon_zpt import render_template_to_response
 from pyramid.exceptions import NotFound
 from pyramid.security import authenticated_userid, forget, remember
 from pyramid.url import route_url
+from pyramid_signup.views import AuthController
 from showroom.security import check_login
 from urlparse import urlsplit, urlunsplit
 from utils import ADMIN_HOST
@@ -20,6 +23,7 @@ LOG = logging.getLogger(__name__)
 def _flash_message(request, message, message_type='SUCCESS'):
     """send a message through the session to the next url
     """
+    # TODO: remove and replace occurences with self.request.session.flash
     request.environ['beaker.session']['message_type'] = message_type
     request.environ['beaker.session']['message'] = message
     request.environ['beaker.session'].save()
@@ -50,7 +54,12 @@ def direct_url(demo, request):
 def installed_demos(request):
     """ return the main page, with applications list, and actions.
     """
-    # XXX this is too slow
+    # XXX this view is too slow
+
+    logged_in = authenticated_userid(request)
+    if logged_in is not None:
+        logged_in = UserManager(request).get_by_pk(logged_in).username
+
     return render_template_to_response(
         join(abspath(dirname(__file__)), 'templates', 'demos.pt'),
         master=get_template('templates/master.pt'),
@@ -60,7 +69,7 @@ def installed_demos(request):
         direct_url=direct_url,
         demos=utils.installed_demos(),
         supervisor=utils.SuperVisor().is_running,
-        logged_in=authenticated_userid(request),
+        logged_in=logged_in,
         )
 
 
@@ -76,7 +85,7 @@ def json_installed_demos(request):
     return utils.installed_demos()
 
 
-def login(request):
+def OLDlogin(request): #XXX remove
     """ authenticate to do admin tasks.
     """
     login_url = route_url('login', request)
@@ -108,11 +117,12 @@ def login(request):
         )
 
 
-def logout(request):
-    """ Get out of the application.
+def forbidden(request):
+    """View for the 401 Error: use the login
     """
-    headers = forget(request)
-    return HTTPFound(location = '/', headers = headers)
+    if not authenticated_userid(request):
+        return AuthController(request).login()
+    return Response('forbidden')
 
 
 def deploy(request):

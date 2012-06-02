@@ -10,31 +10,21 @@
       reissue_time="600"
   />
 
-  <aclauthorizationpolicy />
 
-  <forbidden
-  view=".views.login"
-  renderer="templates/login.pt"
+  <view for="pyramid.exceptions.Forbidden"
+        view="showroom.views.forbidden"
+        renderer="pyramid_signup:templates/login.mako"
   />
-
+  <route name="index"
+         path=""
+         view=".views.installed_demos"
+         view_permission="edit"
+  />
   <route name="home"
          path=""
          view=".views.installed_demos"
          view_permission="edit"
   />
-
-  <route name="login"
-         path="/login"
-         view=".views.login"
-         view_renderer="templates/login.pt"
-         view_permission="edit"
-  />
-
-  <route name="logout"
-         path="/logout"
-         view=".views.logout"
-  />
-
   <route name="deploy"
          path="/deploy"
          view=".views.deploy"

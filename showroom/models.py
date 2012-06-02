@@ -1,10 +1,18 @@
-from pyramid.security import Allow, Authenticated
+from pyramid.security import Allow, Authenticated, ALL_PERMISSIONS
 
 class RootFactory(object):
+    """ root object factory for the whole app
     """
-    this class allow us to setup security policies in the application.
-
-    """
-    __acl__ = [ (Allow, Authenticated, 'edit'), ]
     def __init__(self, request):
-        self.__dict__.update(getattr(request, 'matchdict', {}) or {})
+        self.request = request
+        self.is_root = True
+
+    @property
+    def __acl__(self):
+        defaultlist = [
+            (Allow, 'group:admin', ALL_PERMISSIONS),
+            (Allow, Authenticated, 'view'),
+            (Allow, Authenticated, 'edit'),
+        ]
+        return defaultlist
+

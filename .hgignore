@@ -19,3 +19,4 @@ docs/modules/
 paster.pid
 .mr.developer.cfg
 downloads/
+test.db

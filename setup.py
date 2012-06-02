@@ -6,7 +6,7 @@ if sys.version_info < (2, 6):
     sys.exit(1)
 
 here = os.path.abspath(os.path.dirname(__file__))
-README = open(os.path.join(here, 'README.txt')).read()
+README = open(os.path.join(here, 'README.rst')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
 requires = [
@@ -18,6 +18,17 @@ requires = [
     'python-ldap',
     'Beaker',
     'interlude',
+    'pyramid_signup',
+    'pyramid_beaker',
+    'pyramid_tm',
+    'cryptacular',
+    'zope.sqlalchemy',
+    'colander',
+    'deform',
+    'pyramid_deform',
+    'pyramid_mailer',
+    'pystache',
+    'sqlalchemy',
 #    'gunicorn',
 ]
 
@@ -42,6 +53,8 @@ setup(name='showroom',
       tests_require=requires,
       test_suite="showroom",
       entry_points = """\
+      [console_scripts]
+      signup_setup = pyramid_signup.scripts.populate:main
       [paste.app_factory]
       pyramid = showroom.run:showroom
       [paste.filter_factory]
