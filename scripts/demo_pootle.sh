@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # PARAMS:name version=2.1.6
 
+function first_install {
 # create a virtualenv
 virtualenv --no-site-packages --distribute sandbox
 
@@ -24,3 +25,8 @@ cat > ../start.sh << EOF
 #!/bin/sh
 exec ./PootleServer --port=$PORT
 EOF
+}
+
+function reconfigure_clone {
+echo
+}

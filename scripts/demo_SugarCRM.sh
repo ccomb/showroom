@@ -1,15 +1,16 @@
 #!/bin/bash
 # PARAMS: name, username, password, usermail
 # sudo aptitude install php5-cli apache2 php5-imap php5-curl
-db_host=127.0.0.1
-db_port=$((PORT+1000))
-db_name=sugar
-db_user=sugar
-db_pass=sugar
-# download sugar
-version=6.4.4
-url=$REQUEST_HOST
+export db_host=127.0.0.1
+export db_port=$((PORT+1000))
+export db_name=sugar
+export db_user=sugar
+export db_pass=sugar
+export version=6.4.4
+export url=$REQUEST_HOST
 
+function first_install {
+# download sugar
 #wget http://www.sugarforge.org/frs/download.php/7567/SugarCE-$version.zip
 #wget http://www.sugarforge.org/frs/download.php/7678/SugarCE-6.1.1.zip
 wget http://dl.sugarforge.org/sugarcrm/2SugarCE6.4.0/SugarCE6.4.0/SugarCE-$version.zip
@@ -48,3 +49,8 @@ sed 5i\$_SESSION[\'setup_db_admin_password\']=\'$db_pass\'\; -i sugar/install/db
 cat > start.sh << EOF
 exec /usr/sbin/mysqld --no-defaults --socket=$PWD/mysql/mysqld.sock --datadir=$PWD/mysql/ --log-error=$PWD/mysql/mysql-error.log --port=$db_port
 EOF
+}
+
+function reconfigure_clone {
+echo
+}
