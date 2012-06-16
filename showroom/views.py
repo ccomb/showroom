@@ -121,7 +121,13 @@ def forbidden(request):
     """View for the 401 Error: use the login
     """
     if not authenticated_userid(request):
-        return AuthController(request).login()
+        res = AuthController(request).login()
+        if type(res) == dict:
+            res.update(dict(
+                master=get_template('templates/master.pt'),
+                url = request.application_url + '/login',
+            ))
+        return res
     return Response('forbidden')
 
 

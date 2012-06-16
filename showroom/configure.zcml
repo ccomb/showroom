@@ -13,7 +13,7 @@
 
   <view for="pyramid.exceptions.Forbidden"
         view="showroom.views.forbidden"
-        renderer="pyramid_signup:templates/login.mako"
+        renderer="templates/login.pt"
   />
   <route name="index"
          path=""
