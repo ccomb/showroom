@@ -81,7 +81,7 @@
       </td>
       <td class="demo_button">
         <a href="#" class="start"
-           tal:condition="python: demo['status'] == 'STOPPED'"
+           tal:condition="python: demo['status'] in ('STOPPED', 'FATAL')"
            tal:attributes="href string:/start?name=${demo['name']}">
           start
         </a>
