@@ -3,14 +3,6 @@
   <!-- this must be included for the view declarations to work -->
   <include package="pyramid_zcml" />
 
-  <authtktauthenticationpolicy
-      path='/'
-      secret="68b329da9893e34099c7d8ad5cb9c940"
-      timeout="3600"
-      reissue_time="600"
-  />
-
-
   <view for="pyramid.exceptions.Forbidden"
         view="showroom.views.forbidden"
         renderer="templates/login.pt"

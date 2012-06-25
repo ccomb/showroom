@@ -1,24 +1,25 @@
 # coding: utf-8
 from os.path import join, abspath, dirname
-from pyramid_signup.managers import UserManager
 from pyramid.chameleon_zpt import get_template
-from pyramid.request import Response
 from pyramid.chameleon_zpt import render_template_to_response
 from pyramid.exceptions import NotFound
-from pyramid.security import authenticated_userid, forget, remember
-from pyramid.url import route_url
-from pyramid_signup.views import AuthController
-from showroom.security import check_login
+from pyramid.i18n import TranslationStringFactory
+from pyramid.request import Response
+from pyramid.security import authenticated_userid
+from pyramid_signup.managers import UserManager
 from urlparse import urlsplit, urlunsplit
 from utils import ADMIN_HOST
 from utils import keep_working_dir
 from webob.exc import HTTPFound
+import deform
 import logging
 import os
+import pyramid_signup.views
 import subprocess
 import utils
 
 LOG = logging.getLogger(__name__)
+_ = TranslationStringFactory('showroom')
 
 def _flash_message(request, message, message_type='SUCCESS'):
     """send a message through the session to the next url
@@ -85,36 +86,49 @@ def json_installed_demos(request):
     return utils.installed_demos()
 
 
-def OLDlogin(request): #XXX remove
-    """ authenticate to do admin tasks.
+class AuthController(pyramid_signup.views.AuthController):
+    """ Inherit from horus just to add macros
     """
-    login_url = route_url('login', request)
-    referrer = request.url
-    if referrer == login_url:
-        referrer = '/' # never use the login form itself as came_from
-    came_from = request.params.get('came_from', referrer)
-    message = ''
-    login = ''
-    password = ''
-    if 'form.submitted' in request.params:
-        login = request.params['login']
-        password = request.params['password']
-        if check_login(login, password):
-            headers = remember(request, login)
-            return HTTPFound(location = came_from,
-                             headers = headers)
-        message = 'Failed login'
-        _flash_message(request,
-            u"%s" % message, 'ERROR')
+    def login(self):
+        """modified from horus
+        """
+        if self.request.method == 'GET':
+            if self.request.user:
+                return HTTPFound(location=self.login_redirect_view)
 
-    return dict(
-        master=get_template('templates/master.pt'),
-        message = message,
-        url = request.application_url + '/login',
-        came_from = came_from,
-        login = login,
-        password = password,
-        )
+            return {'form': self.form.render(),
+                    'master': get_template('templates/master.pt'),
+                    }
+        elif self.request.method == 'POST':
+            try:
+                controls = self.request.POST.items()
+                captured = self.form.validate(controls)
+            except deform.ValidationFailure, e:
+                return {'form': e.render(), 'errors': e.error.children,
+                        'master': get_template('templates/master.pt'),
+                        }
+
+            username = captured['Username']
+            password = captured['Password']
+
+            mgr = UserManager(self.request)
+
+            user = mgr.get_user(username, password)
+
+            if user:
+                if not user.activated:
+                    self.request.session.flash(_(u'Your account is not active, please check your e-mail.'), 'error')
+                    return {'form': self.form.render(),
+                            'master': get_template('templates/master.pt'),
+                            }
+                else:
+                    return self.authenticated(self.request, user.pk)
+
+            self.request.session.flash(_('Invalid username or password.'), 'error')
+
+            return {'form': self.form.render(appstruct=captured),
+                    'master': get_template('templates/master.pt'),
+                    }
 
 
 def forbidden(request):
@@ -276,6 +290,48 @@ def postinstall(request):
         os.rename(script, script + '.executed')
     return HTTPFound(location=getattr(request, 'referrer', False) or '/')
 
+def add_macro(result, request):
+    """ Add master macro to the dict result
+    """
+    if hasattr(result, 'update'):
+        logged_in = authenticated_userid(request)
+        if logged_in is not None:
+            logged_in = UserManager(request).get_by_pk(logged_in).username
 
+        result.update({'master': get_template('templates/master.pt'),
+                        'logged_in': logged_in})
+    
+
+
+class RegisterController(pyramid_signup.views.RegisterController):
+    """ Inherit from horus just to add macros
+    """
+    def register(self):
+        result = super(RegisterController, self).register()
+        add_macro(result, self.request)
+        return result
+
+
+class ForgotPasswordController(pyramid_signup.views.ForgotPasswordController):
+    """ Inherit from horus just to add macros
+    """
+    def forgot_password(self):
+        result = super(ForgotPasswordController, self).forgot_password()
+        add_macro(result, self.request)
+        return result
+
+
+class ProfileController(pyramid_signup.views.ProfileController):
+    """ Inherit from horus just to add macros
+    """
+    def profile(self):
+        result = super(ProfileController, self).profile()
+        add_macro(result, self.request)
+        return result
+
+    def edit_profile(self):
+        result = super(ProfileController, self).edit_profile()
+        add_macro(result, self.request)
+        return result
 
 

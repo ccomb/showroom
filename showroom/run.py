@@ -52,10 +52,28 @@ def showroom(global_config, **settings):
         config.include('pyramid_mailer')
     config.registry.registerUtility(DBSession, ISUSession)
     config.include('pyramid_signup')
-    for template in ('edit_profile.mako', 'forgot_password', 'login', 'profile', 'register', 'reset_password'):
-        config.override_asset(to_override='pyramid_signup:templates/%s.mako' % template,
-                              override_with='showroom:templates/%s.mako' % template)
-
+    config.add_view('showroom.views.ForgotPasswordController',
+                    attr='forgot_password',
+                    route_name='forgot_password',
+                    renderer='templates/forgot_password.pt')
+    config.add_view('showroom.views.AuthController',
+                    attr='login',
+                    route_name='login',
+                    renderer='templates/login.pt')
+    config.add_view('showroom.views.ProfileController',
+                    attr='profile',
+                    route_name='profile',
+                    renderer='templates/profile.pt')
+    config.add_view('showroom.views.ProfileController',
+                    attr='edit_profile',
+                    route_name='edit_profile',
+                    renderer='templates/edit_profile.pt')
+    config.override_asset(to_override='pyramid_signup:templates/reset_password.mako',
+                          override_with='showroom:templates/reset_password.mako')
+    config.add_view('showroom.views.RegisterController',
+                    attr='register',
+                    route_name='register',
+                    renderer='templates/register.pt')
     # override pyramid_signup root factory
     config.set_root_factory(RootFactory)
 

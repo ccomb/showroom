@@ -32,7 +32,7 @@
     </div>
   </div>
 
-  <!-- message -->
+  <!-- message (XXX to remove) -->
   <tal:block define="session python:request.environ.get('beaker.session', {})"
              condition="session.has_key('message')">
   <div id="message"
@@ -42,6 +42,14 @@
        tal:content="structure message" />
   <div tal:replace="python:session.save() or ''" />
   </tal:block>
+
+  <!-- message -->
+  <tal:block repeat="type python: ['success', 'error', 'warning', 'info']">
+    <div class="alert-message ${type}" tal:condition="python: request.session.peek_flash(type)" tal:repeat="message python:request.session.pop_flash(type)">
+      <p><strong>${message}</strong></p>
+    </div>
+  </tal:block>
+
 
   <!-- content -->
   <div id="content" metal:define-slot="content">
