@@ -59,7 +59,7 @@ def installed_demos(request):
 
     logged_in = authenticated_userid(request)
     if logged_in is not None:
-        logged_in = UserManager(request).get_by_pk(logged_in).username
+        logged_in = UserManager(request).get_by_pk(logged_in)
 
     return render_template_to_response(
         join(abspath(dirname(__file__)), 'templates', 'demos.pt'),
@@ -296,7 +296,7 @@ def add_macro(result, request):
     if hasattr(result, 'update'):
         logged_in = authenticated_userid(request)
         if logged_in is not None:
-            logged_in = UserManager(request).get_by_pk(logged_in).username
+            logged_in = UserManager(request).get_by_pk(logged_in)
 
         result.update({'master': get_template('templates/master.pt'),
                         'logged_in': logged_in})
