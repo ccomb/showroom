@@ -29,6 +29,7 @@ requires = [
     'pyramid_mailer',
     'pystache',
     'sqlalchemy',
+    'psycopg2',
 #    'gunicorn',
 ]
 
