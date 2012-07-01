@@ -32,21 +32,14 @@
     </div>
   </div>
 
-  <!-- message (XXX to remove) -->
-  <tal:block define="session python:request.environ.get('beaker.session', {})"
-             condition="session.has_key('message')">
-  <div id="message"
-       tal:define="message python:session.pop('message', None);
-                   message_type python:session.pop('message_type', None);"
-       tal:attributes="class string:subcontent appear ${message_type};"
-       tal:content="structure message" />
-  <div tal:replace="python:session.save() or ''" />
-  </tal:block>
-
   <!-- message -->
   <tal:block repeat="type python: ['success', 'error', 'warning', 'info']">
-    <div class="alert-message ${type}" tal:condition="python: request.session.peek_flash(type)" tal:repeat="message python:request.session.pop_flash(type)">
-      <p><strong>${message}</strong></p>
+    <div class="alert-message ${type}"
+         tal:condition="python: request.session.peek_flash(type)"
+         tal:repeat="message python:request.session.pop_flash(type)"
+         tal:attributes="class string:subcontent appear ${type};"
+         tal:content="structure message">
+    MESSAGE
     </div>
   </tal:block>
 
@@ -58,8 +51,9 @@
 
   <!-- start footer -->
   <div colspan="2" id="footer">
-      Powered by <a href="http://www.pylonsproject.org/">Pyramid</a>
-      - <a href="https://bitbucket.org/ccomb/showroom">Source code</a>
+      <a href="https://bitbucket.org/ccomb/showroom">Showroom</a>
+      is powered by
+      <a href="http://www.pylonsproject.org/">Pyramid</a>
   </div>
 
 </div>

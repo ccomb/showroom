@@ -12,11 +12,19 @@
 <div metal:fill-slot="header">
 </div>
 
-<div class="subcontent" metal:fill-slot="content">
-  <h2>ShowRoom log in</h2>
-  <a href="${request.route_url('register')}">Sign up</a>
-  <form tal:replace="structure form"/>
+<div metal:fill-slot="content">
+  <div class="subcontent">
+    <h1>Log in</h1>
+    <p>Log in to your Showroom to manage your demos<p>
+    <form tal:replace="structure form"/>
     <a href="${request.route_url('forgot_password')}">Forgot Password?</a>
+  </div>
+  <div class="subcontent">
+    <h1>Don't have an account?</h1>
+    <fieldset>
+    <a href="${request.route_url('register')}"><button>Sign up!</button></a>
+    </fieldset>
+  </div>
 </div>
 </body>
 </html>

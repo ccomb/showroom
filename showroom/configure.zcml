@@ -7,44 +7,44 @@
         view="showroom.views.forbidden"
         renderer="templates/login.pt"
   />
-  <route name="index"
-         path=""
-         view=".views.installed_demos"
-         view_permission="edit"
-  />
   <route name="home"
          path=""
          view=".views.installed_demos"
-         view_permission="edit"
   />
   <route name="deploy"
          path="/deploy"
-         view=".views.deploy"
+         view=".views.DemoController"
+         view_attr="deploy"
          view_permission="edit"
   />
   <route name="start"
          path="/start"
-         view=".views.start"
+         view=".views.DemoController"
+         view_attr="start"
          view_permission="edit"
   />
   <route name="stop"
          path="/stop"
-         view=".views.stop"
+         view=".views.DemoController"
+         view_attr="stop"
          view_permission="edit"
   />
   <route name="start_all"
          path="/start_all"
-         view=".views.start_all"
+         view=".views.MainController"
+         view_attr="start_all"
          view_permission="edit"
   />
   <route name="stop_all"
          path="/stop_all"
-         view=".views.stop_all"
+         view=".views.MainController"
+         view_attr="stop_all"
          view_permission="edit"
   />
   <route name="destroy"
          path="/destroy"
-         view=".views.destroy"
+         view=".views.DemoController"
+         view_attr="destroy"
          view_permission="edit"
   />
 
@@ -56,20 +56,23 @@
   />
   <route name="app_params"
          path="/app_params"
-         view=".views.app_params"
+         view=".views.DemoController"
+         view_attr="app_params"
          renderer="json"
          view_permission="edit"
   />
 
   <route name="app_scripts"
          path="/script"
-         view=".views.app_script"
+         view=".views.DemoController"
+         view_attr="app_script"
          view_permission="edit"
   />
 
   <route name="postinstall"
          path="/postinstall"
-         view=".views.postinstall"
+         view=".views.DemoController"
+         view_attr="postinstall"
          view_permission="edit"
   />
 

@@ -13,8 +13,9 @@
 </div>
 
 <div class="subcontent" metal:fill-slot="content">
-<a href="${request.route_url('index')}">Back to Index</a>
-  <h2>Sign up</h2>
+<a href="${request.route_url('home')}">Back to Index</a>
+  <h1>Sign up</h1>
+    <p>Create a free account on Showroom to manage your demos!</p>
     <form tal:replace="structure form"/>
 </div>
 </body>

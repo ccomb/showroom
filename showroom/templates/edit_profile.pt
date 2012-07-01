@@ -13,13 +13,14 @@
   <!-- user -->
   <div metal:fill-slot="header" id="user_ID">
       <a href='/profile/${logged_in.pk}'>${logged_in.first_name} ${logged_in.last_name} (${logged_in.username})</a>
-      <a href='${request.application_url}/logout'>disconnect</a>
+      -
+      <a href='${request.application_url}/logout'>Log out</a>
   </div>
 </div>
 
 <div class="subcontent" metal:fill-slot="content">
-<a href="${request.route_url('index')}">Back to Index</a>
-  <h2>Profile</h2>
+<a href="${request.route_url('home')}">Back to Index</a>
+  <h1>Profile</h1>
     <form tal:replace="structure form"/>
 </div>
 </body>

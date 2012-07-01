@@ -14,30 +14,15 @@
 
   <!-- user -->
   <div metal:fill-slot="header" id="user_ID">
-      <a href='/profile/${logged_in.pk}'>${logged_in.first_name} ${logged_in.last_name} (${logged_in.username})</a>
-      -
-      <a href='${request.application_url}/logout'>Log out</a>
+    <a href="login">Login</a>
   </div>
 </div>
 
 <div id="content" metal:fill-slot="content">
-  <!-- demo list -->
-  <div id="demos_list" class="subcontent">
-  <table>
-   <tr>
-    <td>
-     <span tal:repeat="line lines">
-       <a tal:attributes="href #${line[0]}"
-       tal:content="line[0]"> line num </a>
-     </span>
-    </td>
-   <td>
-    <span tal:repeat="line lines" tal:content="line[1]">
-     line
-    </span>
-   </td>
-   </tr>
-  </table>
+
+  <!-- general shutdown -->
+  <div class="subcontent">
+
   </div>
 </div>
 
