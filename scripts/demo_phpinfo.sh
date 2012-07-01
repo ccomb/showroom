@@ -23,6 +23,8 @@ EOF
 }
 
 function reconfigure_clone {
-echo
+# $1 is the old name, $2 is the old port
+sed -i "s/\/$1\//\/$name\//" apache2.conf
+sed -i "s/$2/$PORT/" apache2.conf
 }
 

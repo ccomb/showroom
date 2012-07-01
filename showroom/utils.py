@@ -145,11 +145,11 @@ def installed_demos(user):
     """
     demo_infos = []
     try:
-        names = os.listdir(join(PATHS['demos'], user.username))
+        names = os.listdir(join(PATHS['demos'], user))
     except:
         return []
     for name in names:
-        if not isdir(join(PATHS['demos'], user.username, name)):
+        if not isdir(join(PATHS['demos'], user, name)):
             continue
         demo = InstalledDemo(user, name)
         demo_infos.append(dict(
@@ -164,6 +164,7 @@ def installed_demos(user):
 
 class InstalledDemo(object):
     """object representing an installed demo
+    the "user" argument should be a string
     """
     broken = False
     def __init__(self, user, name):
@@ -171,12 +172,14 @@ class InstalledDemo(object):
         self.name = name
         if self.name == '':
             raise ValueError('empty demo name')
-        self.path = join(PATHS['demos'], user.username, self.name)
+        self.path = join(PATHS['demos'], user, self.name)
         if not os.path.exists(self.path):
-            raise Exception('this demo does not exist')
+            raise UnknownDemo('this demo does not exist')
         self.start_script = join(self.path, 'start.sh')
         self.apache_config_file = join(self.path, 'apache2.conf')
-        self.apache_config_link = join(PATHS['var'], 'apache2', 'demos', name + '.conf')
+        self.apache_config_dir = join(PATHS['var'], 'apache2', 'demos')
+        self.apache_config_link = join(self.apache_config_dir,
+                                       user + '.' + name + '.conf')
         self.popup = None
         self.popup_file = join(self.path, 'popup.html')
         if self.has_popup:
@@ -224,13 +227,13 @@ class InstalledDemo(object):
         """
         if not os.path.exists(self.path):
             return 'DESTROYED'
-        app_conf_path = join(PATHS['demos'], self.user.username, self.name, 'demo.conf')
+        app_conf_path = join(PATHS['demos'], self.user, self.name, 'demo.conf')
         if os.path.exists(app_conf_path):
             app_conf = SafeConfigParser()
             app_conf.read(app_conf_path)
             if app_conf.has_section('params') \
             and app_conf.has_option('params', 'status'):
-                return app_conf.get('params', 'status')
+                return app_conf.get('params', 'status') # XXX unused?
         if self.port is '':
             return 'FATAL'
 
@@ -245,8 +248,6 @@ class InstalledDemo(object):
                 status = 'UNKNOWN'
             statuses.add(status)
 
-        apache_links = os.listdir(join(PATHS['var'], 'apache2', 'demos'))
-
         # get the status of apache
         if 'apache2.conf' in democontent:
             # unless Apache is stopped
@@ -255,9 +256,8 @@ class InstalledDemo(object):
             except:
                 status = 'UNKNOWN'
             # consider apache running if we have a link
-            if status == 'RUNNING':
-                if self.name + '.conf' not in apache_links:
-                    status = 'STOPPED'
+            if status == 'RUNNING' and not self.has_apache_link:
+                status = 'STOPPED'
             statuses.add(status)
 
         if len(statuses) == 1:
@@ -292,10 +292,8 @@ class InstalledDemo(object):
     def _reload_apache(self):
         """reload apache config, or shutdown if it is not needed anymore
         """
-        apache_confs = [conf
-                        for conf in os.listdir(join(PATHS['var'], 'apache2', 'demos'))
+        apache_confs = [conf for conf in os.listdir(self.apache_config_dir)
                         if conf.endswith('.conf')]
-
         if len(apache_confs) == 0:
             # no more demos needing apache, we stop it
             self.supervisor.xmlrpc.supervisor.stopProcess('apache2')
@@ -312,13 +310,11 @@ class InstalledDemo(object):
     def _a2ensite(self):
         """sandbox equivalent to the Apache a2ensite command
         """
-        config_file = join(PATHS['demos'], self.user.username, self.name, 'apache2.conf')
-        config_link = join(PATHS['var'], 'apache2', 'demos', self.name + '.conf')
-        config_dir = join(PATHS['var'], 'apache2', 'demos')
-        if os.path.exists(config_file) and not os.path.exists(config_link):
-            if not os.path.exists(config_dir):
-                os.mkdir(config_dir)
-            os.link(config_file, config_link)
+        self.garbage_collect_apache_confs()
+        if self.has_apache_conf and not self.has_apache_link:
+            if not os.path.exists(self.apache_config_dir):
+                os.mkdir(self.apache_config_dir)
+            os.link(self.apache_config_file, self.apache_config_link)
             # if apache doesn't restart because of us,
             # we should disable the new config and stop the app.
             # Supervisor should immediately try to restart apache
@@ -333,9 +329,9 @@ class InstalledDemo(object):
     def _a2dissite(self, reload=True):
         """sandbox equivalent to the Apache a2dissite command
         """
-        config_link = join(PATHS['var'], 'apache2', 'demos', self.name + '.conf')
-        if os.path.exists(config_link):
-            os.remove(config_link)
+        self.garbage_collect_apache_confs()
+        if os.path.exists(self.apache_config_link):
+            os.remove(self.apache_config_link)
             if reload:
                 self._reload_apache()
 
@@ -364,19 +360,33 @@ class InstalledDemo(object):
             except:
                 LOG.warning(u'Got error trying to reload supervisor config')
 
+    def garbage_collect_apache_confs(self):
+        """delete apache config hard links if there is no associated demo
+        (ie. a hard link ref count of 1)
+        """
+        apache_conf_dir = join(PATHS['var'], 'apache2', 'demos')
+        for apache_conf_name in os.listdir(apache_conf_dir):
+            if not apache_conf_name.endswith('.conf'): continue
+            apache_conf_path = join(apache_conf_dir, apache_conf_name)
+            if os.stat(apache_conf_path).st_nlink == 1:
+                os.remove(apache_conf_path)
 
-def get_available_port(request):
+def get_available_port():
     """ return the first available port
     """
     demos = []
     users = os.listdir(PATHS['demos'])
     for user in users:
-        demos += installed_demos(UserManager(request).get_by_username(user))
+        demos += installed_demos(user)
     ports = [int(demo['port']) for demo in demos if demo['port'].isdigit()]
     port = 20000
     while port in ports:
         port += 1
     return port
+
+
+class UnknownDemo(Exception):
+    pass
 
 
 class DeploymentError(Exception):
@@ -417,7 +427,7 @@ def deploy(user, params):
     env['http_proxy'] = 'http://%s:%s/' % (PROXY_HOST, PROXY_PORT)
 
     # create the directory for the demo
-    userpath = join(PATHS['demos'], user.username)
+    userpath = join(PATHS['demos'], user)
     if not os.path.exists(userpath):
         os.mkdir(userpath)
     demopath = join(userpath, app_name)
@@ -496,7 +506,7 @@ def deploy(user, params):
             supervisor_conf.write(supervisor_file)
     
         # reload the supervisor config
-        supervisor = SuperVisor(self.user)
+        supervisor = SuperVisor(user)
         supervisor.xmlrpc.supervisor.reloadConfig()
         supervisor.xmlrpc.supervisor.addProcessGroup(app_name)
 

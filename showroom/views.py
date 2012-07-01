@@ -33,6 +33,10 @@ def _flash_message(request, message, message_type='SUCCESS'):
 def proxied_url(demo, request):
     """Give the url of the proxied demo
     """
+    user = authenticated_userid(request)
+    if user is not None:
+        user = UserManager(request).get_by_pk(user)
+
     current_host = urlsplit(request.host_url)
     port = current_host.port
     if port is None:
@@ -40,7 +44,7 @@ def proxied_url(demo, request):
     else:
         host = ADMIN_HOST + ':' + str(current_host.port)
     return urlunsplit(
-        (current_host.scheme, demo['name'] + '.' + host, '/', '', ''))
+        (current_host.scheme, demo['name'] + '.' + user.username + '.' + host, '/', '', ''))
 
 
 def direct_url(demo, request):
@@ -68,8 +72,8 @@ def installed_demos(request):
         apps=utils.available_demos(),
         proxied_url=proxied_url,
         direct_url=direct_url,
-        demos=utils.installed_demos(user),
-        supervisor=utils.SuperVisor(user).is_running,
+        demos=utils.installed_demos(user.username),
+        supervisor=utils.SuperVisor(user.username).is_running,
         logged_in=user,
         )
 
@@ -80,7 +84,7 @@ def json_available_demos(request):
     user = authenticated_userid(request)
     if user is not None:
         user = UserManager(request).get_by_pk(user)
-    return utils.available_demos(user)
+    return utils.available_demos(user.username)
 
 
 def json_installed_demos(request):
@@ -89,7 +93,7 @@ def json_installed_demos(request):
     user = authenticated_userid(request)
     if user is not None:
         user = UserManager(request).get_by_pk(user)
-    return utils.installed_demos(user)
+    return utils.installed_demos(user.username)
 
 
 class AuthController(pyramid_signup.views.AuthController):
@@ -170,14 +174,14 @@ class DemoController(object):
         if 'plugins' in params:
             params['plugins'] = ' '.join(params['plugins'].split())
         try:
-            params['port'] = utils.get_available_port(self.request)
-            utils.deploy(self.user, params)
+            params['port'] = utils.get_available_port()
+            utils.deploy(self.user.username, params)
         except utils.DeploymentError, e:
             _flash_message(self.request,
                 u"Error deploying %s : %s" % (name, e.message), 'ERROR')
             return HTTPFound(location='/')
     
-        demo = utils.InstalledDemo(self.user, name)
+        demo = utils.InstalledDemo(self.user.username, name)
         _flash_message(self.request,
             u"application %s created on port %s" % (demo.name, demo.port),
             'SUCCESS')
@@ -188,7 +192,7 @@ class DemoController(object):
         """ view that starts the demo
         """
         name = self.request.params.get('name', '_')
-        demo = utils.InstalledDemo(self.user, name)
+        demo = utils.InstalledDemo(self.user.username, name)
     
         old_status = demo.get_status()
         message = u'Nothing changed'
@@ -209,7 +213,7 @@ class DemoController(object):
         """ view that stops a demo
         """
         name = self.request.params.get('name', '_')
-        demo = utils.InstalledDemo(self.user, name)
+        demo = utils.InstalledDemo(self.user.username, name)
     
         old_status = demo.get_status()
         message = u'Nothing changed'
@@ -231,7 +235,7 @@ class DemoController(object):
         """
         name = self.request.params['name']
         try:
-            utils.InstalledDemo(self.user, name).destroy()
+            utils.InstalledDemo(self.user.username, name).destroy()
         except Exception, e:
             message = 'Error: %s' % e.message
             _flash_message(self.request, message, 'ERROR')
@@ -273,7 +277,7 @@ class DemoController(object):
         """
         if 'app' in self.request.params and self.request.params['app'] in [d['name'] for d in utils.installed_demos(self.user.username)]:
             app = self.request.params['app']
-            demo = utils.InstalledDemo(self.user, app)
+            demo = utils.InstalledDemo(self.user.username, app)
             script = join(demo.path, 'post_install.sh')
             with open(script, 'r+') as s:
                 start = ''
@@ -301,7 +305,7 @@ class MainController(object):
         """ view to start supervisor
         """
         try:
-            utils.SuperVisor(self.user).start()
+            utils.SuperVisor(self.user.username).start()
         except AssertionError:
             message = u'Could not start supervisor. Please retry in a few seconds.'
             _flash_message(self.request, message, 'ERROR')
@@ -311,7 +315,7 @@ class MainController(object):
     def stop_all(self):
         """ view to stop supervisor and all demos
         """
-        utils.SuperVisor(self.user).stop()
+        utils.SuperVisor(self.user.username).stop()
         return HTTPFound(location='/')
 
 
