@@ -22,7 +22,6 @@
 <div id="content" metal:fill-slot="content">
 
   <!-- general shutdown -->
-
   <div id="app_form" class="subcontent">
     <!-- big red button -->
     <div id="big_switch">

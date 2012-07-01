@@ -32,6 +32,7 @@ a:visited {
 }
 #header {
     height: 70px;
+    margin-right: 1em;
 }
 td {
     vertical-align: top;

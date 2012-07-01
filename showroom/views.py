@@ -55,18 +55,27 @@ def installed_demos(request):
     user = authenticated_userid(request)
     if user is not None:
         user = UserManager(request).get_by_pk(user)
+        return render_template_to_response(
+            join(abspath(dirname(__file__)), 'templates', 'demos.pt'),
+            master=get_template('templates/master.pt'),
+            request=request,
+            apps=utils.available_demos(),
+            proxied_url=proxied_url,
+            direct_url=direct_url,
+            demos=utils.installed_demos(user.username),
+            supervisor=utils.SuperVisor(user.username).is_running,
+            logged_in=user,
+            )
+    else:
+        return render_template_to_response(
+            join(abspath(dirname(__file__)), 'templates', 'home.pt'),
+            master=get_template('templates/master.pt'),
+            request=request,
+            apps=utils.available_demos(),
+            supervisor=None,
+            logged_in=None,
+            )
 
-    return render_template_to_response(
-        join(abspath(dirname(__file__)), 'templates', 'demos.pt'),
-        master=get_template('templates/master.pt'),
-        request=request,
-        apps=utils.available_demos(),
-        proxied_url=proxied_url,
-        direct_url=direct_url,
-        demos=utils.installed_demos(user.username),
-        supervisor=utils.SuperVisor(user.username).is_running,
-        logged_in=user,
-        )
 
 
 def json_available_demos(request):

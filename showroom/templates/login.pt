@@ -14,7 +14,7 @@
 
 <div class="subcontent" metal:fill-slot="content">
   <h2>ShowRoom log in</h2>
-  <a href="${request.route_url('register')}">Sign up</a>
+  <a href="${request.route_url('register')}">Create an account</a>
   <form tal:replace="structure form"/>
     <a href="${request.route_url('forgot_password')}">Forgot Password?</a>
 </div>

@@ -7,15 +7,9 @@
         view="showroom.views.forbidden"
         renderer="templates/login.pt"
   />
-  <route name="index"
-         path=""
-         view=".views.installed_demos"
-         view_permission="edit"
-  />
   <route name="home"
          path=""
          view=".views.installed_demos"
-         view_permission="edit"
   />
   <route name="deploy"
          path="/deploy"
