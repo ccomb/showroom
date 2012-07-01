@@ -4,7 +4,7 @@ body {
     background-color: white;
     background: url('/static/images/background.png');
     font-size: 13px;
-    font-family: "Trebuchet MS", Georgia, "Times New Roman", Times, serif;
+    font-family: 'Ubuntu', sans;
     text-align: justify;
     color: #000;
     height: 100%;
