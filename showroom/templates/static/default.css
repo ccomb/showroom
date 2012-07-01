@@ -83,14 +83,14 @@ width: 6em;
 -webkit-border-radius: 0.5em;
 }
 /* flash messages */
-div.SUCCESS {
+div.SUCCESS, div.success {
     background: #7fffa6;
 }
 div.WARNING {
     background: #ffe57f;
 }
-div.ERROR {
-    background: #ff7fd9;
+div.ERROR, div.error {
+    background: #EE436A;
 }
 /* supervisor statuses */
 div.RUNNING {

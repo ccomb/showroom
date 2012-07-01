@@ -348,7 +348,7 @@ class InstalledDemo(object):
 
         userpath = dirname(self.path)
         if not os.listdir(userpath):
-            os.unlink(userpath)
+            os.rmdir(userpath)
 
         if had_startup_script:
             try:

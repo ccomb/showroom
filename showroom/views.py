@@ -21,15 +21,6 @@ import utils
 LOG = logging.getLogger(__name__)
 _ = TranslationStringFactory('showroom')
 
-def _flash_message(request, message, message_type='SUCCESS'):
-    """send a message through the session to the next url
-    """
-    # TODO: remove and replace occurences with self.request.session.flash
-    request.environ['beaker.session']['message_type'] = message_type
-    request.environ['beaker.session']['message'] = message
-    request.environ['beaker.session'].save()
-
-
 def proxied_url(demo, request):
     """Give the url of the proxied demo
     """
@@ -177,14 +168,11 @@ class DemoController(object):
             params['port'] = utils.get_available_port()
             utils.deploy(self.user.username, params)
         except utils.DeploymentError, e:
-            _flash_message(self.request,
-                u"Error deploying %s : %s" % (name, e.message), 'ERROR')
+            self.request.session.flash(u"Error deploying %s : %s" % (name, e.message), 'error')
             return HTTPFound(location='/')
     
         demo = utils.InstalledDemo(self.user.username, name)
-        _flash_message(self.request,
-            u"application %s created on port %s" % (demo.name, demo.port),
-            'SUCCESS')
+        self.request.session.flash(u"application %s created on port %s" % (demo.name, demo.port), 'success')
         return HTTPFound(location='/')
     
     
@@ -200,12 +188,12 @@ class DemoController(object):
             demo.start()
         except Exception, e:
             message = u'Error: %s' % e.message
-            _flash_message(self.request, message, 'ERROR')
+            self.request.session.flash(message, 'error')
             return HTTPFound(location='/')
         new_status = demo.get_status()
         if new_status == 'RUNNING' and new_status != old_status:
             message = u'Demo "%s" succesfully started' % demo.name
-        _flash_message(self.request, message, 'SUCCESS')
+        self.request.session.flash(message, 'success')
         return HTTPFound(location='/')
     
     
@@ -221,12 +209,12 @@ class DemoController(object):
             demo.stop()
         except Exception, e:
             message = u'Error: %s' % e.message
-            _flash_message(self.request, message, 'ERROR')
+            self.request.session.flash(message, 'error')
             return HTTPFound(location='/')
         new_status = demo.get_status()
         if new_status == 'STOPPED' and new_status != old_status:
             message = u'Demo "%s" succesfully stopped' % demo.name
-        _flash_message(self.request, message, 'SUCCESS')
+        self.request.session.flash(message, 'success')
         return HTTPFound(location='/')
     
     
@@ -238,10 +226,10 @@ class DemoController(object):
             utils.InstalledDemo(self.user.username, name).destroy()
         except Exception, e:
             message = 'Error: %s' % e.message
-            _flash_message(self.request, message, 'ERROR')
+            self.request.session.flash(message, 'error')
             return HTTPFound(location='/')
     
-        _flash_message(self.request, '%s demo successfully deleted!' % name, 'SUCCESS')
+        self.request.session.flash('%s demo successfully deleted!' % name, 'success')
         return HTTPFound(location='/')
 
 
@@ -308,7 +296,7 @@ class MainController(object):
             utils.SuperVisor(self.user.username).start()
         except AssertionError:
             message = u'Could not start supervisor. Please retry in a few seconds.'
-            _flash_message(self.request, message, 'ERROR')
+            self.request.session.flash(message, 'error')
         return HTTPFound(location='/')
     
     
