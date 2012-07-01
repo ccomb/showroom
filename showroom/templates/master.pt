@@ -51,8 +51,9 @@
 
   <!-- start footer -->
   <div colspan="2" id="footer">
-      Powered by <a href="http://www.pylonsproject.org/">Pyramid</a>
-      - <a href="https://bitbucket.org/ccomb/showroom">Source code</a>
+      <a href="https://bitbucket.org/ccomb/showroom">Showroom</a>
+      is powered by
+      <a href="http://www.pylonsproject.org/">Pyramid</a>
   </div>
 
 </div>
