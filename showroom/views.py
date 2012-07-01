@@ -57,9 +57,9 @@ def installed_demos(request):
     """
     # XXX this view is too slow
 
-    logged_in = authenticated_userid(request)
-    if logged_in is not None:
-        logged_in = UserManager(request).get_by_pk(logged_in)
+    user = authenticated_userid(request)
+    if user is not None:
+        user = UserManager(request).get_by_pk(user)
 
     return render_template_to_response(
         join(abspath(dirname(__file__)), 'templates', 'demos.pt'),
@@ -68,22 +68,28 @@ def installed_demos(request):
         apps=utils.available_demos(),
         proxied_url=proxied_url,
         direct_url=direct_url,
-        demos=utils.installed_demos(),
-        supervisor=utils.SuperVisor().is_running,
-        logged_in=logged_in,
+        demos=utils.installed_demos(user),
+        supervisor=utils.SuperVisor(user).is_running,
+        logged_in=user,
         )
 
 
 def json_available_demos(request):
     """return a json view of all apps and their params/plugins
     """
-    return utils.available_demos()
+    user = authenticated_userid(request)
+    if user is not None:
+        user = UserManager(request).get_by_pk(user)
+    return utils.available_demos(user)
 
 
 def json_installed_demos(request):
     """ return a json view of all installed apps and their statuses
     """
-    return utils.installed_demos()
+    user = authenticated_userid(request)
+    if user is not None:
+        user = UserManager(request).get_by_pk(user)
+    return utils.installed_demos(user)
 
 
 class AuthController(pyramid_signup.views.AuthController):
@@ -145,150 +151,169 @@ def forbidden(request):
     return Response('forbidden')
 
 
-def deploy(request):
-    """ deploy a demo
+class DemoController(object):
+    """controller for demos
     """
-    params = dict(request.params.copy())
-    if 'app' not in params or 'name' not in params:
-        raise NotFound
-    name = params['name'] = params['name'].replace(' ', '_').lower() # FIXME
-    if 'plugins' in params:
-        params['plugins'] = ' '.join(params['plugins'].split())
-    try:
-        utils.deploy(params)
-    except utils.DeploymentError, e:
-        _flash_message(request,
-            u"Error deploying %s : %s" % (name, e.message), 'ERROR')
+    def __init__(self, request):
+        self.request = request
+        self.user = authenticated_userid(self.request)
+        if self.user is not None:
+            self.user = UserManager(request).get_by_pk(self.user)
+
+    def deploy(self):
+        """ deploy a demo
+        """
+        params = dict(self.request.params.copy())
+        if 'app' not in params or 'name' not in params:
+            raise NotFound
+        name = params['name'] = params['name'].replace(' ', '_').lower() # FIXME
+        if 'plugins' in params:
+            params['plugins'] = ' '.join(params['plugins'].split())
+        try:
+            params['port'] = utils.get_available_port(self.request)
+            utils.deploy(self.user, params)
+        except utils.DeploymentError, e:
+            _flash_message(self.request,
+                u"Error deploying %s : %s" % (name, e.message), 'ERROR')
+            return HTTPFound(location='/')
+    
+        demo = utils.InstalledDemo(self.user, name)
+        _flash_message(self.request,
+            u"application %s created on port %s" % (demo.name, demo.port),
+            'SUCCESS')
+        return HTTPFound(location='/')
+    
+    
+    def start(self):
+        """ view that starts the demo
+        """
+        name = self.request.params.get('name', '_')
+        demo = utils.InstalledDemo(self.user, name)
+    
+        old_status = demo.get_status()
+        message = u'Nothing changed'
+        try:
+            demo.start()
+        except Exception, e:
+            message = u'Error: %s' % e.message
+            _flash_message(self.request, message, 'ERROR')
+            return HTTPFound(location='/')
+        new_status = demo.get_status()
+        if new_status == 'RUNNING' and new_status != old_status:
+            message = u'Demo "%s" succesfully started' % demo.name
+        _flash_message(self.request, message, 'SUCCESS')
+        return HTTPFound(location='/')
+    
+    
+    def stop(self):
+        """ view that stops a demo
+        """
+        name = self.request.params.get('name', '_')
+        demo = utils.InstalledDemo(self.user, name)
+    
+        old_status = demo.get_status()
+        message = u'Nothing changed'
+        try:
+            demo.stop()
+        except Exception, e:
+            message = u'Error: %s' % e.message
+            _flash_message(self.request, message, 'ERROR')
+            return HTTPFound(location='/')
+        new_status = demo.get_status()
+        if new_status == 'STOPPED' and new_status != old_status:
+            message = u'Demo "%s" succesfully stopped' % demo.name
+        _flash_message(self.request, message, 'SUCCESS')
+        return HTTPFound(location='/')
+    
+    
+    def destroy(self):
+        """ Destroy a demo
+        """
+        name = self.request.params['name']
+        try:
+            utils.InstalledDemo(self.user, name).destroy()
+        except Exception, e:
+            message = 'Error: %s' % e.message
+            _flash_message(self.request, message, 'ERROR')
+            return HTTPFound(location='/')
+    
+        _flash_message(self.request, '%s demo successfully deleted!' % name, 'SUCCESS')
         return HTTPFound(location='/')
 
-    demo = utils.InstalledDemo(name)
-    _flash_message(request,
-        u"application %s created on port %s" % (demo.name, demo.port),
-        'SUCCESS')
-    return HTTPFound(location='/')
+
+    def app_params(self):
+        """ return the params of a given demo, in a json list.
+        This is used in the app creation form
+        """
+        available_demos = utils.available_demos()
+        if 'app' in self.request.params and self.request.params['app'] in available_demos:
+            return utils.available_demos()[self.request.params['app']]
+        else:
+            return ("No application name given or unknown application.",)
+    
+    
+    def app_script(self):
+        """ return the script of a given demo, this is a link avaiable during the
+        demo creation process
+        """
+        if 'app' in self.request.params and self.request.params['app'] in utils.available_demos(self.user.username):
+            app = self.request.params['app']
+            return render_template_to_response(
+            join(abspath(dirname(__file__)), 'templates', 'script.pt'),
+            master=get_template('templates/master.pt'),
+            lines=enumerate(open(utils.scriptname(app)).readlines()),
+            logged_in=self.user,
+            )
+    
+        else:
+            return ("No application name given or unknown application.",)
+
+    def postinstall(self):
+        """ execute the postinstall script for a demo
+        """
+        if 'app' in self.request.params and self.request.params['app'] in [d['name'] for d in utils.installed_demos(self.user.username)]:
+            app = self.request.params['app']
+            demo = utils.InstalledDemo(self.user, app)
+            script = join(demo.path, 'post_install.sh')
+            with open(script, 'r+') as s:
+                start = ''
+                content = s.read()
+                if not content.startswith('#!'):
+                    start = '#!/bin/bash\n'
+                content = start + content
+                s.seek(0); s.truncate(); s.write(content)
+            with keep_working_dir:
+                os.chdir(demo.path)
+                subprocess.call(['chmod', '+x', script])
+                subprocess.call([script])
+            os.rename(script, script + '.executed')
+        return HTTPFound(location=getattr(self.request, 'referrer', False) or '/')
 
 
-def start(request):
-    """ view that starts the demo
-    """
-    name = request.params.get('name', '_')
-    demo = utils.InstalledDemo(name)
+class MainController(object):
+    def __init__(self, request):
+        self.request = request
+        self.user = authenticated_userid(self.request)
+        if self.user is not None:
+            self.user = UserManager(request).get_by_pk(self.user)
 
-    old_status = demo.get_status()
-    message = u'Nothing changed'
-    try:
-        demo.start()
-    except Exception, e:
-        message = u'Error: %s' % e.message
-        _flash_message(request, message, 'ERROR')
+    def start_all(self):
+        """ view to start supervisor
+        """
+        try:
+            utils.SuperVisor(self.user).start()
+        except AssertionError:
+            message = u'Could not start supervisor. Please retry in a few seconds.'
+            _flash_message(self.request, message, 'ERROR')
         return HTTPFound(location='/')
-    new_status = demo.get_status()
-    if new_status == 'RUNNING' and new_status != old_status:
-        message = u'Demo "%s" succesfully started' % demo.name
-    _flash_message(request, message, 'SUCCESS')
-    return HTTPFound(location='/')
-
-
-def stop(request):
-    """ view that stops a demo
-    """
-    name = request.params.get('name', '_')
-    demo = utils.InstalledDemo(name)
-
-    old_status = demo.get_status()
-    message = u'Nothing changed'
-    try:
-        demo.stop()
-    except Exception, e:
-        message = u'Error: %s' % e.message
-        _flash_message(request, message, 'ERROR')
-        return HTTPFound(location='/')
-    new_status = demo.get_status()
-    if new_status == 'STOPPED' and new_status != old_status:
-        message = u'Demo "%s" succesfully stopped' % demo.name
-    _flash_message(request, message, 'SUCCESS')
-    return HTTPFound(location='/')
-
-
-def start_all(request):
-    """ view to start supervisor
-    """
-    try:
-        utils.SuperVisor().start()
-    except AssertionError:
-        message = u'Could not start supervisor. Please retry in a few seconds.'
-        _flash_message(request, message, 'ERROR')
-    return HTTPFound(location='/')
-
-
-def stop_all(request):
-    """ view to stop supervisor and all demos
-    """
-    utils.SuperVisor().stop()
-    return HTTPFound(location='/')
-
-
-def destroy(request):
-    """ Destroy a demo
-    """
-    name=request.params['name']
-    try:
-        utils.InstalledDemo(name).destroy()
-    except Exception, e:
-        message = 'Error: %s' % e.message
-        _flash_message(request, message, 'ERROR')
+    
+    
+    def stop_all(self):
+        """ view to stop supervisor and all demos
+        """
+        utils.SuperVisor(self.user).stop()
         return HTTPFound(location='/')
 
-    _flash_message(request, '%s demo successfully deleted!' % name, 'SUCCESS')
-    return HTTPFound(location='/')
-
-
-def app_params(request):
-    """ return the params of a given demo, in a json list.
-    This is used in the app creation form
-    """
-    available_demos = utils.available_demos()
-    if 'app' in request.params and request.params['app'] in available_demos:
-        return utils.available_demos()[request.params['app']]
-    else:
-        return ("No application name given or unknown application.",)
-
-def app_script(request):
-    """ return the script of a given demo, this is a link avaiable during the
-    demo creation process
-    """
-    if 'app' in request.params and request.params['app'] in utils.available_demos():
-        app = request.params['app']
-        return render_template_to_response(
-        join(abspath(dirname(__file__)), 'templates', 'script.pt'),
-        master=get_template('templates/master.pt'),
-        lines=enumerate(open(utils.scriptname(app)).readlines()),
-        logged_in=authenticated_userid(request),
-        )
-
-    else:
-        return ("No application name given or unknown application.",)
-
-def postinstall(request):
-    """ execute the postinstall script for a demo
-    """
-    if 'app' in request.params and request.params['app'] in [d['name'] for d in utils.installed_demos()]:
-        app = request.params['app']
-        demo = utils.InstalledDemo(app)
-        script = join(demo.path, 'post_install.sh')
-        with open(script, 'r+') as s:
-            start = ''
-            content = s.read()
-            if not content.startswith('#!'):
-                start = '#!/bin/bash\n'
-            content = start + content
-            s.seek(0); s.truncate(); s.write(content)
-        with keep_working_dir:
-            os.chdir(demo.path)
-            subprocess.call(['chmod', '+x', script])
-            subprocess.call([script])
-        os.rename(script, script + '.executed')
-    return HTTPFound(location=getattr(request, 'referrer', False) or '/')
 
 def add_macro(result, request):
     """ Add master macro to the dict result
@@ -300,7 +325,6 @@ def add_macro(result, request):
 
         result.update({'master': get_template('templates/master.pt'),
                         'logged_in': logged_in})
-    
 
 
 class RegisterController(pyramid_signup.views.RegisterController):

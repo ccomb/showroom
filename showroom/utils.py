@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from pyramid_signup.managers import UserManager
 from ConfigParser import SafeConfigParser
 from os.path import isdir, join, dirname, exists
 from xmlrpclib import ServerProxy
@@ -43,7 +44,8 @@ for d in PATHS:
 class SuperVisor(object):
     """class to manage the supervisor process
     """
-    def __init__(self, configpath=None):
+    def __init__(self, user, configpath=None):
+        self.user = user
         # connect to supervisor
         if configpath is None:
             self.configpath = PATHS['supervisor']
@@ -75,8 +77,8 @@ class SuperVisor(object):
 
     def stop(self):
         # remove hard links for apache configs
-        for demo in installed_demos():
-            demo =  InstalledDemo(demo['name'])
+        for demo in installed_demos(self.user):
+            demo =  InstalledDemo(self.user, demo['name'])
             if demo.has_apache_link:
                 demo._a2dissite(reload=False)
         # shutdown supervisor and all demos
@@ -84,11 +86,11 @@ class SuperVisor(object):
                           '-c', PATHS['supervisor'], 'shutdown']).wait()
 
 
-def daemon(name, command='restart'):
+def daemon(user, name, command='restart'):
     """function that start, stop or restart the demo.
     We read the command in the apps config file
     """
-    demos = installed_demos()
+    demos = installed_demos(user)
     if not demos.has_key(name) or not demos[name].has_key(command):
         print 'command %s not found for %s' % (command, name)
         return
@@ -116,7 +118,7 @@ def daemon(name, command='restart'):
                 return pid
 
 
-def available_demos():
+def available_demos(user=None):
     """ return a dict containing all available demos
     and their respective commands defined in config file.
 
@@ -137,16 +139,19 @@ def available_demos():
     return demos
 
 
-def installed_demos():
+def installed_demos(user):
     """ return a dict with infos of deployed demos,
         or info of a single demo
     """
     demo_infos = []
-    demo_paths = os.listdir(PATHS['demos'])
-    for demo_path in demo_paths:
-        if not os.path.isdir(join(PATHS['demos'], demo_path)):
+    try:
+        names = os.listdir(join(PATHS['demos'], user.username))
+    except:
+        return []
+    for name in names:
+        if not isdir(join(PATHS['demos'], user.username, name)):
             continue
-        demo = InstalledDemo(demo_path)
+        demo = InstalledDemo(user, name)
         demo_infos.append(dict(
             name=demo.name,
             port=demo.port,
@@ -161,11 +166,12 @@ class InstalledDemo(object):
     """object representing an installed demo
     """
     broken = False
-    def __init__(self, name):
+    def __init__(self, user, name):
+        self.user = user
         self.name = name
         if self.name == '':
             raise ValueError('empty demo name')
-        self.path = join(PATHS['demos'], self.name)
+        self.path = join(PATHS['demos'], user.username, self.name)
         if not os.path.exists(self.path):
             raise Exception('this demo does not exist')
         self.start_script = join(self.path, 'start.sh')
@@ -189,7 +195,7 @@ class InstalledDemo(object):
         self.name = self.democonf.get('params', 'name')
 
         # init the supervisor
-        self.supervisor = SuperVisor()
+        self.supervisor = SuperVisor(self.user)
 
     has_startup_script = property(lambda self: os.path.exists(self.start_script))
     has_apache_link = property(lambda self: os.path.exists(self.apache_config_link))
@@ -218,7 +224,7 @@ class InstalledDemo(object):
         """
         if not os.path.exists(self.path):
             return 'DESTROYED'
-        app_conf_path = join(PATHS['demos'], self.name, 'demo.conf')
+        app_conf_path = join(PATHS['demos'], self.user.username, self.name, 'demo.conf')
         if os.path.exists(app_conf_path):
             app_conf = SafeConfigParser()
             app_conf.read(app_conf_path)
@@ -306,7 +312,7 @@ class InstalledDemo(object):
     def _a2ensite(self):
         """sandbox equivalent to the Apache a2ensite command
         """
-        config_file = join(PATHS['demos'], self.name, 'apache2.conf')
+        config_file = join(PATHS['demos'], self.user.username, self.name, 'apache2.conf')
         config_link = join(PATHS['var'], 'apache2', 'demos', self.name + '.conf')
         config_dir = join(PATHS['var'], 'apache2', 'demos')
         if os.path.exists(config_file) and not os.path.exists(config_link):
@@ -340,9 +346,14 @@ class InstalledDemo(object):
             self.stop()
         LOG.warn("removing demo %s" % self.name)
         had_startup_script = self.has_startup_script
-        if os.path.isdir(self.path):
+        if isdir(self.path):
             subprocess.call(['chmod', '-R', '777', self.path])
             shutil.rmtree(self.path)
+
+        userpath = dirname(self.path)
+        if not os.listdir(userpath):
+            os.unlink(userpath)
+
         if had_startup_script:
             try:
                 self.supervisor.xmlrpc.supervisor.removeProcessGroup(self.name)
@@ -354,10 +365,13 @@ class InstalledDemo(object):
                 LOG.warning(u'Got error trying to reload supervisor config')
 
 
-def get_available_port():
+def get_available_port(request):
     """ return the first available port
     """
-    demos = installed_demos()
+    demos = []
+    users = os.listdir(PATHS['demos'])
+    for user in users:
+        demos += installed_demos(UserManager(request).get_by_username(user))
     ports = [int(demo['port']) for demo in demos if demo['port'].isdigit()]
     port = 20000
     while port in ports:
@@ -373,7 +387,7 @@ class DestructionError(Exception):
     pass
 
 
-def deploy(params):
+def deploy(user, params):
     """deploy a demo of 'app_type' in the 'app_name' directory
     """
     app_name = params.pop('name')
@@ -381,7 +395,7 @@ def deploy(params):
     if app_type not in available_demos():
         raise DeploymentError('this demo does not exist')
 
-    if app_name in [d['name'] for d in installed_demos()]:
+    if app_name in [d['name'] for d in installed_demos(user)]:
         raise DeploymentError('this demo already exists')
 
     # rebuild the name of the deployment script
@@ -393,7 +407,7 @@ def deploy(params):
     env = os.environ.copy()
     env['name'] = app_name
 
-    port = get_available_port()
+    port = params.pop('port')
     env['PORT'] = str(port)
     # put the virtualenv path first
     env['PATH'] = os.path.abspath('bin') + ':' + env['PATH']
@@ -403,7 +417,10 @@ def deploy(params):
     env['http_proxy'] = 'http://%s:%s/' % (PROXY_HOST, PROXY_PORT)
 
     # create the directory for the demo
-    demopath = join(PATHS['demos'], app_name)
+    userpath = join(PATHS['demos'], user.username)
+    if not os.path.exists(userpath):
+        os.mkdir(userpath)
+    demopath = join(userpath, app_name)
     if not os.path.exists(demopath):
         os.mkdir(demopath)
     else:
@@ -418,7 +435,7 @@ def deploy(params):
     for param_name, param_value in params.items():
         assert(param_name not in ('port', 'status'))
         app_conf.set('params', param_name, param_value.encode('utf-8'))
-    app_conf_path = join(PATHS['demos'], app_name, 'demo.conf')
+    app_conf_path = join(demopath, 'demo.conf')
     with open(app_conf_path, 'w+') as configfile:
         app_conf.write(configfile)
     LOG.info('section %s added', app_name)
@@ -434,7 +451,7 @@ def deploy(params):
             # XXX replace this waste of space with a btrfs subvolume
             subprocess.call(['cp', '-r', join(template_path, item), demopath])
         # run the clone reconfiguration script
-        old_demo = InstalledDemo(app_name)
+        old_demo = InstalledDemo(user, app_name)
         functions = join(PATHS['scripts'], 'functions.sh')
         retcode = subprocess.call(['bash', '-c', 'source "%s" && source "%s" && export -f reconfigure_clone && bash -xce "reconfigure_clone \"%s\" %s"' % (functions, script, old_demo.name, old_demo.port)], cwd=demopath, env=env)
         if retcode != 0:
@@ -479,7 +496,7 @@ def deploy(params):
             supervisor_conf.write(supervisor_file)
     
         # reload the supervisor config
-        supervisor = SuperVisor()
+        supervisor = SuperVisor(self.user)
         supervisor.xmlrpc.supervisor.reloadConfig()
         supervisor.xmlrpc.supervisor.addProcessGroup(app_name)
 
