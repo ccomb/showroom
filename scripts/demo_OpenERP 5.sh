@@ -35,7 +35,7 @@ sed -i "s/^server.socket_port =.*/server.socket_port = $PORT/" openerp-web.cfg
 sed -i "s/^port = '8070'/port = '$NETRPC'/" openerp-web.cfg
 
 # initialise and create the database
-/usr/lib/postgresql/8.4/bin/initdb postgresql
+/usr/lib/postgresql/9.1/bin/initdb postgresql
 echo "data_directory = './postgresql'" >> postgresql/postgresql.conf
 echo "hba_file = './postgresql/pg_hba.conf'" >> postgresql/postgresql.conf
 echo "ident_file = './postgresql/pg_ident.conf'" >> postgresql/postgresql.conf
@@ -46,7 +46,7 @@ echo "port = $((PORT+2000))" >> postgresql/postgresql.conf
 cat > start.sh << EOF
 #!/bin/bash
 trap "pkill -1 -P \$\$" EXIT
-/usr/lib/postgresql/8.4/bin/postgres -D ./postgresql &
+/usr/lib/postgresql/9.1/bin/postgres -D ./postgresql &
 postgres_pid=\$!
 ./sandbox/bin/openerp-server --no-xmlrpc --net_port=$NETRPC --db_host=localhost --db_port=$((PORT+2000)) &
 openerp_pid=\$!
