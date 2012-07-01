@@ -65,6 +65,7 @@ form div span {
     left: 200px;
     margin: 1em;
     background: white;
+    border: solid 1px #555;
 }
 
 td.demo_title {
@@ -109,7 +110,7 @@ div.STARTING, div.RESTARTING {
 }
 div.FATAL, div.UNKNOWN, div.PARTIAL, div.DEPLOYING {
     background: transparent;
-    border: solid 0.1em black;
+    border: solid 0.1em #555;
 }
 a.start, a.stop, a.destroy {
     display: inline-block;
