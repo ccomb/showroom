@@ -19,9 +19,9 @@
 </div>
 
 <div class="subcontent" metal:fill-slot="content">
-<a href="${request.route_url('home')}">Back to Index</a>
   <h1>Profile</h1>
     <form tal:replace="structure form"/>
+<a href="${request.route_url('home')}">Back to home</a>
 </div>
 </body>
 </html>

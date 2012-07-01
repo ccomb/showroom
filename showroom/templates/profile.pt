@@ -19,12 +19,12 @@
 </div>
 
 <div class="subcontent" metal:fill-slot="content">
-<a href="${request.route_url('home')}">Back to Index</a>
   <h1>Profile</h1>
     ${ user.username }<br />
     ${ user.email }<br/>
     <br/>
     <a href="${request.route_url('profile', user_pk=user.pk)}/edit">Edit</a>
+<a href="${request.route_url('home')}">Back to home</a>
 </div>
 </body>
 </html>
