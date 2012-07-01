@@ -2,6 +2,7 @@ body {
     margin: 0;
     padding: 0;
     background-color: white;
+    background: url('/static/images/background.png');
     font-size: 13px;
     font-family: "Trebuchet MS", Georgia, "Times New Roman", Times, serif;
     text-align: justify;
@@ -226,11 +227,15 @@ label {
     width: 140px;
     margin-left: 10px; 
     color: #555; 
+    line-height: 3em;
     }
+
 ul li ul li label {
 padding-left: 18px;
 width: 120px;
 border-left: solid 2px #CCC;}
-
+fieldset {
+    background: #fff;
+}
 
 
