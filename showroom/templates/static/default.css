@@ -6,28 +6,25 @@ body {
     font-size: 13px;
     font-family: 'Ubuntu', sans;
     text-align: justify;
-    color: #000;
+    color: #555;
     height: 100%;
     width: 100%;
 }
 h1, h2, h3 {
     margin: 0.5em 0;
     font-weight: normal;
-    color: #000;
 }
 img {
     border: none;
 }
 a:link {
     text-decoration: none;
-    color: #000;
 }
 a:hover, a:active {
     text-decoration: underline;
-    color: #000;
 }
 a:visited {
-    color: #777;
+    color: #666;
     text-decoration: none;
 }
 li {
@@ -112,7 +109,6 @@ div.FATAL, div.UNKNOWN, div.PARTIAL, div.DEPLOYING {
     border: solid 0.1em black;
 }
 a.start, a.stop, a.destroy {
-    color: black;
     display: inline-block;
     background: #FFF;
     text-decoration: none;
