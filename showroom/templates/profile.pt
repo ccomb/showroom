@@ -13,7 +13,8 @@
   <!-- user -->
   <div metal:fill-slot="header" id="user_ID">
       <a href='/profile/${logged_in.pk}'>${logged_in.first_name} ${logged_in.last_name} (${logged_in.username})</a>
-      <a href='${request.application_url}/logout'>disconnect</a>
+      -
+      <a href='${request.application_url}/logout'>Log out</a>
   </div>
 </div>
 

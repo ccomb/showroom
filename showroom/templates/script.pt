@@ -15,7 +15,8 @@
   <!-- user -->
   <div metal:fill-slot="header" id="user_ID">
       <a href='/profile/${logged_in.pk}'>${logged_in.first_name} ${logged_in.last_name} (${logged_in.username})</a>
-      <a href='${request.application_url}/logout'>disconnect</a>
+      -
+      <a href='${request.application_url}/logout'>Log out</a>
   </div>
 </div>
 
@@ -38,13 +39,6 @@
    </tr>
   </table>
   </div>
-</div>
-
-
-<!-- start footer -->
-<div colspan="2" id="footer">
-    Powered by <a href="http://www.pylonsproject.org/">Pyramid</a>
-    - <a href="https://bitbucket.org/ccomb/showroom">Source code</a>
 </div>
 
 </body>

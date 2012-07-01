@@ -58,10 +58,6 @@ form div span {
     width: 8em;
     margin: 0.2em;
 }
-input, textarea, select {
-    width: 15em;
-    margin: 0.2em 0;
-}
 #loading {
     margin: 0.5em;   
 }
@@ -188,30 +184,29 @@ ul {
 padding: 0;
 }
 .field {
-margin-bottom: 0.5em;
+margin-bottom: 0.2em;
 }
-label {
-display: inline-block;
-min-width: 10em;
-}
-label.desc[for=deformField4] {
-    display: none;
-}
+
 #deformsubmit {
-margin-left: 10.8em;
+margin-left: 154px;
 }
-input, textarea { 
+input, textarea, li.field p { 
+    width: 15em;
+    margin: 0.2em 0;
+    display: inline-block;
     padding: 9px;
     border: solid 1px #E5E5E5;
     outline: 0;
     font: normal 13px/100% Verdana, Tahoma, sans-serif;
-    width: 200px;
     background: -webkit-gradient(linear, left top, left 25, from(#FFFFFF), color-stop(4%, #FAFAFA), to(#FFFFFF));
     background: -moz-linear-gradient(top, #FFFFFF, #FAFAFA 1px, #FFFFFF 25px);
     box-shadow: rgba(0,0,0, 0.1) 0px 0px 2px;
     -moz-box-shadow: rgba(0,0,0, 0.1) 0px 0px 2px;
     -webkit-box-shadow: rgba(0,0,0, 0.1) 0px 0px 2px;
-    }
+}
+li.field p {
+color: #999;
+}
 
 textarea { 
     width: 400px;
@@ -227,7 +222,15 @@ input:focus, textarea:focus {
     }
 
 label { 
+    display: inline-block;
+    width: 140px;
     margin-left: 10px; 
     color: #555; 
-
     }
+ul li ul li label {
+padding-left: 18px;
+width: 120px;
+border-left: solid 2px #CCC;}
+
+
+
