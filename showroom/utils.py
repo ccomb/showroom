@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from pyramid_signup.managers import UserManager
 from ConfigParser import SafeConfigParser
 from os.path import isdir, join, dirname, exists
 from xmlrpclib import ServerProxy
@@ -464,7 +463,7 @@ def deploy(user, params):
         old_demo = InstalledDemo(user, app_name)
         old_user = old_demo.democonf.get('params', 'user')
         functions = join(PATHS['scripts'], 'functions.sh')
-        retcode = subprocess.call(['bash', '-c', 'source "%s" && source "%s" && export -f reconfigure_clone && bash -xce "reconfigure_clone \"%s\" %s"' % (functions, script, old_demo.name, old_demo.port, old_user)], cwd=demopath, env=env)
+        retcode = subprocess.call(['bash', '-c', 'source "%s" && source "%s" && export -f reconfigure_clone && bash -xce "reconfigure_clone \"%s\" %s \"%s\""' % (functions, script, old_demo.name, old_demo.port, old_user)], cwd=demopath, env=env)
         if retcode != 0:
             shutil.rmtree(demopath)
             raise DeploymentError('installation ended with an error')
@@ -511,6 +510,7 @@ def deploy(user, params):
         supervisor.xmlrpc.supervisor.reloadConfig()
         supervisor.xmlrpc.supervisor.addProcessGroup(app_name)
 
+    # write the demo config file
     app_conf = SafeConfigParser()
     app_conf.read(app_conf_path)
     app_conf.set('params', 'name', app_name.encode('utf-8'))

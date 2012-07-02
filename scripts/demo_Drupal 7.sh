@@ -74,10 +74,17 @@ EOF
 function reconfigure_clone {
 # $1 is the old name, $2 is the old port, $3 is the old user
 sed -i "s/^\$db_url.*/\$db_url='mysql:\/\/$db_user:$db_pass@$db_host:$db_port\/$db_name';/" drupal/sites/default/settings.php
-sed -i "s/\/$1\//\/$name\//" apache2.conf
-sed -i "s/\/$3\//\/$user\//" apache2.conf
-sed -i "s/$2/$PORT/" apache2.conf
 sed -i "s/$(($2 + 1000))/$db_port/" start.sh
 sed -i "s/'port' => .*/'port' => '$db_port',/" drupal/sites/default/settings.php
+# recreate the Apache config
+cat > apache2.conf << EOF
+Listen $PORT
+NameVirtualHost *:$PORT
+<VirtualHost *:$PORT>
+ServerName localhost
+DocumentRoot $PWD/drupal
+#ErrorLog var/error.log
+</VirtualHost>
+EOF
 
 }
