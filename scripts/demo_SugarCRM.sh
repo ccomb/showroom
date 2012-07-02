@@ -1,5 +1,5 @@
 #!/bin/bash
-# PARAMS: name, username, password, usermail
+# PARAMS: name
 # sudo aptitude install php5-cli apache2 php5-imap php5-curl
 export db_host=127.0.0.1
 export db_port=$((PORT+1000))
@@ -52,5 +52,19 @@ EOF
 }
 
 function reconfigure_clone {
-echo
+# create the Apache config
+cat > apache2.conf << EOF
+Listen $PORT
+NameVirtualHost *:$PORT
+<VirtualHost *:$PORT>
+ServerName localhost
+DocumentRoot $PWD/sugar
+#ErrorLog var/error.log
+</VirtualHost>
+EOF
+# hack into install script!
+sed 3i\$_SESSION[\'setup_db_host_name\']=\'$db_host:$db_port\'\; -i sugar/install/dbConfig_a.php
+sed 4i\$_SESSION[\'setup_db_database_name\']=\'$db_name\'\; -i sugar/install/dbConfig_a.php
+sed 4i\$_SESSION[\'setup_db_admin_user_name\']=\'$db_user\'\; -i sugar/install/dbConfig_a.php
+sed 5i\$_SESSION[\'setup_db_admin_password\']=\'$db_pass\'\; -i sugar/install/dbConfig_a.php
 }
