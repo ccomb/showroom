@@ -90,6 +90,7 @@ div.WARNING {
     background: #ffe57f;
 }
 div.ERROR, div.error {
+    color: white;
     background: #EE436A;
 }
 /* supervisor statuses */
