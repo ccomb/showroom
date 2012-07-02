@@ -69,7 +69,7 @@ class Proxy(object):
                 break
 
         # get the user for this demo
-        admin_url = request.host_url.replace(demo_name+'.'+user_name, '')
+        admin_url = request.host_url.replace(demo_name+'.'+user_name+'.', '')
         try:
             demo = InstalledDemo(user_name, demo_name)
         except UnknownDemo:
