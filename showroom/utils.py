@@ -462,8 +462,9 @@ def deploy(user, params):
             subprocess.call(['cp', '-r', join(template_path, item), demopath])
         # run the clone reconfiguration script
         old_demo = InstalledDemo(user, app_name)
+        old_user = old_demo.democonf.get('params', 'user')
         functions = join(PATHS['scripts'], 'functions.sh')
-        retcode = subprocess.call(['bash', '-c', 'source "%s" && source "%s" && export -f reconfigure_clone && bash -xce "reconfigure_clone \"%s\" %s"' % (functions, script, old_demo.name, old_demo.port)], cwd=demopath, env=env)
+        retcode = subprocess.call(['bash', '-c', 'source "%s" && source "%s" && export -f reconfigure_clone && bash -xce "reconfigure_clone \"%s\" %s"' % (functions, script, old_demo.name, old_demo.port, old_user)], cwd=demopath, env=env)
         if retcode != 0:
             shutil.rmtree(demopath)
             raise DeploymentError('installation ended with an error')
@@ -514,6 +515,7 @@ def deploy(user, params):
     app_conf.read(app_conf_path)
     app_conf.set('params', 'name', app_name.encode('utf-8'))
     app_conf.set('params', 'port', str(port))
+    app_conf.set('params', 'user', user.encode('utf-8'))
     app_conf.remove_option('params', 'status')
     with open(app_conf_path, 'w+') as configfile:
         app_conf.write(configfile)
