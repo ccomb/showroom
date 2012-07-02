@@ -6,7 +6,7 @@ export db_port=$((PORT+1000))
 export db_name=sugar
 export db_user=sugar
 export db_pass=sugar
-export version=6.4.4
+export version=6.4.5
 export url=$REQUEST_HOST
 
 function first_install {
