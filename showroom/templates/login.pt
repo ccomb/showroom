@@ -17,6 +17,7 @@
     <h1>Log in</h1>
     <p>Log in to your Showroom to manage your demos<p>
     <form tal:replace="structure form"/>
+    <script>$('input[name="Username"]').focus();</script>
     <a href="${request.route_url('forgot_password')}">Forgot Password?</a>
   </div>
   <div class="subcontent">

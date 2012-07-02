@@ -16,6 +16,7 @@
   <h1>Sign up</h1>
     <p>Create a free account on Showroom to manage your demos!</p>
     <form tal:replace="structure form"/>
+    <script>$('input[name="Username"]').focus();</script>
 <a href="${request.route_url('home')}">Back to home</a>
 </div>
 </body>
