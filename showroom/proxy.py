@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from os.path import join, dirname, abspath
-from pyramid_signup.managers import UserManager
 from webob import Request, Response
 from webob.exc import HTTPFound
 from wsgiproxy.exactproxy import proxy_exact_request
@@ -70,10 +69,10 @@ class Proxy(object):
                 break
 
         # get the user for this demo
+        admin_url = request.host_url.replace(demo_name+'.'+user_name, '')
         try:
             demo = InstalledDemo(user_name, demo_name)
         except UnknownDemo:
-            admin_url = request.host_url.replace(demo_name+'.', '')
             message = (u'<html><body>'
                        u'This demo does not exist. You can create it though the '
                        u'<a href="%s">admin interface</a>'
@@ -84,7 +83,6 @@ class Proxy(object):
 
         # if the app is not running, tell it
         if demo.get_status() != 'RUNNING':
-            admin_url = request.host_url.replace(demo_name+'.', '')
             message = (u'<html><body>'
                        u'This demo is not running. You can start it from the '
                        u'<a href="%s">admin interface</a>'
