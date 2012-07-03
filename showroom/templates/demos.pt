@@ -75,7 +75,8 @@
         </a>
       </td>
       <td class="demo_title">
-        <a tal:attributes="href python: direct_url(demo, request)">
+        <a tal:attributes="href python: direct_url(demo, request)"
+           tal:condition="python:logged_in.username == 'admin' or request.host == 'localhost'">
             (direct link)
         </a>
       </td>
