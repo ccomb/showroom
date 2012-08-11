@@ -46,20 +46,23 @@ class Proxy(object):
         if ADMIN_HOST is None:
             ADMIN_HOST = request.host
 
-        splitted_host = request.host.split(':')[0].split('.')
-        hostname = request.host.split(':')[0]
+        # We parse this from the right : ['a.b.c', 'user', 'showroom', 'io']
+        splitted_host = request.host.split(':')[0].rsplit('.', 3)
 
-        if hostname == ADMIN_HOST:
-            # go to the admin interface
-            return self.app(environ, start_response)
-
-        if ADMIN_HOST not in hostname:
+        # bad domain?
+        if splitted_host.pop(-2) + '.' + splitted_host.pop() != ADMIN_HOST:
             # redirect to the configured hostname
+            hostname = request.host.split(':')[0]
             url = request.url.replace(hostname, ADMIN_HOST)
             response = HTTPFound(location=url)
             return response(environ, start_response)
 
-        demo_name, user_name = hostname[:-len(ADMIN_HOST)][:-1].rsplit('.',1)
+        # 'user.showroom' or 'showroom.io'
+        if len(splitted_host) <= 1:
+            # go to the admin interface
+            return self.app(environ, start_response)
+
+        demo_name, user_name = splitted_host
 
         # for a domain "a.b.c.com", first try "a.b.c", then "a.b" and "a" as a demo_name
         for i in range(1, len(splitted_host)):
