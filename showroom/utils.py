@@ -452,7 +452,8 @@ def deploy(user, params):
     # check whether we already have a template available
     template_name = app_type + '_' + '_' + b64encode(
       ','.join(['%s=%s' % (n.strip(), '\n'.join([i.strip() for i in str(v).split('\n')]))
-                for (n, v) in sorted(params.items()) if n not in ('name','login','user','password')]))
+                for (n, v) in sorted(params.items())
+                if n not in ('name','login','user','password','admin_passwd')]))
     template_path = join(PATHS['templates'], template_name)
 
     if os.path.exists(template_path):
