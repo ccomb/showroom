@@ -19,6 +19,7 @@ options.db_host = localhost
 options.db_port = $((PORT+1000))
 options.admin_passwd = $admin_password
 options.xmlrpc_port = $PORT
+options.netrpc = False
 
 [versions]
 MarkupSafe = 0.15
