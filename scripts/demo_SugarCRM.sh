@@ -47,7 +47,8 @@ sed 5i\$_SESSION[\'setup_db_admin_password\']=\'$db_pass\'\; -i sugar/install/db
 
 # create a startup script
 cat > start.sh << EOF
-exec /usr/sbin/mysqld --no-defaults --socket=$PWD/mysql/mysqld.sock --datadir=$PWD/mysql/ --log-error=$PWD/mysql/mysql-error.log --port=$db_port
+DIR=`pwd`
+exec /usr/sbin/mysqld --no-defaults --socket=$DIR/mysql/mysqld.sock --datadir=$DIR/mysql/ --log-error=$DIR/mysql/mysql-error.log --port=$db_port
 EOF
 }
 
