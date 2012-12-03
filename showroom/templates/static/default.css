@@ -68,6 +68,12 @@ form div span {
     border: solid 1px #555;
 }
 
+td.demo_instructions {
+    font-size: 100%;
+    padding: 0em 1em;
+    vertical-align: middle;
+    text-shadow: 0 1px 0 #CCC;
+}
 td.demo_title {
     font-size: 120%;
     padding: 0em 1em;

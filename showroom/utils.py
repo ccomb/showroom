@@ -179,11 +179,8 @@ class InstalledDemo(object):
         self.apache_config_dir = join(PATHS['var'], 'apache2', 'demos')
         self.apache_config_link = join(self.apache_config_dir,
                                        user + '.' + name + '.conf')
-        self.popup = None
-        self.popup_file = join(self.path, 'popup.html')
-        if self.has_popup:
-            with open(self.popup_file) as p:
-                self.popup = p.read()
+
+        self.howto_file = join(self.path, 'howto.html')
         # read the demo config
         self.democonf = SafeConfigParser()
         self.democonf_path = join(self.path, 'demo.conf')
@@ -195,6 +192,14 @@ class InstalledDemo(object):
             self.port = ''
         # get the real name of the demo
         self.name = self.democonf.get('params', 'name')
+        if self.democonf.has_option('params', 'type'):
+            self.type = self.democonf.get('params', 'type')
+        else:
+            self.type = 'Unknown'
+        if self.democonf.has_option('params', 'version'):
+            self.version = self.democonf.get('params', 'version')
+        else:
+            self.version = ''
 
         # init the supervisor
         self.supervisor = SuperVisor(self.user)
@@ -202,23 +207,7 @@ class InstalledDemo(object):
     has_startup_script = property(lambda self: os.path.exists(self.start_script))
     has_apache_link = property(lambda self: os.path.exists(self.apache_config_link))
     has_apache_conf = property(lambda self: os.path.exists(self.apache_config_file))
-    has_popup = property(lambda self: os.path.exists(self.popup_file))
-
-    @property
-    def is_popup_displayed(self):
-        """tells if the popup should be displayed
-        """
-        try:
-            return self.democonf.getboolean('params', 'displaypopup')
-        except Exception:
-            return True
-
-    def disable_popup(self):
-        """disable the popup
-        """
-        self.democonf.set('params', 'displaypopup', '0')
-        with open(self.democonf_path, 'w') as democonf_file:
-            self.democonf.write(democonf_file)
+    has_howto = property(lambda self: os.path.exists(self.howto_file))
 
     def get_status(self):
         """return the status of the demo
@@ -267,6 +256,15 @@ class InstalledDemo(object):
             return 'PARTIAL'
         else:
             return 'FATAL'
+
+    def howto(self):
+        """retrieve the howto
+        """
+        if self.has_howto:
+            with open(join(self.path, 'howto.html')) as howto_file:
+                return howto_file.read()
+        else:
+            return 'No specific instructions'
 
     def start(self):
         """start the demo
@@ -440,6 +438,7 @@ def deploy(user, params):
     app_conf.add_section('params')
     app_conf.set('params', 'port', str(port))
     app_conf.set('params', 'name', app_name.encode('utf-8'))
+    app_conf.set('params', 'type', app_type.encode('utf-8'))
     app_conf.set('params', 'status', 'DEPLOYING')
     for param_name, param_value in params.items():
         assert(param_name not in ('port', 'status'))

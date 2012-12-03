@@ -56,8 +56,8 @@ trap "kill \$web_pid; kill -1 \$openerp_pid; kill \$postgres_pid" EXIT
 cat
 EOF
 
-# create a popup for installation instruction
-cat > popup.html << EOF
+# create a howto for installation instruction
+cat > howto.html << EOF
 <p>To start using OpenERP, you must create a database. Do the following:</p>
 <ol>
     <li>Click on "Databases"</li>

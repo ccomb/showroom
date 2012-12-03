@@ -23,7 +23,7 @@
   <div id="header">
     <!-- logo -->
     <div id="logo">
-        <a href="${request.application_url}">
+        <a href="${request['admin_url']}">
             <img src="${request.application_url}/static/images/logo.png" alt="logo" />
         </a>
     </div>

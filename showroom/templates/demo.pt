@@ -1,0 +1,37 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="master.macros['master']">
+<head>
+  <title>Showroom</title>
+</head>
+
+<body>
+
+<!-- header -->
+<div id="header">
+
+  <!-- user -->
+  <div metal:fill-slot="header" id="user_ID">
+      <a href='/profile/${logged_in.pk}'>${logged_in.first_name} ${logged_in.last_name} (${logged_in.username})</a>
+      - 
+      <a href='${request.application_url}/logout'>Log out</a>
+  </div>
+</div>
+
+<div id="content" metal:fill-slot="content">
+
+  <h2>Demo of ${demo.type} ${demo.version} (${demo.name})</h2>
+
+TODO button start/stop/destroy
+
+  <h2>Instructions</h2>
+  <div style="margin-bottom: 2em" tal:content="structure howto">
+    howto
+  </div>
+
+</div>
+
+</body>
+</html>

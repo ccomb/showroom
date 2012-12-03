@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from os.path import join, dirname, abspath
 from webob import Request, Response
 from webob.exc import HTTPFound
 from wsgiproxy.exactproxy import proxy_exact_request
@@ -11,27 +10,6 @@ from showroom.utils import PATHS, ADMIN_HOST, InstalledDemo, UnknownDemo
 #logging.basicConfig(level=logging.DEBUG)
 LOG = logging.getLogger(__name__)
 
-CSS = '''
-<link href="/showroom_static/jquery/css/showroom/jquery-ui-1.8.16.custom.css" type="text/css" rel="stylesheet" />
-<link href="/showroom_static/popup.css" type="text/css" rel="stylesheet" />
-'''
-
-JS = '''
-<script type="text/javascript" src="/showroom_static/jquery/js/jquery-1.6.2.min.js"></script>
-<script type="text/javascript" src="/showroom_static/jquery/js/jquery-ui-1.8.16.custom.min.js"></script>
-<script type="text/javascript">
-    $.noConflict();
-    jQuery(document).ready(function($) {
-        $("#showroompopup").dialog({width: "40%%", title: 'Installation instructions'}).parents(".ui-dialog:eq(0)").wrap('<div id="showroomscope"></div>');
-        $('#showroompopup_hide form input').click(
-            function() {
-                $.get(window.location.protocol + '//' + window.location.host + '/?showroompopup_hide');
-                $("#showroompopup").parent().hide();
-            }
-        );
-    })
-</script>
-'''
 
 class Proxy(object):
     """ wsgi middleware that acts as a proxy, or redirects to the admin
@@ -99,26 +77,7 @@ class Proxy(object):
         request.path_info = path_info
         request.environ['SERVER_NAME'] = 'localhost'
         request.environ['SERVER_PORT'] = demo.port
-        # disable compression to be able to insert the js popup
-        request.environ['HTTP_ACCEPT_ENCODING'] = ''
         response = request.get_response(proxy_exact_request)
-
-        # disable the popup if asked
-        if 'showroompopup_hide' in environ['QUERY_STRING']:
-            demo.disable_popup()
-
-        # inject the information popup
-        content = demo.popup
-        if content is not None and demo.is_popup_displayed:
-            popup = open(join(abspath(dirname(__file__)),
-                              'templates', 'popup.html')).read() % content
-
-            if 'html' in (response.content_type or ''):
-                if '</body>' in response.body and '<head>' in response.body:
-                    response.body = response.body.replace('</head>', CSS + JS + '</head>')
-                    response.body = response.body.replace('</body>', popup + '</body>')
-                else:
-                    response.body = CSS + JS + response.body + popup
 
         return response(environ, start_response)
 

@@ -57,7 +57,7 @@ setup(name='showroom',
       [console_scripts]
       signup_setup = pyramid_signup.scripts.populate:main
       [paste.app_factory]
-      pyramid = showroom.run:showroom
+      admin = showroom.run:showroom
       [paste.filter_factory]
       proxy = showroom.proxy:make_filter
       """

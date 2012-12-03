@@ -1,21 +1,15 @@
 # coding: utf-8
 from os.path import join, abspath, dirname
-from pyramid.chameleon_zpt import get_template
-from pyramid.chameleon_zpt import render_template_to_response
+from pyramid.chameleon_zpt import get_template, render_template_to_response
 from pyramid.exceptions import NotFound
 from pyramid.i18n import TranslationStringFactory
 from pyramid.request import Response
 from pyramid.security import authenticated_userid
 from pyramid_signup.managers import UserManager
 from urlparse import urlsplit, urlunsplit
-from utils import ADMIN_HOST
-from utils import keep_working_dir
 from webob.exc import HTTPFound
-import deform
-import logging
-import os
+import os, deform, logging, subprocess
 import pyramid_signup.views
-import subprocess
 import utils
 
 LOG = logging.getLogger(__name__)
@@ -31,9 +25,9 @@ def proxied_url(demo, request):
     current_host = urlsplit(request.host_url)
     port = current_host.port
     if port is None:
-        host = ADMIN_HOST
+        host = utils.ADMIN_HOST
     else:
-        host = ADMIN_HOST + ':' + str(current_host.port)
+        host = utils.ADMIN_HOST + ':' + str(current_host.port)
     return urlunsplit(
         (current_host.scheme, demo['name'] + '.' + user.username + '.' + host, '/', '', ''))
 
@@ -45,7 +39,7 @@ def direct_url(demo, request):
         return "#"
     current_host = urlsplit(request.host_url)
     return urlunsplit(
-        (current_host.scheme, ADMIN_HOST + ':' + demo['port'], '/', '', ''))
+        (current_host.scheme, utils.ADMIN_HOST + ':' + demo['port'], '/', '', ''))
 
 def installed_demos(request):
     """ return the main page, with applications list, and actions.
@@ -161,6 +155,7 @@ class DemoController(object):
     def __init__(self, request):
         self.request = request
         self.user = authenticated_userid(self.request)
+        self.name = self.request.params.get('name', '').replace(' ', '_').lower() # FIXME?
         if self.user is not None:
             self.user = UserManager(request).get_by_pk(self.user)
 
@@ -170,7 +165,7 @@ class DemoController(object):
         params = dict(self.request.params.copy())
         if 'app' not in params or 'name' not in params:
             raise NotFound
-        name = params['name'] = params['name'].replace(' ', '_').lower() # FIXME
+        name = params['name'] = self.name
         if 'plugins' in params:
             params['plugins'] = ' '.join(params['plugins'].split())
         try:
@@ -188,8 +183,7 @@ class DemoController(object):
     def start(self):
         """ view that starts the demo
         """
-        name = self.request.params.get('name', '_')
-        demo = utils.InstalledDemo(self.user.username, name)
+        demo = utils.InstalledDemo(self.user.username, self.name)
     
         old_status = demo.get_status()
         message = u'Nothing changed'
@@ -209,8 +203,7 @@ class DemoController(object):
     def stop(self):
         """ view that stops a demo
         """
-        name = self.request.params.get('name', '_')
-        demo = utils.InstalledDemo(self.user.username, name)
+        demo = utils.InstalledDemo(self.user.username, self.name)
     
         old_status = demo.get_status()
         message = u'Nothing changed'
@@ -230,15 +223,14 @@ class DemoController(object):
     def destroy(self):
         """ Destroy a demo
         """
-        name = self.request.params['name']
         try:
-            utils.InstalledDemo(self.user.username, name).destroy()
+            utils.InstalledDemo(self.user.username, self.name).destroy()
         except Exception, e:
             message = 'Error: %s' % e.message
             self.request.session.flash(message, 'error')
             return HTTPFound(location='/')
     
-        self.request.session.flash('%s demo successfully deleted!' % name, 'success')
+        self.request.session.flash('%s demo successfully deleted!' % self.name, 'success')
         return HTTPFound(location='/')
 
 
@@ -283,12 +275,27 @@ class DemoController(object):
                     start = '#!/bin/bash\n'
                 content = start + content
                 s.seek(0); s.truncate(); s.write(content)
-            with keep_working_dir:
+            with utils.keep_working_dir:
                 os.chdir(demo.path)
                 subprocess.call(['chmod', '+x', script])
                 subprocess.call([script])
             os.rename(script, script + '.executed')
         return HTTPFound(location=getattr(self.request, 'referrer', False) or '/')
+
+    def howto(self):
+        """Display the howto for the demo
+        """
+        demo = utils.InstalledDemo(self.user.username, self.name)
+        return render_template_to_response(
+            join(abspath(dirname(__file__)), 'templates', 'demo.pt'),
+            master=get_template(join('templates', 'master.pt')),
+            request=self.request,
+            proxied_url=proxied_url,
+            howto=demo.howto(),
+            demo=demo,
+            supervisor=utils.SuperVisor(self.user).is_running,
+            logged_in=self.user,
+            )
 
 
 class MainController(object):

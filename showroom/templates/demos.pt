@@ -70,7 +70,8 @@
       </td>
       <td class="demo_title">
         <a tal:attributes="href python: proxied_url(demo, request)"
-           tal:content="python: demo.get('name')">
+           tal:content="python: demo.get('name')"
+           target="_new">
             app name
         </a>
       </td>
@@ -78,6 +79,11 @@
         <a tal:attributes="href python: direct_url(demo, request)"
            tal:condition="python:logged_in.username == 'admin' or request.host == 'localhost'">
             (direct link)
+        </a>
+      </td>
+      <td class="demo_instructions">
+        <a tal:attributes="href python: proxied_url(demo, request) + 'showroom_manage/howto?name=' + demo.get('name')">
+            (instructions)
         </a>
       </td>
       <td class="demo_button">

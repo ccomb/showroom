@@ -44,8 +44,8 @@ cat > start.sh << EOF
 exec zinstance/bin/runzope
 EOF
 
-# create a popup for installation instruction
-cat > popup.html << EOF
+# create a howto for installation instruction
+cat > howto.html << EOF
 <p>To start using CPS, you must create a CPS site. Do the following:</p>
 <ol>
     <li>Click on <a href="manage_main">Zope Management Interface</a> and connect with the password you chose</li>

@@ -47,7 +47,6 @@
          view_attr="destroy"
          view_permission="edit"
   />
-
   <route name="json_installed_demos"
          path="/json_installed_demos"
          view=".views.json_installed_demos"
@@ -61,21 +60,24 @@
          renderer="json"
          view_permission="edit"
   />
-
   <route name="app_scripts"
          path="/script"
          view=".views.DemoController"
          view_attr="app_script"
          view_permission="edit"
   />
-
   <route name="postinstall"
          path="/postinstall"
          view=".views.DemoController"
          view_attr="postinstall"
          view_permission="edit"
   />
-
+  <route name="howto"
+         path="/howto"
+         view=".views.DemoController"
+         view_attr="howto"
+         view_permission="view"
+  />
   <static
      name="static"
      path="templates/static"

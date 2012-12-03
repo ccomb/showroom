@@ -60,8 +60,8 @@ cat > start.sh << EOF
 exec /usr/sbin/mysqld --no-defaults --socket=./mysql/mysqld.sock --datadir=./mysql/ --log-error=./mysql/mysql-error.log --port=$((PORT+1000))
 EOF
 
-# create a popup for installation instruction
-cat > popup.html << EOF
+# create a howto for installation instruction
+cat > howto.html << EOF
 <p>To finish the Drupal installation, do the following:</p>
 <ol>
     <li>Visit the <a href="install.php">install.php</a> page.</li>

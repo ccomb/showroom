@@ -54,9 +54,9 @@ EOF
 #
 #bin/instance run bin/initialize.py
 
-# create a popup for installation instruction
+# create a howto for installation instruction
 cd ..
-cat > popup.html << EOF
+cat > howto.html << EOF
 <p>To start using Plone 3, you must create a plone site. Do the following:</p>
 <ol>
     <li>Click on <a href="manage_main">Zope Management Interface</a> and connect with the password you chose</li>

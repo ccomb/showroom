@@ -35,8 +35,8 @@ bin/runzeo -C etc/zeo.conf &
 exec bin/paster serve etc/karl.ini
 EOF
 
-# create a popup for installation instruction
-cat > popup.html << EOF
+# create a howto for installation instruction
+cat > howto.html << EOF
 <p>The initial user account is<br/>
 user : admin<br/>
 pass : admin</p>
