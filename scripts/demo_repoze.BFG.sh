@@ -12,9 +12,6 @@ sandbox/bin/pip install -i http://dist.repoze.org/bfg/current/simple --download-
 sandbox/bin/paster create -t bfg_starter bfg
 cd bfg
 
-# change the port used by default
-sed -i "s/port = 6543/port = $PORT/" "bfg.ini"
-
 # install our new application in the virtualenv
 ../sandbox/bin/python setup.py develop
 
@@ -29,6 +26,5 @@ EOF
 }
 
 function reconfigure_clone {
-cd bfg
-sed -i "s/^port =.*/port = $PORT/" "bfg.ini"
+echo
 }
