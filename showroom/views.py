@@ -57,7 +57,6 @@ def installed_demos(request):
             proxied_url=proxied_url,
             direct_url=direct_url,
             demos=utils.installed_demos(user.username),
-            supervisor=utils.SuperVisor(user.username).is_running,
             logged_in=user,
             )
     else:
@@ -66,7 +65,6 @@ def installed_demos(request):
             master=get_template('templates/master.pt'),
             request=request,
             apps=utils.available_demos(),
-            supervisor=None,
             logged_in=None,
             )
 
@@ -169,7 +167,8 @@ class DemoController(object):
         if 'plugins' in params:
             params['plugins'] = ' '.join(params['plugins'].split())
         try:
-            params['port'] = utils.get_available_port()
+            params['ip'] = utils.get_available_ip()
+            params['mac'] = utils.get_available_mac()
             utils.deploy(self.user.username, params)
         except utils.DeploymentError, e:
             self.request.session.flash(u"Error deploying %s : %s" % (name, e.message), 'error')
@@ -293,7 +292,6 @@ class DemoController(object):
             proxied_url=proxied_url,
             howto=demo.howto(),
             demo=demo,
-            supervisor=utils.SuperVisor(self.user).is_running,
             logged_in=self.user,
             )
 
@@ -304,23 +302,6 @@ class MainController(object):
         self.user = authenticated_userid(self.request)
         if self.user is not None:
             self.user = UserManager(request).get_by_pk(self.user)
-
-    def start_all(self):
-        """ view to start supervisor
-        """
-        try:
-            utils.SuperVisor(self.user.username).start()
-        except AssertionError:
-            message = u'Could not start supervisor. Please retry in a few seconds.'
-            self.request.session.flash(message, 'error')
-        return HTTPFound(location='/')
-    
-    
-    def stop_all(self):
-        """ view to stop supervisor and all demos
-        """
-        utils.SuperVisor(self.user.username).stop()
-        return HTTPFound(location='/')
 
 
 def add_macro(result, request):

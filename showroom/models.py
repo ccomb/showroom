@@ -22,3 +22,4 @@ class RootFactory(object):
         ]
         return defaultlist
 
+# TODO refactor everything and add SqlAlchemy models here (or any other db)

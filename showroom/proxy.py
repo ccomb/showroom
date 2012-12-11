@@ -75,7 +75,7 @@ class Proxy(object):
         request.content_length = len(request.body)
         path_info = urllib.quote(request.path_info)
         request.path_info = path_info
-        request.environ['SERVER_NAME'] = 'localhost'
+        request.environ['SERVER_NAME'] = demo.ip
         request.environ['SERVER_PORT'] = demo.port
         response = request.get_response(proxy_exact_request)
 

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from ConfigParser import SafeConfigParser
 from os.path import isdir, join, dirname, exists
-from xmlrpclib import ServerProxy
 from base64 import b64encode
 import logging
 import os
@@ -26,7 +25,6 @@ PATHS = {
   'templates' : join(PATH, CONFIG.get('paths', 'templates')),
   'var' : join(PATH, CONFIG.get('paths', 'var')),
   'etc' : join(PATH, CONFIG.get('paths', 'etc')),
-  'supervisor' : join(PATH, CONFIG.get('paths', 'supervisor')),
 }
 ADMIN_HOST = CONFIG.get('global', 'hostname')
 PROXY_HOST = CONFIG.get('global', 'proxy_host')
@@ -38,51 +36,6 @@ for d in PATHS:
     if not exists(directory) and not isdir(directory):
         os.makedirs(directory)
         LOG.info('%s created.', directory)
-
-
-class SuperVisor(object):
-    """class to manage the supervisor process
-    """
-    def __init__(self, user, configpath=None):
-        self.user = user
-        # connect to supervisor
-        if configpath is None:
-            self.configpath = PATHS['supervisor']
-        else:
-            self.configpath = configpath
-        supervisor_conf = SafeConfigParser()
-        supervisor_conf.read(self.configpath)
-        serverurl = supervisor_conf.get('supervisorctl', 'serverurl')
-        self.xmlrpc = ServerProxy(serverurl)
-
-    @property
-    def is_running(self):
-        try:
-            self.xmlrpc.supervisor.getPID()
-            return True
-        except:
-            return False
-
-    def start(self):
-        if self.is_running:
-            LOG.info(u'OK, supervisor was already running.')
-            return
-        else:
-            LOG.info(u'Starting supervisor...')
-            subprocess.Popen([join(PATH, 'bin', 'supervisord'),
-                              '-c', PATHS['supervisor']],
-                              close_fds=True).wait()
-        assert(self.is_running), "Could not start supervisor"
-
-    def stop(self):
-        # remove hard links for apache configs
-        for demo in installed_demos(self.user):
-            demo =  InstalledDemo(self.user, demo['name'])
-            if demo.has_apache_link:
-                demo._a2dissite(reload=False)
-        # shutdown supervisor and all demos
-        subprocess.Popen([join(PATH, 'bin', 'supervisorctl'),
-                          '-c', PATHS['supervisor'], 'shutdown']).wait()
 
 
 def daemon(user, name, command='restart'):
@@ -129,10 +82,11 @@ def available_demos(user=None):
                       if filename.startswith('demo_')
                       and filename.endswith('.sh')]:
         params = []
-        for line in open(join(PATHS['scripts'], filename)):
-            if line.split(':')[0].strip() == '# PARAMS':
-                # params looks like: ['name', 'version=6.26', 'plugins']
-                params = map(string.strip, line.strip().split(':')[1].split(','))
+        with open(join(PATHS['scripts'], filename)) as script:
+            for line in script:
+                if line.split(':')[0].strip() == '# PARAMS':
+                    # params looks like: ['name', 'version=6.26', 'plugins']
+                    params = map(string.strip, line.strip().split(':')[1].split(','))
 
         demos[(filename[5:-3])] = {'params':params}
     return demos
@@ -154,6 +108,8 @@ def installed_demos(user):
         demo_infos.append(dict(
             name=demo.name,
             port=demo.port,
+            ip=demo.ip,
+            mac=demo.mac,
             status = demo.get_status(),
             comment='',
             #comment=demo.get_comment()
@@ -186,6 +142,16 @@ class InstalledDemo(object):
         self.democonf_path = join(self.path, 'demo.conf')
         self.democonf.read(self.democonf_path)
         try:
+            self.mac = self.democonf.get('params', 'mac')
+        except:
+            LOG.warning(u'Demo %s seems broken: no mac' % self.name)
+            self.mac = ''
+        try:
+            self.ip = self.democonf.get('params', 'ip')
+        except:
+            LOG.warning(u'Demo %s seems broken: no ip' % self.name)
+            self.ip = ''
+        try:
             self.port = self.democonf.get('params', 'port')
         except:
             LOG.warning(u'Demo %s seems broken: no port' % self.name)
@@ -200,9 +166,7 @@ class InstalledDemo(object):
             self.version = self.democonf.get('params', 'version')
         else:
             self.version = ''
-
-        # init the supervisor
-        self.supervisor = SuperVisor(self.user)
+        self.container_name = '_'.join([self.user, self.name])
 
     has_startup_script = property(lambda self: os.path.exists(self.start_script))
     has_apache_link = property(lambda self: os.path.exists(self.apache_config_link))
@@ -211,51 +175,14 @@ class InstalledDemo(object):
 
     def get_status(self):
         """return the status of the demo
-        We use the same status as supervisor
+        We use the same status as lxc
         """
-        if not os.path.exists(self.path):
-            return 'DESTROYED'
-        app_conf_path = join(PATHS['demos'], self.user, self.name, 'demo.conf')
-        if os.path.exists(app_conf_path):
-            app_conf = SafeConfigParser()
-            app_conf.read(app_conf_path)
-            if app_conf.has_section('params') \
-            and app_conf.has_option('params', 'status'):
-                return app_conf.get('params', 'status') # XXX unused?
-        if self.port is '':
-            return 'FATAL'
+        # get the status of the lxc container if any
+        status = subprocess.check_output(
+            ['lxc-info', '-n', self.container_name]
+            ).splitlines()[0].split(':')[1].strip()
+        return status
 
-        statuses = set()
-        democontent = os.listdir(self.path)
-        
-        # get the status of the process monitored by supervisor if any
-        if 'supervisor.cfg' in democontent:
-            try:
-                status = self.supervisor.xmlrpc.supervisor.getProcessInfo(self.name)['statename']
-            except:
-                status = 'UNKNOWN'
-            statuses.add(status)
-
-        # get the status of apache
-        if 'apache2.conf' in democontent:
-            # unless Apache is stopped
-            try:
-                status = self.supervisor.xmlrpc.supervisor.getProcessInfo('apache2')['statename']
-            except:
-                status = 'UNKNOWN'
-            # consider apache running if we have a link
-            if status == 'RUNNING' and not self.has_apache_link:
-                status = 'STOPPED'
-            statuses.add(status)
-
-        if len(statuses) == 1:
-            # consistent state
-            return statuses.pop()
-        elif len(statuses) > 1 and 'RUNNING' in statuses:
-            # half started!
-            return 'PARTIAL'
-        else:
-            return 'FATAL'
 
     def howto(self):
         """retrieve the howto
@@ -270,21 +197,22 @@ class InstalledDemo(object):
         """start the demo
         """
         if self.has_startup_script:
-            self.supervisor.xmlrpc.supervisor.startProcess(self.name)
+            subprocess.Popen(
+                ['lxc-execute',
+                 '-n', self.container_name,
+                 '-f', 'lxc.conf',
+                 './start.sh'],
+                cwd=self.path)
         if self.has_apache_conf:
             self._a2ensite()
 
     def stop(self):
         """stop the demo
         """
-        if self.has_startup_script:
-            try:
-                self.supervisor.xmlrpc.supervisor.stopProcess(self.name)
-            except:
-                LOG.warning('Could not stop %s' % self.name)
+        if self.get_status() == 'RUNNING':
+            subprocess.Popen(['lxc-kill', '-n', self.container_name])
         if self.has_apache_link:
             self._a2dissite()
-        assert(self.get_status() != 'RUNNING'), "Stopping the demo failed"
 
     def _reload_apache(self):
         """reload apache config, or shutdown if it is not needed anymore
@@ -338,7 +266,6 @@ class InstalledDemo(object):
         if self.get_status() in ('RUNNING', 'STARTING'):
             self.stop()
         LOG.warn("removing demo %s" % self.name)
-        had_startup_script = self.has_startup_script
         if isdir(self.path):
             subprocess.call(['chmod', '-R', '777', self.path])
             shutil.rmtree(self.path)
@@ -347,15 +274,6 @@ class InstalledDemo(object):
         if not os.listdir(userpath):
             os.rmdir(userpath)
 
-        if had_startup_script:
-            try:
-                self.supervisor.xmlrpc.supervisor.removeProcessGroup(self.name)
-            except:
-                LOG.warning(u'Got error trying to remove %s' % self.name)
-            try:
-                self.supervisor.xmlrpc.supervisor.reloadConfig()
-            except:
-                LOG.warning(u'Got error trying to reload supervisor config')
 
     def garbage_collect_apache_confs(self):
         """delete apache config hard links if there is no associated demo
@@ -368,18 +286,35 @@ class InstalledDemo(object):
             if os.stat(apache_conf_path).st_nlink == 1:
                 os.remove(apache_conf_path)
 
-def get_available_port():
-    """ return the first available port
+def get_available_ip():
+    """ return the first available ip
+    FIXME improve
     """
     demos = []
     users = os.listdir(PATHS['demos'])
     for user in users:
         demos += installed_demos(user)
-    ports = [int(demo['port']) for demo in demos if demo['port'].isdigit()]
-    port = 20000
-    while port in ports:
-        port += 1
-    return port
+    ips = [int(demo['ip'].split('.')[3]) for demo in demos if demo['ip'].isdigit()]
+    ip = 1
+    while ip in ips:
+        ip += 1
+    assert(ip<254) # fixme
+    return '192.168.0.' + str(ip)
+
+def get_available_mac():
+    """ return the first available mac address
+    FIXME improve
+    """
+    demos = []
+    users = os.listdir(PATHS['demos'])
+    for user in users:
+        demos += installed_demos(user)
+    macs = [int(demo['mac'], 16) for demo in demos if demo['mac']!='']
+    mac = 0
+    while mac in macs:
+        mac += 1
+    assert(mac<254) # fixme
+    return hex(mac)[2:]
 
 
 class UnknownDemo(Exception):
@@ -442,7 +377,7 @@ def deploy(user, params):
     app_conf.set('params', 'status', 'DEPLOYING')
     for param_name, param_value in params.items():
         assert(param_name not in ('port', 'status'))
-        app_conf.set('params', param_name, param_value.encode('utf-8'))
+        app_conf.set('params', param_name, unicode(param_value).encode('utf-8'))
     app_conf_path = join(demopath, 'demo.conf')
     with open(app_conf_path, 'w+') as configfile:
         app_conf.write(configfile)
@@ -459,11 +394,11 @@ def deploy(user, params):
         for item in os.listdir(template_path):
             # XXX replace this waste of space with a btrfs subvolume
             subprocess.call(['cp', '-r', join(template_path, item), demopath])
-        # run the clone reconfiguration script
+        # run the demo reconfiguration script
         old_demo = InstalledDemo(user, app_name)
         old_user = old_demo.democonf.get('params', 'user')
         functions = join(PATHS['scripts'], 'functions.sh')
-        retcode = subprocess.call(['bash', '-c', 'source "%s" && source "%s" && export -f reconfigure_clone && bash -xce "reconfigure_clone \"%s\" %s \"%s\""' % (functions, script, old_demo.name, old_demo.port, old_user)], cwd=demopath, env=env)
+        retcode = subprocess.call(['bash', '-c', 'source "%s" && source "%s" && export -f reconfigure_demo && bash -xce "reconfigure_demo \"%s\" %s \"%s\""' % (functions, script, old_demo.name, old_demo.port, old_user)], cwd=demopath, env=env)
         if retcode != 0:
             shutil.rmtree(demopath)
             raise DeploymentError('installation ended with an error')
@@ -472,7 +407,7 @@ def deploy(user, params):
         # run the deployment script
         LOG.debug(script)
         functions = join(PATHS['scripts'], 'functions.sh')
-        retcode = subprocess.call(['bash', '-c', 'source "%s" && source "%s" && export -f first_install && bash -xce first_install' % (functions, script)], cwd=demopath, env=env)
+        retcode = subprocess.call(['bash', '-c', 'source "%s" && source "%s" && export -f create_template && bash -xce create_template' % (functions, script)], cwd=demopath, env=env)
         if retcode != 0:
             shutil.rmtree(demopath)
             raise DeploymentError('installation ended with an error')
@@ -491,25 +426,6 @@ def deploy(user, params):
             content = start + content
             s.seek(0); s.truncate(); s.write(content)
     
-    # add a supervisor include file for this program
-    start_script = join(demopath, 'start.sh')
-    if os.path.exists(start_script):
-        supervisor_conf = SafeConfigParser()
-        section = 'program:%s' % app_name
-        supervisor_conf.add_section(section)
-        supervisor_conf.set(section, 'command', start_script)
-        supervisor_conf.set(section, 'directory', demopath)
-        supervisor_conf.set(section, 'autostart', 'false')
-        supervisor_conf.set(section, 'autorestart', 'false')
-        supervisor_conf.set(section, 'startsecs', '2')
-        with open(join(demopath, 'supervisor.cfg'), 'w') as supervisor_file:
-            supervisor_conf.write(supervisor_file)
-    
-        # reload the supervisor config
-        supervisor = SuperVisor(user)
-        supervisor.xmlrpc.supervisor.reloadConfig()
-        supervisor.xmlrpc.supervisor.addProcessGroup(app_name)
-
     # write the demo config file
     app_conf = SafeConfigParser()
     app_conf.read(app_conf_path)
@@ -519,7 +435,21 @@ def deploy(user, params):
     app_conf.remove_option('params', 'status')
     with open(app_conf_path, 'w+') as configfile:
         app_conf.write(configfile)
+
     LOG.info('Finished deploying %s', app_name)
+
+    # create a container config
+    container_config = (
+        'lxc.utsname = bfg\n'
+        'lxc.network.type = veth\n'
+        'lxc.network.flags = up\n'
+        'lxc.network.link = br0\n'
+        'lxc.network.hwaddr = 0a:00:00:00:00:%(mac)s\n'
+        'lxc.network.ipv4 = %(ip)s/24\n'
+        % {'mac': params['mac'], 'ip': params['ip']}
+    )
+    with open(join(demopath, 'lxc.conf'), 'w+') as configfile:
+        configfile.write(container_config)
 
     # now save this app in a template for cloning
     if not os.path.exists(template_path):

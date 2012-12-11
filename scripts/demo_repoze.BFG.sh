@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-# PARAMS:name
+# PARAMS:name, port=6543
 
-function first_install {
+function create_template {
+
 # create a virtualenv
 virtualenv --no-site-packages --distribute sandbox
 
@@ -20,11 +21,11 @@ cd ..
 virtualenv --no-site-packages --distribute sandbox --relocatable
 
 cat > start.sh << EOF
-exec sandbox/bin/paster serve bfg/bfg.ini
+sandbox/bin/paster serve --daemon bfg/bfg.ini
 EOF
 
 }
 
-function reconfigure_clone {
-echo
+function reconfigure_demo {
+echo Nothing to do
 }
