@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+showroom_server_admin_access,showroom_server_admin_access,model_showroom_server,group_admin,1,1,1,1
+showroom_server_user_access,showroom_server_user_access,model_showroom_server,group_user,1,0,0,0

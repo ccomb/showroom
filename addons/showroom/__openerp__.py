@@ -33,7 +33,11 @@
     'depends': ['base'],
     'init_xml': [],
     'update_xml': [
-        'menu.xml'
+        'groups.xml',
+        'menu.xml',
+        'server/ir.model.access.csv',
+        'template/ir.model.access.csv',
+        'instance/ir.model.access.csv',
     ],
     'test': [],
     'demo_xml': [],
