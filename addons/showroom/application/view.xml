@@ -21,10 +21,10 @@
     <field name="arch" type="xml">
     <form string="Application" version="7.0">
         <header>
-            <button name="deploy" states="draft" string="Deploy" groups="showroom.group_user"/>
+            <button name="deploy" states="draft" string="Deploy" groups="showroom.group_user" class="oe_highlight"/>
             <button name="deploy_ok" states="deploy" string="Simulate deploy OK" groups="showroom.group_user"/>
             <button name="deploy_failed" states="deploy" string="Simulate deploy Failed" groups="showroom.group_user"/>
-            <button name="start" states="stopped" string="Start" groups="showroom.group_user"/>
+            <button name="start" states="stopped" string="Start" groups="showroom.group_user" class="oe_highlight"/>
             <button name="stop" states="running" string="Stop" groups="showroom.group_user"/>
             <button name="destroy" states="stopped" string="Destroy" groups="showroom.group_user"/>
             <field name="state" widget="statusbar" statusbar_visible="draft,deploy,stopped,running"
