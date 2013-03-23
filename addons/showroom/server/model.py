@@ -8,7 +8,7 @@ class Server(osv.Model):
 
     _columns = {
         'name': fields.char(
-            'Label',
+            'Name',
             size=64,
             help='Hostname of the server'),
         'application_ids': fields.one2many(

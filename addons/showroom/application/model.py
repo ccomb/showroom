@@ -28,3 +28,7 @@ class Application(osv.Model):
             'Type',
             help='Type of app'),
     }
+
+    _defaults = {
+        'user_id': lambda self, cr, uid, context: uid,
+    }

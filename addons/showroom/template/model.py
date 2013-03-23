@@ -17,5 +17,3 @@ class Template(osv.Model):
             'Current applications',
             help='Current applications for this template'),
     }
-
-

@@ -9,10 +9,10 @@
     <form string="Application">
         <group colspan="4" col="2">
             <field name="name" select="1"/>
-            <field name="host_id"/>
-            <field name="user_id"/>
-            <field name="permanent"/>
             <field name="template_id"/>
+            <field name="host_id"/>
+            <field name="user_id" groups="showroom.group_admin"/>
+            <field name="permanent"/>
         </group>
     </form>
     </field>
