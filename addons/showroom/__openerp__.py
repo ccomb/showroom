@@ -1,14 +1,14 @@
 #==============================================================================
 #                                                                             =
 #    showroom module for OpenERP, showroom
-#    Copyright (C) 2013 Gorfou (<http://http://gorfou.fr>) 
+#    Copyright (C) 2013 Gorfou (<http://http://gorfou.fr>)
 #                         Christophe Combelles <ccomb@gorfou.fr>
 #                                                                             =
 #    This file is a part of showroom
 #                                                                             =
 #    showroom is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License v3 or later
-#    as published by the Free Software Foundation, either version 3 of the 
+#    as published by the Free Software Foundation, either version 3 of the
 #    License, or (at your option) any later version.
 #                                                                             =
 #    showroom is distributed in the hope that it will be useful,
@@ -26,13 +26,15 @@
     'version': '0.1',
     'category': 'showroom',
     'description': """
-    showroom
+    Demo management application
     """,
     'author': 'Christophe Combelles',
     'website': 'http://gorfou.fr',
     'depends': ['base'],
     'init_xml': [],
-    'update_xml': [],
+    'update_xml': [
+        'menu.xml'
+    ],
     'test': [],
     'demo_xml': [],
     'installable': True,
@@ -40,4 +42,3 @@
     'auto_install': True,
     'license': 'AGPL-3',
 }
-
