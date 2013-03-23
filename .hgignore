@@ -1,3 +1,6 @@
 sandbox/
 develop-eggs/
 bin/
+parts/
+etc/
+.installed.cfg
