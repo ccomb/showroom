@@ -22,7 +22,7 @@
 #                                                                             =
 #==============================================================================
 {
-    'name': 'showroom',
+    'name': 'Showroom',
     'version': '0.1',
     'category': 'showroom',
     'description': """
@@ -34,7 +34,7 @@
     'init_xml': [],
     'update_xml': [
         'groups.xml',
-        'menu.xml',
+        'view.xml',
         'server/ir.model.access.csv',
         'template/ir.model.access.csv',
         'instance/ir.model.access.csv',
