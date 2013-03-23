@@ -22,11 +22,13 @@
 
 <act_window id="act_server_list"
     name="Server list"
+    groups="group_admin"
     res_model="showroom.server" />
 
 <menuitem id="menu_servers"
     name="Servers"
     parent="menu_showroom"
+    groups="group_admin"
     sequence="10" />
     <menuitem id="server_list"
         name="Server list"

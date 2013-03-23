@@ -18,11 +18,13 @@
 
 <act_window id="act_template_list"
     name="Template list"
+    groups="group_admin"
     res_model="showroom.template" />
 
 <menuitem id="menu_templates"
     name="Templates"
     parent="menu_showroom"
+    groups="group_admin"
     sequence="20" />
     <menuitem id="template_list"
         name="Template list"
