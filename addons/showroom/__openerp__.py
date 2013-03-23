@@ -43,6 +43,7 @@
         'template/view.xml',
         'application/ir.model.access.csv',
         'application/view.xml',
+        'application/workflow.xml',
         'data/company.xml',
         'data/user.xml',
     ],

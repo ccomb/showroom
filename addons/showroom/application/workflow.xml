@@ -1,0 +1,104 @@
+<openerp> <data>
+
+<record model="workflow" id="workflow_application">
+  <field name="activities"/>
+  <field name="name">Showroom application workflow</field>
+  <field name="on_create" eval="1"/>
+  <field name="osv">showroom.application</field>
+</record>
+
+<record model="workflow.activity" id="activity_deploy">
+  <field name="flow_start" eval="0"/>
+  <field name="flow_stop" eval="0"/>
+  <field name="in_transitions"/>
+  <field name="join_mode">XOR</field>
+  <field name="kind">dummy</field>
+  <field name="name">deploy</field>
+  <field name="out_transitions"/>
+  <field name="split_mode">XOR</field>
+  <field name="wkf_id" ref="workflow_application"/>
+</record>
+<record model="workflow.activity" id="activity_draft">
+  <field name="flow_start" eval="1"/>
+  <field name="flow_stop" eval="0"/>
+  <field name="in_transitions"/>
+  <field name="join_mode">XOR</field>
+  <field name="kind">dummy</field>
+  <field name="name">draft</field>
+  <field name="out_transitions"/>
+  <field name="split_mode">XOR</field>
+  <field name="wkf_id" ref="workflow_application"/>
+</record>
+<record model="workflow.activity" id="activity_running">
+  <field name="flow_start" eval="0"/>
+  <field name="flow_stop" eval="0"/>
+  <field name="in_transitions"/>
+  <field name="join_mode">XOR</field>
+  <field name="kind">dummy</field>
+  <field name="name">running</field>
+  <field name="out_transitions"/>
+  <field name="split_mode">XOR</field>
+  <field name="wkf_id" ref="workflow_application"/>
+</record>
+<record model="workflow.activity" id="activity_stopped">
+  <field name="flow_start" eval="0"/>
+  <field name="flow_stop" eval="0"/>
+  <field name="in_transitions"/>
+  <field name="join_mode">XOR</field>
+  <field name="kind">dummy</field>
+  <field name="name">stopped</field>
+  <field name="out_transitions"/>
+  <field name="split_mode">XOR</field>
+  <field name="wkf_id" ref="workflow_application"/>
+</record>
+
+<record model="workflow.transition" id="transition_deploy_ok">
+  <field name="act_from" ref="activity_deploy"/>
+  <field name="act_to" ref="activity_stopped"/>
+  <field name="condition">True</field>
+  <field name="group_id" ref="showroom.group_user"/>
+  <field name="signal">deploy_ok</field>
+  <field name="wkf_id" ref="workflow_application"/>
+</record>
+<record model="workflow.transition" id="transition_deploy_failed">
+  <field name="act_from" ref="activity_deploy"/>
+  <field name="act_to" ref="activity_draft"/>
+  <field name="condition">True</field>
+  <field name="group_id" ref="showroom.group_user"/>
+  <field name="signal">deploy_failed</field>
+  <field name="wkf_id" ref="workflow_application"/>
+</record>
+<record model="workflow.transition" id="transition_deploy">
+  <field name="act_from" ref="activity_draft"/>
+  <field name="act_to" ref="activity_deploy"/>
+  <field name="condition">True</field>
+  <field name="signal">deploy</field>
+  <field name="wkf_id" ref="workflow_application"/>
+</record>
+<record model="workflow.transition" id="transition_stop">
+  <field name="act_from" ref="activity_running"/>
+  <field name="act_to" ref="activity_stopped"/>
+  <field name="condition">True</field>
+  <field name="group_id" ref="showroom.group_user"/>
+  <field name="signal">stop</field>
+  <field name="wkf_id" ref="workflow_application"/>
+</record>
+<record model="workflow.transition" id="transition_start">
+  <field name="act_from" ref="activity_stopped"/>
+  <field name="act_to" ref="activity_running"/>
+  <field name="condition">True</field>
+  <field name="group_id" ref="showroom.group_user"/>
+  <field name="signal">start</field>
+  <field name="wkf_id" ref="workflow_application"/>
+</record>
+<record model="workflow.transition" id="transition_destroy">
+  <field name="act_from" ref="activity_stopped"/>
+  <field name="act_to" ref="activity_draft"/>
+  <field name="condition">True</field>
+  <field name="group_id" ref="showroom.group_user"/>
+  <field name="signal">destroy</field>
+  <field name="wkf_id" ref="workflow_application"/>
+</record>
+
+</data> </openerp>
+
