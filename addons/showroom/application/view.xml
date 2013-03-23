@@ -1,12 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp><data>
 
+<record id="view_application_tree" model="ir.ui.view">
+    <field name="name">showroom.application.tree</field>
+    <field name="model">showroom.application</field>
+    <field name="priority" eval="8"/>
+    <field name="arch" type="xml">
+    <tree string="Applications" colors="red: state=='stopped';green:state=='running';orange:state=='deploy'">
+        <field name="name"/>
+        <field name="template_id"/>
+        <field name="state"/>
+    </tree>
+    </field>
+</record>
+
 <record id="view_application_form" model="ir.ui.view">
     <field name="name">showroom.application.form</field>
     <field name="model">showroom.application</field>
     <field name="priority" eval="8"/>
     <field name="arch" type="xml">
     <form string="Application" version="7.0">
+        <header>
+            <button name="deploy" states="draft" string="Deploy" groups="showroom.group_user"/>
+            <button name="deploy_ok" states="deploy" string="Simulate deploy OK" groups="showroom.group_user"/>
+            <button name="deploy_failed" states="deploy" string="Simulate deploy Failed" groups="showroom.group_user"/>
+            <button name="start" states="stopped" string="Start" groups="showroom.group_user"/>
+            <button name="stop" states="running" string="Stop" groups="showroom.group_user"/>
+            <button name="destroy" states="stopped" string="Destroy" groups="showroom.group_user"/>
+            <field name="state" widget="statusbar" statusbar_visible="draft,deploy,stopped,running"
+                   statusbar_colors='{"draft": "blue", "deploy": "orange", "stopped":"red", "running":"green"}'/>
+        </header>
         <sheet>
             <group colspan="4" col="1">
                 <label string="Give a name to your application" class="oe_edit_only"/>

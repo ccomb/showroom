@@ -12,8 +12,9 @@
   <field name="flow_stop" eval="0"/>
   <field name="in_transitions"/>
   <field name="join_mode">XOR</field>
-  <field name="kind">dummy</field>
+  <field name="kind">function</field>
   <field name="name">deploy</field>
+  <field name="action">deploy()</field>
   <field name="out_transitions"/>
   <field name="split_mode">XOR</field>
   <field name="wkf_id" ref="workflow_application"/>
@@ -23,7 +24,8 @@
   <field name="flow_stop" eval="0"/>
   <field name="in_transitions"/>
   <field name="join_mode">XOR</field>
-  <field name="kind">dummy</field>
+  <field name="kind">function</field>
+  <field name="action">draft()</field>
   <field name="name">draft</field>
   <field name="out_transitions"/>
   <field name="split_mode">XOR</field>
@@ -34,7 +36,8 @@
   <field name="flow_stop" eval="0"/>
   <field name="in_transitions"/>
   <field name="join_mode">XOR</field>
-  <field name="kind">dummy</field>
+  <field name="kind">function</field>
+  <field name="action">start()</field>
   <field name="name">running</field>
   <field name="out_transitions"/>
   <field name="split_mode">XOR</field>
@@ -45,7 +48,8 @@
   <field name="flow_stop" eval="0"/>
   <field name="in_transitions"/>
   <field name="join_mode">XOR</field>
-  <field name="kind">dummy</field>
+  <field name="kind">function</field>
+  <field name="action">stop()</field>
   <field name="name">stopped</field>
   <field name="out_transitions"/>
   <field name="split_mode">XOR</field>
