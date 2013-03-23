@@ -41,6 +41,7 @@
         'template/view.xml',
         'application/ir.model.access.csv',
         'application/view.xml',
+        'data/company.xml',
     ],
     'test': [],
     'demo_xml': [],
