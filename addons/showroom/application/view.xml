@@ -21,7 +21,7 @@
     <menuitem id="menu_applications"
         name="Applications"
         parent="menu_showroom"
-        sequence="10" />
+        sequence="30" />
         <menuitem id="application_list"
             name="Application list"
             parent="menu_applications"

@@ -9,7 +9,7 @@
     <form string="Template">
         <group colspan="4" col="2">
             <field name="name" select="1"/>
-            <field name="application_ids"/>
+            <field name="application_ids" readonly="1"/>
         </group>
     </form>
     </field>
@@ -18,7 +18,7 @@
     <menuitem id="menu_templates"
         name="Templates"
         parent="menu_showroom"
-        sequence="10" />
+        sequence="20" />
         <menuitem id="template_list"
             name="Template list"
             parent="menu_templates"
