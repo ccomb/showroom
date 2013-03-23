@@ -10,7 +10,11 @@
         <sheet>
             <label string="Name of the template" class="oe_edit_only"/>
             <h1><field name="name" select="1"/></h1>
-            <field name="application_ids" readonly="1" groups="showroom.group_admin"/>
+            <notebook>
+                <page string="Applications">
+                    <field name="application_ids" readonly="1" groups="showroom.group_admin"/>
+                </page>
+            </notebook>
         </sheet>
     </form>
     </field>
