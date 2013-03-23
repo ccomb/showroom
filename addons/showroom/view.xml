@@ -1,39 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp><data>
 
-<act_window id="act_server_list"
-    name="Server list"
-    res_model="showroom.server" />
-<act_window id="act_template_list"
-    name="Template list"
-    res_model="showroom.template" />
-<act_window id="act_application_list"
-    name="Application list"
-    res_model="showroom.application" />
-
-
 <menuitem id="menu_showroom"
     name="My Showroom"
     sequence="1" />
-    <menuitem id="menu_templates"
-        name="Templates"
-        parent="menu_showroom"
-        sequence="2" />
-        <menuitem id="template_list"
-            name="Template list"
-            parent="menu_templates"
-            sequence="10"
-            action="act_template_list" />
-
-    <menuitem id="menu_applications"
-        name="My apps"
-        parent="menu_showroom"
-        sequence="3" />
-        <menuitem id="application_list"
-            name="App list"
-            parent="menu_applications"
-            sequence="10"
-            action="act_application_list" />
-
 
 </data> </openerp>

@@ -9,20 +9,24 @@
     <form string="Server">
         <group colspan="4" col="2">
             <field name="name" select="1"/>
-            <field name="application_ids" readonly="1"/>
+            <field name="application_ids" readonly="1" groups="showroom.group_admin"/>
         </group>
     </form>
     </field>
 </record>
 
-    <menuitem id="menu_servers"
-        name="Servers"
-        parent="menu_showroom"
-        sequence="10" />
-        <menuitem id="server_list"
-            name="Server list"
-            parent="menu_servers"
-            sequence="10"
-            action="act_server_list" />
+<act_window id="act_server_list"
+    name="Server list"
+    res_model="showroom.server" />
+
+<menuitem id="menu_servers"
+    name="Servers"
+    parent="menu_showroom"
+    sequence="10" />
+    <menuitem id="server_list"
+        name="Server list"
+        parent="menu_servers"
+        sequence="10"
+        action="act_server_list" />
 
 </data> </openerp>

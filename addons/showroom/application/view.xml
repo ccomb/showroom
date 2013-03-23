@@ -6,27 +6,46 @@
     <field name="model">showroom.application</field>
     <field name="priority" eval="8"/>
     <field name="arch" type="xml">
-    <form string="Application">
-        <group colspan="4" col="2">
-            <field name="name" select="1"/>
-            <field name="template_id"/>
-            <field name="host_id"/>
-            <field name="user_id" groups="showroom.group_admin"/>
-            <field name="permanent"/>
-        </group>
+    <form string="Application" version="7.0">
+        <sheet>
+            <group colspan="4" col="1">
+                <label string="Give a name to your application" class="oe_edit_only"/>
+                <h1><field name="name" default_focus="1" placeholder="Name of your application"/></h1>
+            </group>
+            <group colspan="4" col="2">
+                <field name="template_id" placeholder="Select the type of application"/>
+                <field name="host_id" readonly="1"/>
+                <field name="user_id" groups="showroom.group_admin"/>
+                <field name="permanent"/>
+            </group>
+        </sheet>
     </form>
     </field>
 </record>
 
-    <menuitem id="menu_applications"
-        name="Applications"
-        parent="menu_showroom"
-        sequence="30" />
-        <menuitem id="application_list"
-            name="Application list"
-            parent="menu_applications"
-            sequence="10"
-            action="act_application_list" />
+<record id="action_application_list" model="ir.actions.act_window">
+    <field name="name">Applications</field>
+    <field name="res_model">showroom.application</field>
+    <field name="view_type">form</field>
+    <field name="view_mode">tree,form</field>
+    <field name="domain">[('user_id', '=', uid)]</field>
+    <field name="help" type="html">
+      <p class="oe_view_nocontent_create">
+        Click to create your first application.
+      </p>
+    </field>
+</record>
+
+
+<menuitem id="menu_applications"
+    name="Applications"
+    parent="menu_showroom"
+    sequence="30" />
+    <menuitem id="application_list"
+        name="My applications"
+        parent="menu_applications"
+        sequence="10"
+        action="action_application_list" />
 
 </data> </openerp>
 

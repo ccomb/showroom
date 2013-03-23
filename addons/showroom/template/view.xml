@@ -15,15 +15,19 @@
     </field>
 </record>
 
-    <menuitem id="menu_templates"
-        name="Templates"
-        parent="menu_showroom"
-        sequence="20" />
-        <menuitem id="template_list"
-            name="Template list"
-            parent="menu_templates"
-            sequence="10"
-            action="act_template_list" />
+<act_window id="act_template_list"
+    name="Template list"
+    res_model="showroom.template" />
+
+<menuitem id="menu_templates"
+    name="Templates"
+    parent="menu_showroom"
+    sequence="20" />
+    <menuitem id="template_list"
+        name="Template list"
+        parent="menu_templates"
+        sequence="10"
+        action="act_template_list" />
 
 </data> </openerp>
 

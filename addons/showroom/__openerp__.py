@@ -29,8 +29,11 @@
     Demo management application
     """,
     'author': 'Christophe Combelles',
-    'website': 'http://gorfou.fr',
-    'depends': ['base'],
+    'website': 'http://showroom.io',
+    'depends': [
+        'base',
+        'account',
+    ],
     'init_xml': [],
     'update_xml': [
         'groups.xml',
