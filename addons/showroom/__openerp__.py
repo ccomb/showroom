@@ -32,7 +32,7 @@
     'website': 'http://showroom.io',
     'depends': [
         'base',
-        'account',
+        #'account',
     ],
     'data': [
         'groups.xml',
@@ -47,7 +47,12 @@
         'data/user.xml',
     ],
     'test': [],
-    'demo': [],
+    'css': ['static/src/css/showroom.css'],
+    'js': [],
+    'qweb': [],
+    'demo': [
+        'demo/user.xml',
+    ],
     'installable': True,
     'application': True,
     'auto_install': True,
