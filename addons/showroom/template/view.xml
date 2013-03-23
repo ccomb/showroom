@@ -18,7 +18,6 @@
 
 <act_window id="act_template_list"
     name="Template list"
-    groups="group_admin"
     res_model="showroom.template" />
 
 <menuitem id="menu_templates"
