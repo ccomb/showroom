@@ -29,6 +29,21 @@ class Application(osv.Model):
             help='Type of app'),
     }
 
+    def _choose_server(self, cr, uid, ids, context=None):
+        """ Select an available server for the application
+        """
+        server_obj = self.pool.get('showroom.server')
+        server_ids = server_obj.search(cr, uid, [])
+        chosen_server = None
+        for server in server_obj.browse(cr, uid, server_ids):
+            if len(server.application_ids) < server.max_applications:
+                chosen_server = server.id
+        if chosen_server is None:
+            raise osv.except_osv(
+                'Error',
+                'No more available server now. Please retry later.')
+        return chosen_server
+
     _defaults = {
         'user_id': lambda self, cr, uid, context: uid,
     }
