@@ -28,14 +28,13 @@
     'description': """
     Demo management application
     """,
-    'author': 'Christophe Combelles',
+    'author': 'Gorfou',
     'website': 'http://showroom.io',
     'depends': [
         'base',
         'account',
     ],
-    'init_xml': [],
-    'update_xml': [
+    'data': [
         'groups.xml',
         'view.xml',
         'server/view.xml',
@@ -45,9 +44,10 @@
         'application/ir.model.access.csv',
         'application/view.xml',
         'data/company.xml',
+        'data/user.xml',
     ],
     'test': [],
-    'demo_xml': [],
+    'demo': [],
     'installable': True,
     'application': True,
     'auto_install': True,

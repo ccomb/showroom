@@ -6,11 +6,12 @@
     <field name="model">showroom.template</field>
     <field name="priority" eval="8"/>
     <field name="arch" type="xml">
-    <form string="Template">
-        <group colspan="4" col="2">
-            <field name="name" select="1"/>
-            <field name="application_ids" readonly="1"/>
-        </group>
+    <form string="Template" version="7.0">
+        <sheet>
+            <label string="Name of the template" class="oe_edit_only"/>
+            <h1><field name="name" select="1"/></h1>
+            <field name="application_ids" readonly="1" groups="showroom.group_admin"/>
+        </sheet>
     </form>
     </field>
 </record>
