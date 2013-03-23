@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp><data>
+
+<record id="view_application_form" model="ir.ui.view">
+    <field name="name">showroom.application.form</field>
+    <field name="model">showroom.application</field>
+    <field name="priority" eval="8"/>
+    <field name="arch" type="xml">
+    <form string="Application">
+        <group colspan="4" col="2">
+            <field name="name" select="1"/>
+            <field name="host_id"/>
+            <field name="user_id"/>
+            <field name="permanent"/>
+            <field name="template_id"/>
+        </group>
+    </form>
+    </field>
+</record>
+
+    <menuitem id="menu_applications"
+        name="Applications"
+        parent="menu_showroom"
+        sequence="10" />
+        <menuitem id="application_list"
+            name="Application list"
+            parent="menu_applications"
+            sequence="10"
+            action="act_application_list" />
+
+</data> </openerp>
+

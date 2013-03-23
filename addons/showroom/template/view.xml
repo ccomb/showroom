@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp><data>
+
+<record id="view_template_form" model="ir.ui.view">
+    <field name="name">showroom.template.form</field>
+    <field name="model">showroom.template</field>
+    <field name="priority" eval="8"/>
+    <field name="arch" type="xml">
+    <form string="Template">
+        <field name="name" select="1"/>
+        <field name="application_ids"/>
+    </form>
+    </field>
+</record>
+
+    <menuitem id="menu_templates"
+        name="Templates"
+        parent="menu_showroom"
+        sequence="10" />
+        <menuitem id="template_list"
+            name="Template list"
+            parent="menu_templates"
+            sequence="10"
+            action="act_template_list" />
+
+</data> </openerp>
+
