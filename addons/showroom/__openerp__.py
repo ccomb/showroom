@@ -35,9 +35,12 @@
     'update_xml': [
         'groups.xml',
         'view.xml',
+        'server/view.xml',
         'server/ir.model.access.csv',
         'template/ir.model.access.csv',
-        'instance/ir.model.access.csv',
+        'template/view.xml',
+        'application/ir.model.access.csv',
+        'application/view.xml',
     ],
     'test': [],
     'demo_xml': [],

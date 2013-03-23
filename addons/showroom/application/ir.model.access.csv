@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+showroom_application_admin_access,showroom_application_admin_access,model_showroom_application,group_admin,1,1,1,1
+showroom_application_user_access,showroom_application_user_access,model_showroom_application,group_user,1,1,1,1

@@ -2,14 +2,14 @@ from openerp.osv import osv, fields
 
 
 class User(osv.Model):
-    """ Owner of the instance
+    """ Owner of the application
     """
     _inherit = 'res.users'
 
     _columns = {
-        'instance_ids': fields.one2many(
-            'showroom.instance',
+        'application_ids': fields.one2many(
+            'showroom.application',
             'user_id',
-            'Instances',
-            help='Your instances'),
+            'Applications',
+            help='Your applications'),
     }

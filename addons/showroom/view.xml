@@ -7,24 +7,14 @@
 <act_window id="act_template_list"
     name="Template list"
     res_model="showroom.template" />
-<act_window id="act_instance_list"
+<act_window id="act_application_list"
     name="Application list"
-    res_model="showroom.instance" />
+    res_model="showroom.application" />
 
 
 <menuitem id="menu_showroom"
     name="My Showroom"
     sequence="1" />
-    <menuitem id="menu_servers"
-        name="Servers"
-        parent="menu_showroom"
-        sequence="10" />
-        <menuitem id="server_list"
-            name="Server list"
-            parent="menu_servers"
-            sequence="10"
-            action="act_server_list" />
-
     <menuitem id="menu_templates"
         name="Templates"
         parent="menu_showroom"
@@ -35,15 +25,15 @@
             sequence="10"
             action="act_template_list" />
 
-    <menuitem id="menu_instances"
+    <menuitem id="menu_applications"
         name="My apps"
         parent="menu_showroom"
         sequence="3" />
-        <menuitem id="instance_list"
+        <menuitem id="application_list"
             name="App list"
-            parent="menu_instances"
+            parent="menu_applications"
             sequence="10"
-            action="act_instance_list" />
+            action="act_application_list" />
 
 
 </data> </openerp>

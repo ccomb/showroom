@@ -11,11 +11,11 @@ class Template(osv.Model):
             'Name',
             size=64,
             help='Name of the template'),
-        'instance_ids': fields.one2many(
-            'showroom.instance',
+        'application_ids': fields.one2many(
+            'showroom.application',
             'template_id',
-            'Current instances',
-            help='Current instances for this template'),
+            'Current applications',
+            help='Current applications for this template'),
     }
 
 

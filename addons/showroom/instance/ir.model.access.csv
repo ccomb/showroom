@@ -1,3 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-showroom_instance_admin_access,showroom_instance_admin_access,model_showroom_instance,group_admin,1,1,1,1
-showroom_instance_user_access,showroom_instance_user_access,model_showroom_instance,group_user,1,1,1,1

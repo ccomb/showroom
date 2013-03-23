@@ -1,27 +1,28 @@
 from openerp.osv import osv, fields
 
 
-class Instance(osv.Model):
-    """A demo instance
+class Application(osv.Model):
+    """A demo application
     """
-    _name = 'showroom.instance'
+    _name = 'showroom.application'
 
     _columns = {
         'name': fields.char(
             'Name',
             size=64,
-            help='Name of the instance'),
+            help='Name of the application'),
         'host_id': fields.many2one(
             'showroom.server',
             'Server',
-            help='Server on which the instance runs'),
+            help='Server on which the application runs'),
         'user_id': fields.many2one(
             'res.users',
             'Owner',
-            help='Owner of the instance'),
+            help='Owner of the application'),
         'permanent': fields.boolean(
             'Permanent',
-            help='Instance is permanent'),
+            help='Application is permanent',
+            readonly=True),
         'template_id': fields.many2one(
             'showroom.template',
             'Type',
