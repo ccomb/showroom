@@ -41,6 +41,7 @@
         'server/ir.model.access.csv',
         'template/ir.model.access.csv',
         'template/view.xml',
+        'template/workflow.xml',
         'application/ir.model.access.csv',
         'application/view.xml',
         'application/workflow.xml',

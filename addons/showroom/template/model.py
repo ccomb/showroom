@@ -2,7 +2,8 @@ from openerp.osv import osv, fields
 
 
 class Template(osv.Model):
-    """An application template
+    """An application template.
+    The template is installed locally then is deployed on hosts
     """
     _name = 'showroom.template'
 
