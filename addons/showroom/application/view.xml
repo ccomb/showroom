@@ -6,7 +6,7 @@
     <field name="model">showroom.application</field>
     <field name="priority" eval="8"/>
     <field name="arch" type="xml">
-    <tree string="Applications" colors="red: state=='stopped';green:state=='running';orange:state=='deploy'">
+    <tree string="Applications" colors="red: state=='stopped';green:state=='running';orange:state=='cloning'">
         <field name="name"/>
         <field name="template_id"/>
         <field name="state"/>
@@ -21,14 +21,22 @@
     <field name="arch" type="xml">
     <form string="Application" version="7.0">
         <header>
-            <button name="deploy" states="draft" string="Deploy" groups="showroom.group_user" class="oe_highlight"/>
-            <button name="deploy_ok" states="deploy" string="Simulate deploy OK" groups="showroom.group_user"/>
-            <button name="deploy_failed" states="deploy" string="Simulate deploy Failed" groups="showroom.group_user"/>
+            <button name="clone" states="draft" string="Install" groups="showroom.group_user" class="oe_highlight"/>
             <button name="start" states="stopped" string="Start" groups="showroom.group_user" class="oe_highlight"/>
             <button name="stop" states="running" string="Stop" groups="showroom.group_user"/>
             <button name="destroy" states="stopped" string="Destroy" groups="showroom.group_user"/>
-            <field name="state" widget="statusbar" statusbar_visible="draft,deploy,stopped,running"
-                   statusbar_colors='{"draft": "blue", "deploy": "orange", "stopped":"red", "running":"green"}'/>
+
+            <button name="clone_ok" states="cloning" string="Simulate clone OK" groups="showroom.group_user"/>
+            <button name="clone_failed" states="cloning" string="Simulate clone Failed" groups="showroom.group_user"/>
+            <button name="start_ok" states="starting" string="Simulate start OK" groups="showroom.group_user"/>
+            <button name="start_failed" states="starting" string="Simulate start Failed" groups="showroom.group_user"/>
+            <button name="stop_ok" states="stopping" string="Simulate stop OK" groups="showroom.group_user"/>
+            <button name="stop_failed" states="stopping" string="Simulate stop Failed" groups="showroom.group_user"/>
+            <button name="destroy_ok" states="destroying" string="Simulate destroy OK" groups="showroom.group_user"/>
+            <button name="destroy_failed" states="destroying" string="Simulate destroy Failed" groups="showroom.group_user"/>
+
+            <field name="state" widget="statusbar" statusbar_visible="draft,cloning,stopped,running"
+                   statusbar_colors='{"draft": "blue", "cloning": "orange", "stopped":"red", "running":"green"}'/>
         </header>
         <sheet>
             <group colspan="4" col="1">

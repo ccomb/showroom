@@ -35,9 +35,16 @@ class Application(osv.Model):
             help='Type of app'),
         'state': fields.selection(
             [('draft', 'Draft'),
-             ('deploy', 'Deploying'),
+             ('cloning', 'Installing'),
+             ('clone_error', 'Cannot install'),
              ('stopped', 'Stopped'),
+             ('starting', 'Starting'),
              ('running', 'Running'),
+             ('start_error', 'Cannot start'),
+             ('destroying', 'Destroying'),
+             ('destroy_error', 'Cannot destroy'),
+             ('stop_error', 'Cannot stop'),
+             ('stopping', 'Stopping'),
              ],
             'State',
             required=True,
@@ -60,29 +67,37 @@ class Application(osv.Model):
         return chosen_server
 
     def draft(self, cr, uid, ids, context=None):
-        """ Return the application to draft
-        """
         self.write(cr, uid, ids, {'state': 'draft'}, context)
 
-    def deploy(self, cr, uid, ids, context=None):
-        """ Deploy the application
-        """
-        self.write(cr, uid, ids, {'state': 'deploy'}, context)
+    def clone(self, cr, uid, ids, context=None):
+        self.write(cr, uid, ids, {'state': 'cloning'}, context)
+
+    def clone_error(self, cr, uid, ids, context=None):
+        self.write(cr, uid, ids, {'state': 'clone_error'}, context)
 
     def start(self, cr, uid, ids, context=None):
-        """ Start the application
-        """
-        self.write(cr, uid, ids, {'state': 'running'}, context)
+        self.write(cr, uid, ids, {'state': 'starting'}, context)
 
     def stop(self, cr, uid, ids, context=None):
-        """ Stop the application
-        """
-        self.write(cr, uid, ids, {'state': 'stopped'}, context)
+        self.write(cr, uid, ids, {'state': 'stopping'}, context)
 
     def destroy(self, cr, uid, ids, context=None):
-        """ destroy the application
-        """
-        self.write(cr, uid, ids, {'state': 'draft'}, context)
+        self.write(cr, uid, ids, {'state': 'destroying'}, context)
+
+    def running(self, cr, uid, ids, context=None):
+        self.write(cr, uid, ids, {'state': 'running'}, context)
+
+    def start_error(self, cr, uid, ids, context=None):
+        self.write(cr, uid, ids, {'state': 'start_error'}, context)
+
+    def stopped(self, cr, uid, ids, context=None):
+        self.write(cr, uid, ids, {'state': 'stopped'}, context)
+
+    def stop_error(self, cr, uid, ids, context=None):
+        self.write(cr, uid, ids, {'state': 'stop_error'}, context)
+
+    def destroy_error(self, cr, uid, ids, context=None):
+        self.write(cr, uid, ids, {'state': 'destroy_error'}, context)
 
     _defaults = {
         'user_id': lambda self, cr, uid, context: uid,
