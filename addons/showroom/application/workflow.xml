@@ -19,7 +19,7 @@
   <field name="split_mode">XOR</field>
   <field name="wkf_id" ref="workflow_application"/>
 </record>
-<record model="workflow.activity" id="workflow_activity_51">
+<record model="workflow.activity" id="workflow_activity_destroy_error">
   <field name="action">destroy_error()</field>
   <field name="flow_start" eval="0"/>
   <field name="flow_stop" eval="0"/>
@@ -31,7 +31,7 @@
   <field name="split_mode">XOR</field>
   <field name="wkf_id" ref="workflow_application"/>
 </record>
-<record model="workflow.activity" id="workflow_activity_50">
+<record model="workflow.activity" id="workflow_activity_destroying">
   <field name="action">destroy()</field>
   <field name="flow_start" eval="0"/>
   <field name="flow_stop" eval="0"/>
@@ -128,7 +128,7 @@
   <field name="wkf_id" ref="workflow_application"/>
 </record>
 
-<record model="workflow.activity" id="workflow_activity_45">
+<record model="workflow.activity" id="workflow_activity_clone_error">
   <field name="action">clone_error()</field>
   <field name="flow_start" eval="0"/>
   <field name="flow_stop" eval="0"/>
@@ -141,8 +141,8 @@
   <field name="wkf_id" ref="workflow_application"/>
 </record>
 
-<record model="workflow.transition" id="workflow_transition_65">
-  <field name="act_from" ref="workflow_activity_45"/>
+<record model="workflow.transition" id="workflow_transition_cleaned">
+  <field name="act_from" ref="workflow_activity_clone_error"/>
   <field name="act_to" ref="activity_draft"/>
   <field name="condition">True</field>
   <field name="group_id" ref="group_user"/>
@@ -151,7 +151,7 @@
 </record>
 <record model="workflow.transition" id="workflow_transition_64">
   <field name="act_from" ref="activity_deploy"/>
-  <field name="act_to" ref="workflow_activity_45"/>
+  <field name="act_to" ref="workflow_activity_clone_error"/>
   <field name="condition">True</field>
   <field name="group_id" ref="group_admin"/>
   <field name="signal">clone_failed</field>
@@ -173,7 +173,7 @@
   <field name="wkf_id" ref="workflow_application"/>
 </record>
 <record model="workflow.transition" id="workflow_transition_75">
-  <field name="act_from" ref="workflow_activity_51"/>
+  <field name="act_from" ref="workflow_activity_destroy_error"/>
   <field name="act_to" ref="activity_draft"/>
   <field name="condition">True</field>
   <field name="group_id" ref="group_admin"/>
@@ -181,15 +181,15 @@
   <field name="wkf_id" ref="workflow_application"/>
 </record>
 <record model="workflow.transition" id="workflow_transition_74">
-  <field name="act_from" ref="workflow_activity_50"/>
-  <field name="act_to" ref="workflow_activity_51"/>
+  <field name="act_from" ref="workflow_activity_destroying"/>
+  <field name="act_to" ref="workflow_activity_destroy_error"/>
   <field name="condition">True</field>
   <field name="group_id" ref="group_user"/>
   <field name="signal">destroy_failed</field>
   <field name="wkf_id" ref="workflow_application"/>
 </record>
 <record model="workflow.transition" id="workflow_transition_73">
-  <field name="act_from" ref="workflow_activity_50"/>
+  <field name="act_from" ref="workflow_activity_destroying"/>
   <field name="act_to" ref="activity_draft"/>
   <field name="condition">True</field>
   <field name="group_id" ref="group_user"/>
@@ -198,7 +198,7 @@
 </record>
 <record model="workflow.transition" id="transition_destroy">
   <field name="act_from" ref="activity_stopped"/>
-  <field name="act_to" ref="workflow_activity_50"/>
+  <field name="act_to" ref="workflow_activity_destroying"/>
   <field name="condition">True</field>
   <field name="group_id" ref="group_user"/>
   <field name="signal">destroy</field>
