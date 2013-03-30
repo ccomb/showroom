@@ -7,6 +7,25 @@
     <field name="priority" eval="8"/>
     <field name="arch" type="xml">
     <form string="Template" version="7.0">
+        <header>
+            <button name="install" states="draft" string="Install" groups="showroom.group_user" class="oe_highlight"/>
+            <button name="deploy" states="installed" string="Deploy" groups="showroom.group_user" class="oe_highlight"/>
+            <button name="undeploy" states="deployed" string="Undeploy" groups="showroom.group_user"/>
+            <button name="uninstall" states="installed" string="Uninstall" groups="showroom.group_user"/>
+
+            <button name="install_ok" states="installing" string="Simulate install OK" groups="showroom.group_user"/>
+            <button name="install_failed" states="installing" string="Simulate install Failed" groups="showroom.group_user"/>
+            <button name="deploy_ok" states="deploying" string="Simulate deploy OK" groups="showroom.group_admin"/>
+            <button name="deploy_failed" states="deploying" string="Simulate deploy Failed" groups="showroom.group_admin"/>
+            <button name="undeploy_ok" states="undeploying" string="Simulate undeploy OK" groups="showroom.group_admin"/>
+            <button name="undeploy_failed" states="undeploying" string="Simulate undeploy Failed" groups="showroom.group_admin"/>
+            <button name="uninstall_ok" states="uninstalling" string="Simulate uninstall OK" groups="showroom.group_admin"/>
+            <button name="uninstall_failed" states="uninstalling" string="Simulate uninstall Failed" groups="showroom.group_admin"/>
+            <button name="cleaned" states="undeploy_error,uninstall_error,deploy_error,install_error" string="Resolved" groups="showroom.group_admin"/>
+
+            <field name="state" widget="statusbar" statusbar_visible="draft,installing,installed,deployed"
+                   statusbar_colors='{"draft": "blue", "installing": "orange", "installed":"red", "deployed":"green"}'/>
+        </header>
         <sheet>
             <label string="Name of the template" class="oe_edit_only"/>
             <h1><field name="name" select="1"/></h1>

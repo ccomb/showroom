@@ -7,7 +7,7 @@
   <field name="osv">showroom.template</field>
 </record>
 
-<record model="workflow.activity" id="workflow_activity_35">
+<record model="workflow.activity" id="workflow_activity_deploying">
   <field name="action">deploy()</field>
   <field name="flow_start" eval="0"/>
   <field name="flow_stop" eval="0"/>
@@ -19,7 +19,7 @@
   <field name="split_mode">XOR</field>
   <field name="wkf_id" ref="workflow_template"/>
 </record>
-<record model="workflow.activity" id="workflow_activity_33">
+<record model="workflow.activity" id="workflow_activity_draft">
   <field name="action">draft()</field>
   <field name="flow_start" eval="1"/>
   <field name="flow_stop" eval="0"/>
@@ -31,7 +31,7 @@
   <field name="split_mode">XOR</field>
   <field name="wkf_id" ref="workflow_template"/>
 </record>
-<record model="workflow.activity" id="workflow_activity_36">
+<record model="workflow.activity" id="workflow_activity_installed">
   <field name="action">installed()</field>
   <field name="flow_start" eval="0"/>
   <field name="flow_stop" eval="0"/>
@@ -43,7 +43,7 @@
   <field name="split_mode">XOR</field>
   <field name="wkf_id" ref="workflow_template"/>
 </record>
-<record model="workflow.activity" id="workflow_activity_34">
+<record model="workflow.activity" id="workflow_activity_installing">
   <field name="action">install()</field>
   <field name="flow_start" eval="0"/>
   <field name="flow_stop" eval="0"/>
@@ -55,7 +55,7 @@
   <field name="split_mode">XOR</field>
   <field name="wkf_id" ref="workflow_template"/>
 </record>
-<record model="workflow.activity" id="workflow_activity_43">
+<record model="workflow.activity" id="workflow_activity_undeploy_error">
   <field name="action">undeploy_error()</field>
   <field name="flow_start" eval="0"/>
   <field name="flow_stop" eval="0"/>
@@ -67,7 +67,7 @@
   <field name="split_mode">XOR</field>
   <field name="wkf_id" ref="workflow_template"/>
 </record>
-<record model="workflow.activity" id="workflow_activity_38">
+<record model="workflow.activity" id="workflow_activity_undeploy">
   <field name="action">undeploy()</field>
   <field name="flow_start" eval="0"/>
   <field name="flow_stop" eval="0"/>
@@ -79,7 +79,7 @@
   <field name="split_mode">XOR</field>
   <field name="wkf_id" ref="workflow_template"/>
 </record>
-<record model="workflow.activity" id="workflow_activity_44">
+<record model="workflow.activity" id="workflow_activity_uninstall_error">
   <field name="action">uninstall_error()</field>
   <field name="flow_start" eval="0"/>
   <field name="flow_stop" eval="0"/>
@@ -90,7 +90,7 @@
   <field name="split_mode">XOR</field>
   <field name="wkf_id" ref="workflow_template"/>
 </record>
-<record model="workflow.activity" id="workflow_activity_39">
+<record model="workflow.activity" id="workflow_activity_uninstalling">
   <field name="action">uninstall()</field>
   <field name="flow_start" eval="0"/>
   <field name="flow_stop" eval="0"/>
@@ -103,8 +103,8 @@
   <field name="wkf_id" ref="workflow_template"/>
 </record>
 
-<record model="workflow.activity" id="workflow_activity_37">
-  <field name="action">deployed</field>
+<record model="workflow.activity" id="workflow_activity_deployed">
+  <field name="action">deployed()</field>
   <field name="flow_start" eval="0"/>
   <field name="flow_stop" eval="0"/>
   <field name="in_transitions"/>
@@ -115,7 +115,7 @@
   <field name="split_mode">XOR</field>
   <field name="wkf_id" ref="workflow_template"/>
 </record>
-<record model="workflow.activity" id="workflow_activity_41">
+<record model="workflow.activity" id="workflow_activity_install_error">
   <field name="action">install_error()</field>
   <field name="flow_start" eval="0"/>
   <field name="flow_stop" eval="0"/>
@@ -127,7 +127,7 @@
   <field name="split_mode">XOR</field>
   <field name="wkf_id" ref="workflow_template"/>
 </record>
-<record model="workflow.activity" id="workflow_activity_42">
+<record model="workflow.activity" id="workflow_activity_deploy_error">
   <field name="action">deploy_error()</field>
   <field name="flow_start" eval="0"/>
   <field name="flow_stop" eval="0"/>
@@ -141,123 +141,131 @@
 </record>
 
 <record model="workflow.transition" id="workflow_transition_48">
-  <field name="act_from" ref="workflow_activity_35"/>
-  <field name="act_to" ref="workflow_activity_37"/>
+  <field name="act_from" ref="workflow_activity_deploying"/>
+  <field name="act_to" ref="workflow_activity_deployed"/>
   <field name="condition">True</field>
   <field name="group_id" ref="showroom.group_admin"/>
   <field name="signal">deploy_ok</field>
   <field name="wkf_id" ref="workflow_template"/>
 </record>
 <record model="workflow.transition" id="workflow_transition_49">
-  <field name="act_from" ref="workflow_activity_35"/>
-  <field name="act_to" ref="workflow_activity_42"/>
+  <field name="act_from" ref="workflow_activity_deploying"/>
+  <field name="act_to" ref="workflow_activity_deploy_error"/>
   <field name="condition">True</field>
   <field name="group_id" ref="showroom.group_admin"/>
   <field name="signal">deploy_failed</field>
   <field name="wkf_id" ref="workflow_template"/>
 </record>
 <record model="workflow.transition" id="workflow_transition_51">
-  <field name="act_from" ref="workflow_activity_36"/>
-  <field name="act_to" ref="workflow_activity_35"/>
+  <field name="act_from" ref="workflow_activity_installed"/>
+  <field name="act_to" ref="workflow_activity_deploying"/>
   <field name="condition">True</field>
   <field name="group_id" ref="showroom.group_admin"/>
   <field name="signal">deploy</field>
   <field name="wkf_id" ref="workflow_template"/>
 </record>
 <record model="workflow.transition" id="workflow_transition_61">
-  <field name="act_from" ref="workflow_activity_42"/>
-  <field name="act_to" ref="workflow_activity_36"/>
+  <field name="act_from" ref="workflow_activity_deploy_error"/>
+  <field name="act_to" ref="workflow_activity_installed"/>
   <field name="condition">True</field>
   <field name="group_id" ref="showroom.group_admin"/>
   <field name="signal">cleaned</field>
   <field name="wkf_id" ref="workflow_template"/>
 </record>
 <record model="workflow.transition" id="workflow_transition_62">
-  <field name="act_from" ref="workflow_activity_41"/>
-  <field name="act_to" ref="workflow_activity_33"/>
+  <field name="act_from" ref="workflow_activity_install_error"/>
+  <field name="act_to" ref="workflow_activity_draft"/>
   <field name="condition">True</field>
   <field name="group_id" ref="showroom.group_admin"/>
   <field name="signal">cleaned</field>
   <field name="wkf_id" ref="workflow_template"/>
 </record>
 <record model="workflow.transition" id="workflow_transition_52">
-  <field name="act_from" ref="workflow_activity_34"/>
-  <field name="act_to" ref="workflow_activity_36"/>
+  <field name="act_from" ref="workflow_activity_installing"/>
+  <field name="act_to" ref="workflow_activity_installed"/>
   <field name="condition">True</field>
   <field name="group_id" ref="showroom.group_admin"/>
   <field name="signal">install_ok</field>
   <field name="wkf_id" ref="workflow_template"/>
 </record>
 <record model="workflow.transition" id="workflow_transition_53">
-  <field name="act_from" ref="workflow_activity_34"/>
-  <field name="act_to" ref="workflow_activity_41"/>
+  <field name="act_from" ref="workflow_activity_installing"/>
+  <field name="act_to" ref="workflow_activity_install_error"/>
   <field name="condition">True</field>
   <field name="group_id" ref="showroom.group_admin"/>
   <field name="signal">install_failed</field>
   <field name="wkf_id" ref="workflow_template"/>
 </record>
 <record model="workflow.transition" id="workflow_transition_50">
-  <field name="act_from" ref="workflow_activity_33"/>
-  <field name="act_to" ref="workflow_activity_34"/>
+  <field name="act_from" ref="workflow_activity_draft"/>
+  <field name="act_to" ref="workflow_activity_installing"/>
   <field name="condition">True</field>
   <field name="group_id" ref="showroom.group_admin"/>
   <field name="signal">install</field>
   <field name="wkf_id" ref="workflow_template"/>
 </record>
 <record model="workflow.transition" id="workflow_transition_63">
-  <field name="act_from" ref="workflow_activity_43"/>
-  <field name="act_to" ref="workflow_activity_36"/>
+  <field name="act_from" ref="workflow_activity_undeploy_error"/>
+  <field name="act_to" ref="workflow_activity_installed"/>
   <field name="condition">True</field>
   <field name="group_id" ref="showroom.group_admin"/>
   <field name="signal">cleaned</field>
   <field name="wkf_id" ref="workflow_template"/>
 </record>
 <record model="workflow.transition" id="workflow_transition_55">
-  <field name="act_from" ref="workflow_activity_38"/>
-  <field name="act_to" ref="workflow_activity_36"/>
+  <field name="act_from" ref="workflow_activity_undeploy"/>
+  <field name="act_to" ref="workflow_activity_installed"/>
   <field name="condition">True</field>
   <field name="group_id" ref="showroom.group_admin"/>
   <field name="signal">undeploy_ok</field>
   <field name="wkf_id" ref="workflow_template"/>
 </record>
 <record model="workflow.transition" id="workflow_transition_59">
-  <field name="act_from" ref="workflow_activity_38"/>
-  <field name="act_to" ref="workflow_activity_43"/>
+  <field name="act_from" ref="workflow_activity_undeploy"/>
+  <field name="act_to" ref="workflow_activity_undeploy_error"/>
   <field name="condition">True</field>
   <field name="group_id" ref="showroom.group_admin"/>
   <field name="signal">undeploy_failed</field>
   <field name="wkf_id" ref="workflow_template"/>
 </record>
 <record model="workflow.transition" id="workflow_transition_54">
-  <field name="act_from" ref="workflow_activity_37"/>
-  <field name="act_to" ref="workflow_activity_38"/>
+  <field name="act_from" ref="workflow_activity_deployed"/>
+  <field name="act_to" ref="workflow_activity_undeploy"/>
   <field name="condition">True</field>
   <field name="group_id" ref="showroom.group_admin"/>
   <field name="signal">undeploy</field>
   <field name="wkf_id" ref="workflow_template"/>
 </record>
 <record model="workflow.transition" id="workflow_transition_57">
-  <field name="act_from" ref="workflow_activity_39"/>
-  <field name="act_to" ref="workflow_activity_33"/>
+  <field name="act_from" ref="workflow_activity_uninstalling"/>
+  <field name="act_to" ref="workflow_activity_draft"/>
   <field name="condition">True</field>
   <field name="group_id" ref="showroom.group_admin"/>
   <field name="signal">uninstall_ok</field>
   <field name="wkf_id" ref="workflow_template"/>
 </record>
 <record model="workflow.transition" id="workflow_transition_60">
-  <field name="act_from" ref="workflow_activity_39"/>
-  <field name="act_to" ref="workflow_activity_44"/>
+  <field name="act_from" ref="workflow_activity_uninstalling"/>
+  <field name="act_to" ref="workflow_activity_uninstall_error"/>
   <field name="condition">True</field>
   <field name="group_id" ref="showroom.group_admin"/>
   <field name="signal">uninstall_failed</field>
   <field name="wkf_id" ref="workflow_template"/>
 </record>
 <record model="workflow.transition" id="workflow_transition_56">
-  <field name="act_from" ref="workflow_activity_36"/>
-  <field name="act_to" ref="workflow_activity_39"/>
+  <field name="act_from" ref="workflow_activity_installed"/>
+  <field name="act_to" ref="workflow_activity_uninstalling"/>
   <field name="condition">True</field>
   <field name="group_id" ref="showroom.group_admin"/>
   <field name="signal">uninstall</field>
+  <field name="wkf_id" ref="workflow_template"/>
+</record>
+<record model="workflow.transition" id="workflow_transition_76">
+  <field name="act_from" ref="workflow_activity_uninstall_error"/>
+  <field name="act_to" ref="workflow_activity_draft"/>
+  <field name="condition">True</field>
+  <field name="group_id" ref="showroom.group_admin"/>
+  <field name="signal">cleaned</field>
   <field name="wkf_id" ref="workflow_template"/>
 </record>
   </data>

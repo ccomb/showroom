@@ -26,14 +26,14 @@
             <button name="stop" states="running" string="Stop" groups="showroom.group_user"/>
             <button name="destroy" states="stopped" string="Destroy" groups="showroom.group_user"/>
 
-            <button name="clone_ok" states="cloning" string="Simulate clone OK" groups="showroom.group_user"/>
-            <button name="clone_failed" states="cloning" string="Simulate clone Failed" groups="showroom.group_user"/>
-            <button name="start_ok" states="starting" string="Simulate start OK" groups="showroom.group_user"/>
-            <button name="start_failed" states="starting" string="Simulate start Failed" groups="showroom.group_user"/>
-            <button name="stop_ok" states="stopping" string="Simulate stop OK" groups="showroom.group_user"/>
-            <button name="stop_failed" states="stopping" string="Simulate stop Failed" groups="showroom.group_user"/>
-            <button name="destroy_ok" states="destroying" string="Simulate destroy OK" groups="showroom.group_user"/>
-            <button name="destroy_failed" states="destroying" string="Simulate destroy Failed" groups="showroom.group_user"/>
+            <button name="clone_ok" states="cloning" string="Simulate clone OK" groups="showroom.group_admin"/>
+            <button name="clone_failed" states="cloning" string="Simulate clone Failed" groups="showroom.group_admin"/>
+            <button name="start_ok" states="starting" string="Simulate start OK" groups="showroom.group_admin"/>
+            <button name="start_failed" states="starting" string="Simulate start Failed" groups="showroom.group_admin"/>
+            <button name="stop_ok" states="stopping" string="Simulate stop OK" groups="showroom.group_admin"/>
+            <button name="stop_failed" states="stopping" string="Simulate stop Failed" groups="showroom.group_admin"/>
+            <button name="destroy_ok" states="destroying" string="Simulate destroy OK" groups="showroom.group_admin"/>
+            <button name="destroy_failed" states="destroying" string="Simulate destroy Failed" groups="showroom.group_admin"/>
             <button name="cleaned" states="stop_error,destroy_error,start_error,clone_error" string="Resolved" groups="showroom.group_admin"/>
 
             <field name="state" widget="statusbar" statusbar_visible="draft,cloning,stopped,running"
