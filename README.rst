@@ -28,7 +28,7 @@ interest from a user point of view:
 Installing
 ----------
 
-Showroom is currently tested only on Debian and Ubuntu. There are some system
+Showroom is currently tested only on Debian. There are some system
 requirements, which can be fullfilled by installing the following packages::
 
 sudo aptitude install subversion mercurial build-essential python-virtualenv \
