@@ -5,3 +5,5 @@ parts/
 etc/
 .installed.cfg
 .*pyc$
+showroom_proxy.egg-info/
+.mr.developer.cfg

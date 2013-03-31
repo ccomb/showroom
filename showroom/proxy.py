@@ -14,9 +14,6 @@ LOG = logging.getLogger(__name__)
 class Proxy(object):
     """ wsgi middleware that acts as a proxy, or redirects to the admin
     """
-    def __init__(self, app):
-        self.app = app
-
     def __call__(self, environ, start_response):
         global ADMIN_HOST
         request = Request(environ)
@@ -38,7 +35,8 @@ class Proxy(object):
         # 'user.showroom' or 'showroom.io'
         if len(splitted_host) <= 1:
             # go to the admin interface
-            return self.app(environ, start_response)
+            response = HTTPFound(location='plop')
+            return response(environ, start_response)
 
         demo_name, user_name = splitted_host
 
@@ -59,7 +57,7 @@ class Proxy(object):
                        u'<a href="%s">admin interface</a>'
                        u'</body></html>') % admin_url
             return Response(message)(environ, start_response)
-            
+
         # XXX possibly do an auth on the demo
 
         # if the app is not running, tell it
@@ -82,11 +80,8 @@ class Proxy(object):
         return response(environ, start_response)
 
 
-def make_filter(global_conf, **local_conf):
-    """factory for the [paste.filter_factory] entry-point
+def app_factory(global_config, **local_conf):
+    """factory for the [paste.app_factory] entry-point
     (see setup.py)
     """
-    def filter(app):
-        return Proxy(app)
-    return filter
-
+    return Proxy()

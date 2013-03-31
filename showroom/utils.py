@@ -411,7 +411,7 @@ def deploy(user, params):
         if retcode != 0:
             shutil.rmtree(demopath)
             raise DeploymentError('installation ended with an error')
-    
+
     # set the start script to executable
     start_script = join(demopath, 'start.sh')
     if os.path.exists(start_script):
@@ -425,7 +425,7 @@ def deploy(user, params):
                 start = '#!/bin/bash\ntrap "pkill -P \$\$" EXIT\n'
             content = start + content
             s.seek(0); s.truncate(); s.write(content)
-    
+
     # write the demo config file
     app_conf = SafeConfigParser()
     app_conf.read(app_conf_path)

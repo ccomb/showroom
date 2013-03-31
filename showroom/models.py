@@ -1,4 +1,3 @@
-from pyramid.security import Allow, Authenticated, ALL_PERMISSIONS
 import utils
 from urlparse import urlsplit, urlunsplit
 
@@ -13,13 +12,3 @@ class RootFactory(object):
         self.request['admin_url'] = admin_url
         self.is_root = True
 
-    @property
-    def __acl__(self):
-        defaultlist = [
-            (Allow, 'group:admin', ALL_PERMISSIONS),
-            (Allow, Authenticated, 'view'),
-            (Allow, Authenticated, 'edit'),
-        ]
-        return defaultlist
-
-# TODO refactor everything and add SqlAlchemy models here (or any other db)
