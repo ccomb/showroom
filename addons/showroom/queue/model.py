@@ -58,7 +58,7 @@ class Queue(osv.Model):
         for job in self.browse(cr, uid, job_ids, context):
             _logger.info('Selected job to run: id %s' % job.id)
             threaded_job = threading.Thread(
-                target=self.run,
+                target=self._run,
                 args=(cr.dbname, uid, job.id,))
             threaded_job.start()
         if not job_ids:
@@ -78,7 +78,7 @@ class Queue(osv.Model):
         self._process_queue(cr, uid)
         return job_id
 
-    def run(self, dbname, uid, job_id):
+    def _run(self, dbname, uid, job_id):
         """ Run the job thread, then continue to process the queue.
         """
         # tell we are running
