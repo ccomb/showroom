@@ -1,0 +1,8 @@
+<openerp>
+  <data noupdate="1">
+    <record model="ir.config_parameter" id="config_max_jobs">
+      <field name="key">showroom.max_jobs</field>
+      <field name="value">2</field>
+    </record>
+  </data>
+</openerp>

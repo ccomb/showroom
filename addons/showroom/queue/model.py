@@ -43,17 +43,18 @@ class Queue(osv.Model):
         'user_id': lambda self, cr, uid, context: uid,
     }
 
-    def process_queue(self, cr, uid, context=None):
+    def _process_queue(self, cr, uid, context=None):
         """ Process the job queue in the right order
         """
         # check for running jobs
+        max_jobs = self.pool.get('ir.config_parameter').get_param(cr, uid, 'showroom.max_jobs')
         job_ids = self.search(cr, uid, [('running', '=', True)], order='create_date')
-        if job_ids:
-            _logger.info('Job processing is already running...')
+        if len(job_ids) >= int(max_jobs):
+            _logger.info('Maximum of %s simultaneous jobs already running.' % max_jobs)
             return cr.close()  # do nothing for now XXX check old jobs
 
         # Run the next job
-        job_ids = self.search(cr, uid, [], order='create_date', limit=1)
+        job_ids = self.search(cr, uid, [('running', '=', False)], order='create_date', limit=1)
         for job in self.browse(cr, uid, job_ids, context):
             _logger.info('Selected job to run: id %s' % job.id)
             threaded_job = threading.Thread(
@@ -61,12 +62,12 @@ class Queue(osv.Model):
                 args=(cr.dbname, uid, job.id,))
             threaded_job.start()
         if not job_ids:
-            _logger.info('No more jobs to run!')
+            _logger.info('(No more jobs to launch)')
 
         cr.close()
 
     def create(self, cr, uid, values, context=None):
-        """ Process the queue after creating a job
+        """ Create a job and launch the processing
         """
         # don't use the same cursor and write immediately
         dbname = cr.dbname
@@ -74,7 +75,7 @@ class Queue(osv.Model):
         cr = pooler.get_db(dbname).cursor()
         job_id = super(Queue, self).create(cr, uid, values, context)
         cr.commit()
-        self.process_queue(cr, uid)
+        self._process_queue(cr, uid)
         return job_id
 
     def run(self, dbname, uid, job_id):
@@ -92,7 +93,7 @@ class Queue(osv.Model):
 
         # run the script
         _logger.info('Starting job id %s: %s )...' % (job_id, job_values))
-        time.sleep(5)
+        time.sleep(20)
 
         # tell we have finished
         cr = pooler.get_db(dbname).cursor()
@@ -102,7 +103,7 @@ class Queue(osv.Model):
             'active': False})
         cr.commit()
         _logger.info('Finished job %s...' % job_id)
-        self.process_queue(cr, uid)
+        self._process_queue(cr, uid)
 
 
 
