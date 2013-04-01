@@ -7,7 +7,6 @@ if sys.version_info < (2, 6):
 
 here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.rst')).read()
-CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
 requires = [
     'setuptools',
@@ -19,7 +18,7 @@ requires = [
 setup(name='showroom-proxy',
       version='0.1dev',
       description='Deploy web app demos in 1 click',
-      long_description=README + '\n\n' +  CHANGES,
+      long_description=README,
       classifiers=[],
       author='',
       author_email='',
