@@ -1,5 +1,5 @@
 #!/bin/bash
-# PARAMS: name
+# PARAMS:
 # sudo aptitude install php5-cli apache2 php5-imap php5-curl
 export db_host=127.0.0.1
 export db_port=$((PORT+1000))

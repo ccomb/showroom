@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PARAMS: name, login=admin, password, version=4.1.4, plugins
+# PARAMS: login=admin, password, version=4.1.4, plugins
 
 function first_install {
 # create a virtualenv

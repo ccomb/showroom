@@ -1,5 +1,5 @@
 #!/bin/bash
-# PARAMS: name, version=1.4.8.2
+# PARAMS: version=1.4.8.2
 set -x
 
 export db_host=127.0.0.1
@@ -14,7 +14,7 @@ url=http://www.prestashop.com/ajax/controller.php?method=download\&type=releases
 wget $url -O  prestashop.zip
 unzip prestashop.zip
 
-if [ "$version" ">" "1.5.0.0" ]; then 
+if [ "$version" ">" "1.5.0.0" ]; then
     sed -i "s/database_server = 'localhost'/database_server = '$db_host:$db_port'/" prestashop/install/controllers/http/database.php
     sed -i "s/database_login = 'root'/database_login = '$db_user'/" prestashop/install/controllers/http/database.php
     sed -i "s/database_password = ''/database_password = '$db_pass'/" prestashop/install/controllers/http/database.php
@@ -67,7 +67,7 @@ function reconfigure_clone {
 sed -i "s/app=$1/app=$name/" howto.html
 sed -i "s/\/$1\//\/$name\//" apache2.conf
 sed -i "s/$2/$PORT/" apache2.conf
-if [ "$version" ">" "1.5.0.0" ]; then 
+if [ "$version" ">" "1.5.0.0" ]; then
     sed -i "s/$(($2 + 1000))/$db_port/" prestashop/install/controllers/http/database.php
 else
     sed -i "s/$(($2 + 1000))/$db_port/" prestashop/install/index.php

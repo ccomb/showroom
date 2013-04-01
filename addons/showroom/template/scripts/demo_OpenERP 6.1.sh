@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PARAMS:name, version=20121025-233243, admin_password=admin
+# PARAMS: version=20121025-233243, admin_password=admin
 
 function first_install {
 # create a virtualenv

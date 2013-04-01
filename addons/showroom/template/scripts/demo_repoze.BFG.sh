@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PARAMS:name, port=6543
+# PARAMS: port=6543
 
 function create_template {
 

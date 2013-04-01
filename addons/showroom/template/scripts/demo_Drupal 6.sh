@@ -1,5 +1,5 @@
 #!/bin/bash
-# PARAMS: name, version=6.26, plugins
+# PARAMS: version=6.26, plugins
 # sudo aptitude install php5-cli apache2
 # sudo pear install Console_Table
 

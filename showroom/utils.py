@@ -5,7 +5,6 @@ from base64 import b64encode
 import logging
 import os
 import shutil
-import string
 import subprocess
 import urllib
 import time
@@ -13,22 +12,6 @@ import time
 #logging.basicConfig(level=logging.DEBUG)
 LOG = logging.getLogger(__name__)
 
-CONFIG = SafeConfigParser()
-PATH = dirname(dirname(__file__))
-
-CONFIG.read(join(PATH, 'showroom.ini'))
-# XXX don't use this file for that
-PATHS = {
-  'bin' : join(PATH, CONFIG.get('paths', 'bin')),
-  'scripts' : join(PATH, CONFIG.get('paths', 'scripts')),
-  'demos' : join(PATH, CONFIG.get('paths', 'demos')),
-  'templates' : join(PATH, CONFIG.get('paths', 'templates')),
-  'var' : join(PATH, CONFIG.get('paths', 'var')),
-  'etc' : join(PATH, CONFIG.get('paths', 'etc')),
-}
-ADMIN_HOST = CONFIG.get('global', 'hostname')
-PROXY_HOST = CONFIG.get('global', 'proxy_host')
-PROXY_PORT = CONFIG.get('global', 'proxy_port')
 
 # create directories if they don't exist
 for d in PATHS:
@@ -68,28 +51,6 @@ def daemon(user, name, command='restart'):
             with open(join(demopath, 'pid'), 'w') as pidfile:
                 pidfile.write(str(pid))
                 return pid
-
-
-def available_demos(user=None):
-    """ return a dict containing all available demos
-    and their respective commands defined in config file.
-
-    >>> available_demos()['repoze.BFG']['params']
-    ['name']
-    """
-    demos = {}
-    for filename in [ filename for filename in os.listdir(PATHS['scripts'])
-                      if filename.startswith('demo_')
-                      and filename.endswith('.sh')]:
-        params = []
-        with open(join(PATHS['scripts'], filename)) as script:
-            for line in script:
-                if line.split(':')[0].strip() == '# PARAMS':
-                    # params looks like: ['name', 'version=6.26', 'plugins']
-                    params = map(string.strip, line.strip().split(':')[1].split(','))
-
-        demos[(filename[5:-3])] = {'params':params}
-    return demos
 
 
 def installed_demos(user):

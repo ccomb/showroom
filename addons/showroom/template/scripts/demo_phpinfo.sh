@@ -1,5 +1,5 @@
 #!/bin/bash
-# PARAMS: name
+# PARAMS: 
 
 function first_install {
 # create a PHP hello world

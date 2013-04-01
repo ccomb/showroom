@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PARAMS:name
+# PARAMS:
 
 function first_install {
 # create a virtualenv

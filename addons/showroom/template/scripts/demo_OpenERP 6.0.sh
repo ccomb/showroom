@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PARAMS:name, version=6.0.4
+# PARAMS:version=6.0.4
 
 function first_install {
 # create a virtualenv

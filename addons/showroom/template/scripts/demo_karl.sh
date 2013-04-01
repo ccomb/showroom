@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PARAMS:name
+# PARAMS:
 
 function first_install {
 # get the last version in svn (no release yet)

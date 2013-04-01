@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PARAMS:name, login=admin, password, version=3.5.4, zope_version=2.9.12-final
+# PARAMS:login=admin, password, version=3.5.4, zope_version=2.9.12-final
 
 function first_install {
 # create a virtualenv

@@ -8,10 +8,10 @@
     <field name="arch" type="xml">
     <form string="Template" version="7.0">
         <header>
-            <button name="install" states="draft" string="Install" groups="showroom.group_user" class="oe_highlight"/>
-            <button name="deploy" states="installed" string="Deploy" groups="showroom.group_user" class="oe_highlight"/>
-            <button name="undeploy" states="deployed" string="Undeploy" groups="showroom.group_user"/>
-            <button name="uninstall" states="installed" string="Uninstall" groups="showroom.group_user"/>
+            <button name="install" states="draft" string="Install" groups="showroom.group_user" class="oe_highlight" help="Run the installation script"/>
+            <button name="deploy" states="installed" string="Deploy" groups="showroom.group_user" class="oe_highlight" help="Deploy this template on all remote servers"/>
+            <button name="undeploy" states="deployed" string="Undeploy" groups="showroom.group_user" help="Remove this template from the remote servers"/>
+            <button name="uninstall" states="installed" string="Uninstall" groups="showroom.group_user" help="Delete the local installation"/>
 
             <button name="install_ok" states="installing" string="Simulate install OK" groups="showroom.group_user"/>
             <button name="install_failed" states="installing" string="Simulate install Failed" groups="showroom.group_user"/>
@@ -29,7 +29,16 @@
         <sheet>
             <label string="Name of the template" class="oe_edit_only"/>
             <h1><field name="name" select="1"/></h1>
+            <field name="script" on_change="onchange_script(script)"/>
             <notebook>
+                <page string="Parameters">
+                    <field name="params">
+                        <tree editable="bottom">
+                            <field name="key"/>
+                            <field name="value"/>
+                        </tree>
+                    </field>
+                </page>
                 <page string="Applications">
                     <field name="application_ids" readonly="1" groups="showroom.group_admin"/>
                 </page>
