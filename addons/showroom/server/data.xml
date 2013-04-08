@@ -1,0 +1,7 @@
+<openerp>
+  <data noupdate="1">
+    <record model="showroom.server" id="localhost">
+       <field name="name">localhost</field>
+    </record>
+  </data>
+</openerp>

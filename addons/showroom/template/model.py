@@ -47,6 +47,16 @@ class Template(osv.Model):
                    and filename.endswith('.sh')]
         return scripts
 
+    def get_default_server(self, cr, uid, context):
+        """ Get localhost for now
+        """
+        try:
+            self.pool.get('showroom.server').search(cr, uid, [('name', '=', 'localhost')])[0]
+        except:
+            raise osv.except_osv(
+                'Error',
+                'You must define at least a localhost server')
+
     _columns = {
         'name': fields.char(
             'Name',
@@ -81,13 +91,18 @@ class Template(osv.Model):
         'params': fields.one2many(
             'showroom.template.param',
             'template_id',
-            'Parameters'),
+            'Parameters',
+            readonly=True,
+            states={'draft': [('readonly', False)]}),
         'user_id': fields.many2one('res.users', u'Template owner'),
+        'host_id': fields.many2one('showroom.server', u'Template server'),
+        'path': fields.text('Path', help='Template path'),
     }
 
     _defaults = {
         'state': 'draft',
         'user_id': lambda self, cr, uid, context: uid,
+        'host_id': get_default_server,
     }
 
     def onchange_script(self, cr, uid, ids, filename):
@@ -117,14 +132,27 @@ class Template(osv.Model):
         self.write(cr, uid, ids, {'state': 'draft'}, context)
 
     def install(self, cr, uid, ids, context=None):
-        host_id = self.pool.get('showroom.server').search(
-            cr, uid, [('name', '=', 'localhost')])
-        if not host_id:
-            raise osv.except_osv(
-                'Error',
-                'You cannot install a template without at least a localhost server')
-        self.write(cr, uid, ids, {'state': 'installing'}, context)
         for template in self.browse(cr, uid, ids, context):
+            # create the directory for the demo
+            user = self.pool.get('res.users').read(cr, uid, uid, ['name'])
+            userpath = join(PATHS['templates'], str(user['id']) + '_' + user['name'])
+            if not os.path.exists(userpath):
+                os.mkdir(userpath)
+            demopath = join(userpath, template.name)
+            if not os.path.exists(demopath):
+                os.mkdir(demopath)
+            else:
+                raise osv.except_osv(
+                    'Error',
+                    'This template already exists on the filesystem: %s'
+                    % demopath)
+
+            template.write({
+                'state': 'installing',
+                'path': demopath
+            }, context)
+
+            # create a job
             self.pool.get('showroom.job').create(cr, uid, {
                 'name': 'install',
                 'model': 'showroom.template',
@@ -132,11 +160,12 @@ class Template(osv.Model):
                 'function': '_install',
                 'kwargs': {
                     'script': template.script,
+                    'path': demopath,
                     'params':
                         dict([(p.key, p.value) for p in template.params]
                              + [('name', template.name)])
                 },
-                'host_id': host_id[0],
+                'host_id': template.host_id,
                 'success_signal': 'install_ok',
                 'failure_signal': 'install_failed',
             })
@@ -163,12 +192,32 @@ class Template(osv.Model):
         self.write(cr, uid, ids, {'state': 'undeploy_error'}, context)
 
     def uninstall(self, cr, uid, ids, context=None):
-        self.write(cr, uid, ids, {'state': 'uninstalling'}, context)
+        for template in self.browse(cr, uid, ids, context):
+            template.write({'state': 'uninstalling'}, context)
+            # create a job
+            self.pool.get('showroom.job').create(cr, uid, {
+                'name': 'uninstall',
+                'model': 'showroom.template',
+                'res_id': template.id,
+                'function': '_uninstall',
+                'kwargs': {
+                },
+                'host_id': template.host_id,
+                'success_signal': 'uninstall_ok',
+                'failure_signal': 'uninstall_failed',
+            })
+
+    def _uninstall(self, cr, uid, ids, **kwargs):
+        """Uninstall the template
+        """
+        for template in self.browse(cr, uid, ids):
+            if os.path.exists(template.path):
+                shutil.rmtree(template.path)
 
     def uninstall_error(self, cr, uid, ids, context=None):
         self.write(cr, uid, ids, {'state': 'uninstall_error'}, context)
 
-    def _install(self, cr, uid, **kwargs):
+    def _install(self, cr, uid, ids, **kwargs):
         """ This method is run from the threaded job
         It runs the template installation script
         """
@@ -176,6 +225,7 @@ class Template(osv.Model):
         script = kwargs['script']
         params = kwargs['params']
         app_name = params['name']
+        demopath = kwargs['path']
         # add environment variables for the install script
         env = os.environ.copy()
         env['name'] = app_name
@@ -189,19 +239,6 @@ class Template(osv.Model):
         PROXY_PORT = config_obj.get_param(cr, uid, 'showroom.proxy_port')
         env['http_proxy'] = 'http://%s:%s/' % (PROXY_HOST, PROXY_PORT)
 
-        # create the directory for the demo
-        user = self.pool.get('res.users').read(cr, uid, uid, ['name'])
-        userpath = join(PATHS['templates'], str(user['id']) + '_' + user['name'])
-        if not os.path.exists(userpath):
-            os.mkdir(userpath)
-        demopath = join(userpath, app_name)
-        if not os.path.exists(demopath):
-            os.mkdir(demopath)
-        else:
-            raise InstallationError(
-                'This template already exists on the filesystem: %s'
-                % demopath)
-
         # run the install script
         util_functions = join(PATHS['scripts'], 'functions.sh')
         install_functions = join(PATHS['scripts'], script)
@@ -214,14 +251,9 @@ class Template(osv.Model):
                       ' '.join(shell_command),
                       demopath)
         # TODO run on a remote host with salt?
-        try:
-            retcode = subprocess.call(shell_command, cwd=demopath, env=env)
-            if retcode != 0:
-                raise InstallationError('Installation script ended with an error')
-        except Exception:
-            _logger.debug('Deleted %s', demopath)
-            shutil.rmtree(demopath)
-            raise
+        retcode = subprocess.call(shell_command, cwd=demopath, env=env)
+        if retcode != 0:
+            raise InstallationError('Installation script ended with an error')
 
         # set the start script to executable
         start_script = join(demopath, 'start.sh')
@@ -242,6 +274,14 @@ class Template(osv.Model):
 
         _logger.info('Finished installing %s', app_name)
 
+    def unlink(self, cr, uid, ids, context):
+        for template in self.browse(cr, uid, ids, context):
+            if template.path and os.path.exists(template.path):
+                raise osv.except_osv(
+                    'Error',
+                    u'Please first uninstall the template %s' % template.name)
+        super(Template, self).unlink(cr, uid, ids, context)
+
 
 class Parameter(osv.Model):
     """ A template parameter
@@ -253,5 +293,5 @@ class Parameter(osv.Model):
             'Template',
             ondelete='cascade'),
         'key': fields.char('Parameter', 64),
-        'value': fields.char('Value', 64)
+        'value': fields.char('Value', 128)
     }

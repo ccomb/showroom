@@ -132,7 +132,7 @@ class Job(osv.Model):
         function = job_values['function']
         kwargs = job_values['kwargs']
         try:
-            getattr(self.pool.get(model), function)(cr, uid, **kwargs)
+            getattr(self.pool.get(model), function)(cr, uid, [res_id], **kwargs)
         except Exception, e:
             # send the failure signal with another cursor, then raise
             cr2 = pooler.get_db(dbname).cursor()
@@ -145,7 +145,7 @@ class Job(osv.Model):
                                         res_id,
                                         job_values['failure_signal'],
                                         cr2)
-            self.pool.get(model).message_post(cr2, uid, [res_id], body=e.message)
+            self.pool.get(model).message_post(cr2, uid, [res_id], body=e.message, type='notification')
             # TODO add a cron tu purge jobs at startup
             cr2.commit()
             cr2.close()
