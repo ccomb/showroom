@@ -51,6 +51,11 @@ class Application(osv.Model):
             help='Current state of the application'),
     }
 
+    _defaults = {
+        'user_id': lambda self, cr, uid, context: uid,
+        'state': 'draft',
+    }
+
     def _choose_server(self, cr, uid, ids, context=None):
         """ Select an available server for the application
         """
@@ -71,6 +76,21 @@ class Application(osv.Model):
 
     def clone(self, cr, uid, ids, context=None):
         self.write(cr, uid, ids, {'state': 'cloning'}, context)
+
+    def _clone(self, cr, uid, ids, context=None):
+        # create a container config
+        container_config = (
+            'lxc.utsname = bfg\n'
+            'lxc.network.type = veth\n'
+            'lxc.network.flags = up\n'
+            'lxc.network.link = br0\n'
+            'lxc.network.hwaddr = 0a:00:00:00:00:%(mac)s\n'
+            'lxc.network.ipv4 = %(ip)s/24\n'
+            % {'mac': params['mac'], 'ip': params['ip']}
+        )
+        with open(join(demopath, 'lxc.conf'), 'w+') as configfile:
+            configfile.write(container_config)
+
 
     def clone_error(self, cr, uid, ids, context=None):
         self.write(cr, uid, ids, {'state': 'clone_error'}, context)
@@ -99,7 +119,33 @@ class Application(osv.Model):
     def destroy_error(self, cr, uid, ids, context=None):
         self.write(cr, uid, ids, {'state': 'destroy_error'}, context)
 
-    _defaults = {
-        'user_id': lambda self, cr, uid, context: uid,
-        'state': 'draft',
-    }
+    def get_available_ip(): #TODO
+        """ return the first available ip
+        FIXME improve
+        """
+        demos = []
+        users = os.listdir(PATHS['demos'])
+        for user in users:
+            demos += installed_demos(user)
+        ips = [int(demo['ip'].split('.')[3]) for demo in demos if demo['ip'].isdigit()]
+        ip = 1
+        while ip in ips:
+            ip += 1
+        assert(ip<254) # fixme
+        return '192.168.0.' + str(ip)
+
+    def get_available_mac():
+        """ return the first available mac address
+        FIXME improve
+        """
+        demos = []
+        users = os.listdir(PATHS['demos'])
+        for user in users:
+            demos += installed_demos(user)
+        macs = [int(demo['mac'], 16) for demo in demos if demo['mac']!='']
+        mac = 0
+        while mac in macs:
+            mac += 1
+        assert(mac<254) # fixme
+        return hex(mac)[2:]
+

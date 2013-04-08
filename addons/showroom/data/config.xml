@@ -4,5 +4,21 @@
       <field name="key">showroom.max_jobs</field>
       <field name="value">2</field>
     </record>
+    <record model="ir.config_parameter" id="config_admin_host">
+      <field name="key">showroom.admin_host</field>
+      <field name="value">localhost</field>
+    </record>
+    <record model="ir.config_parameter" id="config_proxy_host">
+      <field name="key">showroom.proxy_host</field>
+      <field name="value">localhost</field>
+    </record>
+    <record model="ir.config_parameter" id="config_proxy_port">
+      <field name="key">showroom.proxy_port</field>
+      <field name="value">8123</field>
+    </record>
+    <record model="ir.config_parameter" id="config_job_max_age">
+      <field name="key">showroom.job_max_age</field>
+      <field name="value">600</field>
+    </record>
   </data>
 </openerp>

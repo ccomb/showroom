@@ -13,13 +13,6 @@ import time
 LOG = logging.getLogger(__name__)
 
 
-# create directories if they don't exist
-for d in PATHS:
-    directory = PATHS[d]
-    if not exists(directory) and not isdir(directory):
-        os.makedirs(directory)
-        LOG.info('%s created.', directory)
-
 
 def daemon(user, name, command='restart'):
     """function that start, stop or restart the demo.
@@ -247,174 +240,12 @@ class InstalledDemo(object):
             if os.stat(apache_conf_path).st_nlink == 1:
                 os.remove(apache_conf_path)
 
-def get_available_ip():
-    """ return the first available ip
-    FIXME improve
-    """
-    demos = []
-    users = os.listdir(PATHS['demos'])
-    for user in users:
-        demos += installed_demos(user)
-    ips = [int(demo['ip'].split('.')[3]) for demo in demos if demo['ip'].isdigit()]
-    ip = 1
-    while ip in ips:
-        ip += 1
-    assert(ip<254) # fixme
-    return '192.168.0.' + str(ip)
-
-def get_available_mac():
-    """ return the first available mac address
-    FIXME improve
-    """
-    demos = []
-    users = os.listdir(PATHS['demos'])
-    for user in users:
-        demos += installed_demos(user)
-    macs = [int(demo['mac'], 16) for demo in demos if demo['mac']!='']
-    mac = 0
-    while mac in macs:
-        mac += 1
-    assert(mac<254) # fixme
-    return hex(mac)[2:]
-
 
 class UnknownDemo(Exception):
     pass
 
 
-class DeploymentError(Exception):
-    pass
 
-
-class DestructionError(Exception):
-    pass
-
-
-def deploy(user, params):
-    """deploy a demo of 'app_type' in the 'app_name' directory
-    """
-    app_name = params.pop('name')
-    app_type = params.pop('app')
-    if app_type not in available_demos():
-        raise DeploymentError('this demo does not exist')
-
-    if app_name in [d['name'] for d in installed_demos(user)]:
-        raise DeploymentError('this demo already exists')
-
-    # rebuild the name of the deployment script
-    script = join(PATHS['scripts'], "demo_"+app_type+".sh")
-
-    # *check the script* #FIXME move in a function
-
-    # add environment variables for the deployment script
-    env = os.environ.copy()
-    env['name'] = app_name
-
-    port = params.pop('port')
-    env['PORT'] = str(port)
-    # put the virtualenv path first
-    env['PATH'] = os.path.abspath('bin') + ':' + env['PATH']
-    env['HOST'] = ADMIN_HOST
-    env.update(params)
-    # add an http_proxy to manage a download cache
-    env['http_proxy'] = 'http://%s:%s/' % (PROXY_HOST, PROXY_PORT)
-
-    # create the directory for the demo
-    userpath = join(PATHS['demos'], user)
-    if not os.path.exists(userpath):
-        os.mkdir(userpath)
-    demopath = join(userpath, app_name)
-    if not os.path.exists(demopath):
-        os.mkdir(demopath)
-    else:
-        raise DeploymentError('this app already exists')
-
-    # create a config file in the demo directory
-    app_conf = SafeConfigParser()
-    app_conf.add_section('params')
-    app_conf.set('params', 'port', str(port))
-    app_conf.set('params', 'name', app_name.encode('utf-8'))
-    app_conf.set('params', 'type', app_type.encode('utf-8'))
-    app_conf.set('params', 'status', 'DEPLOYING')
-    for param_name, param_value in params.items():
-        assert(param_name not in ('port', 'status'))
-        app_conf.set('params', param_name, unicode(param_value).encode('utf-8'))
-    app_conf_path = join(demopath, 'demo.conf')
-    with open(app_conf_path, 'w+') as configfile:
-        app_conf.write(configfile)
-    LOG.info('section %s added', app_name)
-
-    # check whether we already have a template available
-    template_name = app_type + '_' + '_' + b64encode(
-      ','.join(['%s=%s' % (n.strip(), '\n'.join([i.strip() for i in str(v).split('\n')]))
-                for (n, v) in sorted(params.items())
-                if n not in ('name','login','user','password','admin_passwd')]))
-    template_path = join(PATHS['templates'], template_name)
-
-    if os.path.exists(template_path):
-        for item in os.listdir(template_path):
-            # XXX replace this waste of space with a btrfs subvolume
-            subprocess.call(['cp', '-r', join(template_path, item), demopath])
-        # run the demo reconfiguration script
-        old_demo = InstalledDemo(user, app_name)
-        old_user = old_demo.democonf.get('params', 'user')
-        functions = join(PATHS['scripts'], 'functions.sh')
-        retcode = subprocess.call(['bash', '-c', 'source "%s" && source "%s" && export -f reconfigure_demo && bash -xce "reconfigure_demo \"%s\" %s \"%s\""' % (functions, script, old_demo.name, old_demo.port, old_user)], cwd=demopath, env=env)
-        if retcode != 0:
-            shutil.rmtree(demopath)
-            raise DeploymentError('installation ended with an error')
-
-    else:
-        # run the deployment script
-        LOG.debug(script)
-        functions = join(PATHS['scripts'], 'functions.sh')
-        retcode = subprocess.call(['bash', '-c', 'source "%s" && source "%s" && export -f create_template && bash -xce create_template' % (functions, script)], cwd=demopath, env=env)
-        if retcode != 0:
-            shutil.rmtree(demopath)
-            raise DeploymentError('installation ended with an error')
-
-    # set the start script to executable
-    start_script = join(demopath, 'start.sh')
-    if os.path.exists(start_script):
-        os.chmod(start_script, 0744)
-        # add a shebang and trap if forgotten
-        with open(start_script, 'r+') as s:
-            start = ''
-            content = s.read()
-            if (not content.startswith('#!')
-                or all([not line.startswith('trap') for line in content.splitlines()[:5]])):
-                start = '#!/bin/bash\ntrap "pkill -P \$\$" EXIT\n'
-            content = start + content
-            s.seek(0); s.truncate(); s.write(content)
-
-    # write the demo config file
-    app_conf = SafeConfigParser()
-    app_conf.read(app_conf_path)
-    app_conf.set('params', 'name', app_name.encode('utf-8'))
-    app_conf.set('params', 'port', str(port))
-    app_conf.set('params', 'user', user.encode('utf-8'))
-    app_conf.remove_option('params', 'status')
-    with open(app_conf_path, 'w+') as configfile:
-        app_conf.write(configfile)
-
-    LOG.info('Finished deploying %s', app_name)
-
-    # create a container config
-    container_config = (
-        'lxc.utsname = bfg\n'
-        'lxc.network.type = veth\n'
-        'lxc.network.flags = up\n'
-        'lxc.network.link = br0\n'
-        'lxc.network.hwaddr = 0a:00:00:00:00:%(mac)s\n'
-        'lxc.network.ipv4 = %(ip)s/24\n'
-        % {'mac': params['mac'], 'ip': params['ip']}
-    )
-    with open(join(demopath, 'lxc.conf'), 'w+') as configfile:
-        configfile.write(container_config)
-
-    # now save this app in a template for cloning
-    if not os.path.exists(template_path):
-        shutil.copytree(demopath, template_path)
 
 
 class WorkingDirectoryKeeper(object):

@@ -32,9 +32,11 @@
     'website': 'http://showroom.io',
     'depends': [
         'base',
+        'mail',
         #'account',
     ],
     'data': [
+        'data/config.xml',
         'groups.xml',
         'view.xml',
         'server/view.xml',
