@@ -161,6 +161,8 @@ class Job(osv.Model):
                                         job_values['res_id'],
                                         job_values['success_signal'],
                                         cr)
+            message = u'%s job finished with success' % job_values['name']
+            self.pool.get(model).message_post(cr, uid, [res_id], body=message, type='notification')
             _logger.info('Finished job %s with success...' % job_id)
             cr.commit()
         self._process_queue(cr, uid)
