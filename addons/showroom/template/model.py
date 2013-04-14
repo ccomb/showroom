@@ -1,5 +1,5 @@
 from openerp.osv import osv, fields
-from os.path import join, dirname, exists, isdir
+from os.path import join, dirname
 import logging
 import os
 import shutil
@@ -8,21 +8,7 @@ import subprocess
 
 _logger = logging.getLogger(__name__)
 HERE = dirname(dirname(__file__))
-PATHS = {
-    #  'bin' : join(HERE, CONFIG.get('paths', 'bin')),
-    'scripts': join(HERE, 'template', 'scripts'),
-    'templates': join(HERE, 'templates'),
-    #  'templates' : join(HERE, CONFIG.get('paths', 'templates')),
-    #  'var' : join(HERE, CONFIG.get('paths', 'var')),
-    #  'etc' : join(HERE, CONFIG.get('paths', 'etc')),
-}
-
-# create directories if they don't exist
-for d in PATHS:
-    directory = PATHS[d]
-    if not exists(directory) and not isdir(directory):
-        os.makedirs(directory)
-        _logger.info('Created %s', directory)
+SCRIPTDIR = join(HERE, 'template', 'scripts')
 
 
 class InstallationError(Exception):
@@ -42,7 +28,7 @@ class Template(osv.Model):
 
     def _get_scripts(self, cr, uid, context):
         scripts = [(filename, filename[5:-3])
-                   for filename in os.listdir(PATHS['scripts'])
+                   for filename in os.listdir(SCRIPTDIR)
                    if filename.startswith('demo_')
                    and filename.endswith('.sh')]
         return scripts
@@ -110,7 +96,7 @@ class Template(osv.Model):
         data = {'value': {'params': []}}
         if not filename:
             return data
-        with open(join(PATHS['scripts'], filename)) as script:
+        with open(join(SCRIPTDIR, filename)) as script:
             for line in script:
                 if line.split(':')[0].strip() == '# PARAMS':
                     # params looks like: ['version=6.26', 'plugins']
@@ -135,9 +121,13 @@ class Template(osv.Model):
         for template in self.browse(cr, uid, ids, context):
             # create the directory for the demo
             user = self.pool.get('res.users').read(cr, uid, uid, ['name'])
-            userpath = join(PATHS['templates'], str(user['id']) + '_' + user['name'])
-            if not os.path.exists(userpath):
-                os.mkdir(userpath)
+            config_obj = self.pool.get('ir.config_parameter')
+            templates_path = os.path.abspath(
+                config_obj.get_param(cr, uid, 'showroom.templates_path'))
+            userpath = join(templates_path, str(user['id']) + '_' + user['name'])
+            for path in (templates_path, userpath):
+                if not os.path.exists(path):
+                    os.mkdir(path)
             demopath = join(userpath, template.name)
             if not os.path.exists(demopath):
                 os.mkdir(demopath)
@@ -240,8 +230,8 @@ class Template(osv.Model):
         env['http_proxy'] = 'http://%s:%s/' % (PROXY_HOST, PROXY_PORT)
 
         # run the install script
-        util_functions = join(PATHS['scripts'], 'functions.sh')
-        install_functions = join(PATHS['scripts'], script)
+        util_functions = join(SCRIPTDIR, 'functions.sh')
+        install_functions = join(SCRIPTDIR, script)
         shell_command = [
             'bash',
             '-c',
